@@ -1,0 +1,21 @@
+[package]
+name = "space_time_rewind"
+version = "0.1.0"
+authors = ["andornaut"]
+description = """
+Space-Time-Rewind! (STR) is an arcade game where you pilot a spaceship on adventures through space and time
+"""
+edition = "2021"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/andornaut/space-time-rewind"
+
+[dependencies]
+anyhow = "~1.0"
+chrono = { version = "~0.4", features = ["serde"] }
+crossterm = { version = "0.20", features = ["serde"] }
+rand = "~0.8"
+serde = {version = "~1.0", features = ["derive"] }
+serde_json = "~1.0"
+termion = "~1.5.6"
+tui = { version = "~0.16", default-features = false, features = ["crossterm", "serde"] }
