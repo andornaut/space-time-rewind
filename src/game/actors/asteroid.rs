@@ -27,17 +27,18 @@ impl CommandHandler for Asteroid {
     fn handle_command(&mut self, command: Command) -> Command {
         match command {
             Command::Collide(kind) => {
-                if kind == GameItemKind::Bullet {
-                    self.hp = self.hp.saturating_sub(1);
-                } else if kind == GameItemKind::Missile {
-                    self.hp = 0;
+                match kind {
+                    GameItemKind::Bullet => self.hp = self.hp.saturating_sub(1),
+                    GameItemKind::Missile | GameItemKind::Ship => self.hp = 0,
+                    _ => (),
+                }
+                if self.hp == 0 {
+                    self.deleted = true;
+                    return Command::AddExplosion(self.viewport().center());
                 }
             }
             _ => (),
         };
-        if self.hp == 0 {
-            self.deleted = true;
-        }
         Command::NOOP
     }
 }

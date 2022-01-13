@@ -4,7 +4,7 @@ use crate::{
 };
 
 use super::{
-    actors::{bullet::Bullet, missile::Missile},
+    actors::{bullet::Bullet, explosion::Explosion, missile::Missile},
     spawner::Spawner,
     GameItem,
 };
@@ -33,7 +33,7 @@ impl TickHandler for World {
             .for_each(|handler| handler.handle_tick(ticker));
         self.actors.retain(|actor| !actor.deleted());
         self.actors.extend(self.spawner.actors(ticker));
-        self.spawner.next();
+        self.spawner.next(); // TODO transition levels.
     }
 }
 
@@ -86,8 +86,13 @@ impl World {
 
     fn handle_command(&mut self, command: Command) {
         match command {
-            Command::AddBullet(x, y) => self.actors.push(Box::new(Bullet::new((x, y)))),
-            Command::AddMissile(x, y) => self.actors.push(Box::new(Missile::new((x, y)))),
+            Command::AddBullet(coordinates) => self.actors.push(Box::new(Bullet::new(coordinates))),
+            Command::AddExplosion(coordinates) => {
+                self.actors.push(Box::new(Explosion::new(coordinates)))
+            }
+            Command::AddMissile(coordinates) => {
+                self.actors.push(Box::new(Missile::new(coordinates)))
+            }
             Command::Restart => self.restart(),
             _ => (),
         }

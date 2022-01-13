@@ -1,6 +1,7 @@
 use tui::layout::Rect;
 
 pub type Coordinates = (u16, u16);
+pub type Movement = (i16, i16);
 
 #[derive(Copy, Clone, Debug)]
 pub struct Viewport {
@@ -28,8 +29,13 @@ impl Viewport {
 
     pub fn center(self) -> Coordinates {
         let (x1, y1) = self.bottom_left();
-        let (x2, y2) = self.top_right();
-        (x1 + ((x2 - x1) / 2), y1 + ((y2 - y1) / 2))
+        (x1 + (self.rect.width / 2), y1 + (self.rect.height / 2))
+    }
+
+    pub fn centered_around_bottom_left(self) -> Self {
+        let (x1, y1) = self.bottom_left();
+        let coordinates = (x1 - (self.rect.width / 2), y1 - (self.rect.height / 2));
+        Self::new_from_coordinates(self.rect.width, self.rect.height, coordinates)
     }
 
     pub fn contain(self, other: &Self) -> Coordinates {

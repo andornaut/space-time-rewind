@@ -41,17 +41,17 @@ impl CommandHandler for Ship {
                 if self.disabled_guns.off() {
                     self.disabled_guns.restart();
                     let (cx, cy) = self.viewport().center();
-                    return Command::AddBullet(cx, cy + 1);
+                    return Command::AddBullet((cx, cy + 1));
                 }
             }
             Command::FireMissile => {
                 if self.disabled_missile.off() {
                     self.disabled_missile.restart();
                     let (cx, cy) = self.viewport().center();
-                    return Command::AddMissile(cx, cy + 1);
+                    return Command::AddMissile((cx, cy + 1));
                 }
             }
-            Command::MoveShip(dx, dy) => {
+            Command::MoveShip((dx, dy)) => {
                 let (x, y) = self.coordinates;
                 let width = i16::try_from(width()).unwrap();
                 self.coordinates = (

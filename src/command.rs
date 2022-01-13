@@ -1,6 +1,9 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
-use crate::game::GameItemKind;
+use crate::{
+    game::GameItemKind,
+    view::viewport::{Coordinates, Movement},
+};
 
 pub trait CommandHandler {
     fn handle_command(&mut self, _: Command) -> Command {
@@ -16,9 +19,10 @@ pub enum Command {
 
     // Actors
     Collide(GameItemKind),
-    AddBullet(u16, u16),
-    AddMissile(u16, u16),
-    MoveShip(i16, i16),
+    AddBullet(Coordinates),
+    AddExplosion(Coordinates),
+    AddMissile(Coordinates),
+    MoveShip(Movement),
 
     // Ship controls
     ActivateShields,
@@ -39,10 +43,10 @@ impl From<KeyEvent> for Command {
             (_, _) => (),
         };
         match code {
-            KeyCode::Down | KeyCode::Char('s') => Self::MoveShip(0, -1),
-            KeyCode::Up | KeyCode::Char('w') => Self::MoveShip(0, 1),
-            KeyCode::Right | KeyCode::Char('d') => Self::MoveShip(1, 0),
-            KeyCode::Left | KeyCode::Char('a') => Self::MoveShip(-1, 0),
+            KeyCode::Down | KeyCode::Char('s') => Self::MoveShip((0, -1)),
+            KeyCode::Up | KeyCode::Char('w') => Self::MoveShip((0, 1)),
+            KeyCode::Right | KeyCode::Char('d') => Self::MoveShip((1, 0)),
+            KeyCode::Left | KeyCode::Char('a') => Self::MoveShip((-1, 0)),
 
             KeyCode::Char('k') => Self::ActivateShields,
             KeyCode::Char(' ') => Self::FireGuns,

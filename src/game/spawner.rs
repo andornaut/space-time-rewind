@@ -14,7 +14,6 @@ pub enum ActorSpawns {
 impl ActorSpawns {
     fn next(self) -> Self {
         match self {
-            Self::Initial => Self::Level1,
             // TODO Advance levels. Consider using `Countdown` or `Ticker` to time the advancement.
             _ => Self::Level1,
         }

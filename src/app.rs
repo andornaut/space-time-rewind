@@ -80,10 +80,7 @@ impl App {
     }
 
     fn remaining_timeout(&self) -> Duration {
-        let elapsed = self
-            .last_tick
-            .expect("timeout_remaining() must only be called after first calling restart_tick()")
-            .elapsed();
+        let elapsed = self.last_tick.unwrap_or_else(|| Instant::now()).elapsed();
         self.tick_rate
             .checked_sub(elapsed)
             .unwrap_or_else(|| Duration::from_secs(0))

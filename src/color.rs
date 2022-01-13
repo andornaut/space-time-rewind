@@ -11,6 +11,10 @@ pub enum ColorTheme {
     AsteroidHalfHp,
     AsteroidLowHp,
     Bullet,
+    ExplosionStart,
+    ExplosionMiddle,
+    ExplosionEnd,
+    ExplosionEnd2,
     Ship,
 
     // Buttons
@@ -36,6 +40,10 @@ impl From<ColorTheme> for Color {
             ColorTheme::AsteroidHalfHp => Color::Rgb(99, 66, 33),
             ColorTheme::AsteroidLowHp => Color::Rgb(66, 33, 22),
             ColorTheme::Bullet => Color::Rgb(204, 204, 0),
+            ColorTheme::ExplosionStart => Color::Rgb(153, 0, 0),
+            ColorTheme::ExplosionMiddle => Color::Rgb(204, 21, 21),
+            ColorTheme::ExplosionEnd => Color::Rgb(255, 51, 51),
+            ColorTheme::ExplosionEnd2 => Color::Rgb(255, 104, 104),
             ColorTheme::Ship => Color::Cyan,
 
             // Buttons
