@@ -1,5 +1,3 @@
-use tui::{style::Color, widgets::canvas::Context};
-
 use crate::{
     clock::ticker::{Frequency, TickHandler, Ticker},
     color::ColorTheme,
@@ -10,6 +8,7 @@ use crate::{
         viewport::{Coordinates, Viewport},
     },
 };
+use tui::{style::Color, widgets::canvas::Context};
 
 // \x20 is a quoted space
 static TEXT: &str = "\

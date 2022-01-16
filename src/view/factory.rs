@@ -1,13 +1,11 @@
+use super::viewport::Viewport;
+use crate::color::ColorTheme;
 use tui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     text::Span,
     widgets::{Block, BorderType, Borders},
 };
-
-use crate::color::ColorTheme;
-
-use super::viewport::Viewport;
 
 const BOARD_MIN_HEIGHT: u16 = 10;
 const BUTTON_PANEL_HEIGHT: u16 = 3;

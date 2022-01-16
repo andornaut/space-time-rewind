@@ -1,5 +1,4 @@
-use tui::widgets::canvas::Context;
-
+use super::button::Button;
 use crate::{
     clock::ticker::{TickHandler, Ticker},
     command::{Command, CommandHandler},
@@ -9,8 +8,7 @@ use crate::{
         viewport::{Coordinates, Viewport},
     },
 };
-
-use super::button::Button;
+use tui::widgets::canvas::Context;
 
 const GUTTER_WIDTH: u16 = 1;
 

@@ -1,5 +1,3 @@
-use tui::{style::Color, widgets::canvas::Context};
-
 use crate::{
     clock::{
         countdown::Countdown,
@@ -13,6 +11,7 @@ use crate::{
         viewport::{Coordinates, Viewport},
     },
 };
+use tui::{style::Color, widgets::canvas::Context};
 
 const LIFECYCLE_TRANSITION_COUNT: u16 = 3;
 

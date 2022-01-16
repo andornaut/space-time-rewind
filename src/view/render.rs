@@ -1,5 +1,6 @@
+use super::viewport::{Coordinates, Viewport};
+use crate::{color::ColorTheme, game::game_item::GameItem};
 use std::{cell::RefCell, rc::Rc};
-
 use tui::{
     backend::Backend,
     layout::Rect,
@@ -11,10 +12,6 @@ use tui::{
     },
     Frame,
 };
-
-use crate::{color::ColorTheme, game::game_item::GameItem};
-
-use super::viewport::{Coordinates, Viewport};
 
 const MIN_CANVAS_LENGTH: u16 = 3;
 

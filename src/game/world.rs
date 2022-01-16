@@ -1,13 +1,12 @@
-use crate::{
-    clock::ticker::{TickHandler, Ticker},
-    command::Command,
-    view::viewport::Viewport,
-};
-
 use super::{
     actors::{bullet::Bullet, explosion::Explosion, missile::Missile},
     game_item::GameItem,
     spawner::spawner::Spawner,
+};
+use crate::{
+    clock::ticker::{TickHandler, Ticker},
+    command::Command,
+    view::viewport::Viewport,
 };
 
 pub struct World {

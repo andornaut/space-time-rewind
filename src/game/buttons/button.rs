@@ -1,5 +1,4 @@
-use tui::widgets::canvas::Context;
-
+use super::button_kind::ButtonKind;
 use crate::{
     clock::{
         countdown::Countdown,
@@ -12,8 +11,7 @@ use crate::{
         viewport::{Coordinates, Viewport},
     },
 };
-
-use super::button_kind::ButtonKind;
+use tui::widgets::canvas::Context;
 
 const ACTIVE_COUNT: u16 = 8;
 

@@ -1,6 +1,5 @@
-use tui::style::Color;
-
 use crate::{color::ColorTheme, game::actors::ship::DISABLED_MISSILE_COUNT};
+use tui::style::Color;
 
 static TEXT_GAME_OVER: &str = "\
 ==============================================
