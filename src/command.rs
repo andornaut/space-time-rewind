@@ -1,9 +1,8 @@
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-
 use crate::{
     game::GameItemKind,
     view::viewport::{Coordinates, Movement},
 };
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 pub trait CommandHandler {
     fn handle_command(&mut self, _: Command) -> Command {

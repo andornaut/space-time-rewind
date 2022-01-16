@@ -82,19 +82,6 @@ pub struct Explosion {
 
 impl CommandHandler for Explosion {}
 
-impl Default for Explosion {
-    fn default() -> Self {
-        let mut lifecycle_transition = Countdown::new(LIFECYCLE_TRANSITION_COUNT);
-        lifecycle_transition.restart();
-        Self {
-            coordinates: (0, 0),
-            deleted: false,
-            lifecycle: Lifecycle::Start,
-            lifecycle_next: lifecycle_transition,
-        }
-    }
-}
-
 impl GameItem for Explosion {
     fn deleted(&self) -> bool {
         self.deleted
@@ -132,9 +119,13 @@ impl TickHandler for Explosion {
 
 impl Explosion {
     pub fn new(coordinates: Coordinates) -> Self {
+        let mut lifecycle_next = Countdown::new(LIFECYCLE_TRANSITION_COUNT);
+        lifecycle_next.restart();
         let mut obj = Self {
             coordinates,
-            ..Self::default()
+            deleted: false,
+            lifecycle: Lifecycle::Start,
+            lifecycle_next,
         };
         obj.coordinates = obj.viewport().centered_around_bottom_left();
         obj

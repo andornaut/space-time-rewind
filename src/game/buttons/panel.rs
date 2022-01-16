@@ -46,7 +46,7 @@ impl Default for ButtonPanel {
                 Button::new_shields(),
                 Button::new_rewind(),
             ],
-            coordinates: (0, 0),
+            coordinates: (0, 0), // Will center during render()
         }
     }
 }
@@ -59,10 +59,9 @@ impl GameItem for ButtonPanel {
 
 impl Renderable for ButtonPanel {
     fn render(&mut self, context: &mut Context, viewport: Viewport) {
-        let (x, y) = self.bottom_left_centered(viewport);
-        for (i, button) in self.buttons.iter_mut().enumerate() {
-            let coordinates = (x + (i as u16 * (button.width() + GUTTER_WIDTH)), y);
-            button.set_coordinates(coordinates);
+        self.center_buttons(viewport);
+
+        for button in self.buttons.iter_mut() {
             button.render(context, viewport);
         }
     }
@@ -87,6 +86,14 @@ impl ButtonPanel {
         let x_panel_offset = self.width() / 2;
         let x = x.saturating_add(x_centered).saturating_sub(x_panel_offset);
         (x, y)
+    }
+
+    fn center_buttons(&mut self, viewport: Viewport) {
+        let (x, y) = self.bottom_left_centered(viewport);
+        for (i, button) in self.buttons.iter_mut().enumerate() {
+            let coordinates = (x + (i as u16 * (button.width() + GUTTER_WIDTH)), y);
+            button.set_coordinates(coordinates);
+        }
     }
 
     fn height(&self) -> u16 {

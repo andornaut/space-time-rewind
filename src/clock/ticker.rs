@@ -51,6 +51,10 @@ impl Default for Ticker {
 }
 
 impl Ticker {
+    pub fn first(&self) -> bool {
+        self.number == 1
+    }
+
     pub fn should(&self, frequency: Frequency) -> bool {
         // `number` is initialized to 0, so this will return true for all `frequency` when `self` is first initialized.
         self.number % u16::from(frequency) == 0

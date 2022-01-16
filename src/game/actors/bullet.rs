@@ -33,15 +33,6 @@ impl CommandHandler for Bullet {
     }
 }
 
-impl Default for Bullet {
-    fn default() -> Self {
-        Self {
-            coordinates: (0, 0),
-            deleted: false,
-        }
-    }
-}
-
 impl GameItem for Bullet {
     fn deleted(&self) -> bool {
         self.deleted
@@ -84,7 +75,7 @@ impl Bullet {
     pub fn new(coordinates: Coordinates) -> Self {
         Self {
             coordinates,
-            ..Self::default()
+            deleted: false,
         }
     }
 }

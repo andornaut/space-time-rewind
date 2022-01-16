@@ -43,17 +43,6 @@ impl CommandHandler for Asteroid {
     }
 }
 
-impl Default for Asteroid {
-    fn default() -> Self {
-        // TODO Generate different shapes
-        Self {
-            coordinates: (0, 0),
-            deleted: false,
-            hp: 3,
-        }
-    }
-}
-
 impl GameItem for Asteroid {
     fn deleted(&self) -> bool {
         self.deleted
@@ -91,7 +80,8 @@ impl Asteroid {
     pub fn new(coordinates: Coordinates) -> Self {
         Self {
             coordinates,
-            ..Self::default()
+            deleted: false,
+            hp: 3,
         }
     }
 

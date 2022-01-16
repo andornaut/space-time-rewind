@@ -37,15 +37,6 @@ impl CommandHandler for Missile {
     }
 }
 
-impl Default for Missile {
-    fn default() -> Self {
-        Self {
-            coordinates: (0, 0),
-            deleted: false,
-        }
-    }
-}
-
 impl GameItem for Missile {
     fn deleted(&self) -> bool {
         self.deleted
@@ -91,7 +82,7 @@ impl Missile {
         let x = x.saturating_sub(width().saturating_div(2));
         Self {
             coordinates: (x, y),
-            ..Self::default()
+            deleted: false,
         }
     }
 }

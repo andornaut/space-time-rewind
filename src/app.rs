@@ -1,20 +1,19 @@
-use anyhow::{Error, Result};
-use crossterm::event::{poll, read, Event};
-use std::time::{Duration, Instant};
-
 use crate::{
     clock::ticker::{TickHandler, Ticker},
     command::Command,
     game::world::World,
     session::Session,
     view::{
-        render::render_canvas,
-        viewport_factory::{
-            create_actors_viewport, create_buttons_viewport, split_into_actors_and_buttons,
+        factory::{
+            create_actors_block, create_actors_viewport, create_background_block,
+            create_buttons_block, create_buttons_viewport, split_into_actors_and_buttons,
         },
-        widget_factory::{create_actors_block, create_background_block, create_buttons_block},
+        render::render_canvas,
     },
 };
+use anyhow::{Error, Result};
+use crossterm::event::{poll, read, Event};
+use std::time::{Duration, Instant};
 
 const TICK_RATE_MS: u64 = 20;
 
@@ -41,24 +40,24 @@ impl App {
         loop {
             self.maybe_tick();
             self.render(session)?;
-            let mut commands = self.world.detect_collisions();
 
-            // `poll` blocks until timeout elapses or a keyboard event is received.
-            if poll(self.remaining_timeout())? {
-                // `poll()` returned true, so an event is available,
-                // so the following call to `read()` will not block.
-                if let Event::Key(key) = read()? {
-                    commands.push(Command::from(key));
-                }
-            }
-
-            for command in self.world.broadcast_commands(commands) {
+            for command in self.process_commands()? {
                 match command {
                     Command::Quit => return Ok(()),
                     _ => panic!("`World.broadcast_commands` must return an empty Vector or one containing a single item: Command::Quit"),
                 }
             }
         }
+    }
+
+    fn process_commands(&mut self) -> Result<Vec<Command>, Error> {
+        let mut commands = self.world.detect_collisions();
+        let command = self.wait_for_input_command()?;
+        match command {
+            Some(command) => commands.push(command),
+            None => (),
+        }
+        Ok(self.world.broadcast_commands(commands))
     }
 
     fn maybe_tick(&mut self) {
@@ -73,14 +72,23 @@ impl App {
         }
     }
 
+    fn remaining_timeout(&self) -> Duration {
+        let elapsed = self.last_tick.unwrap_or_else(|| Instant::now()).elapsed();
+        self.tick_rate
+            .checked_sub(elapsed)
+            .unwrap_or_else(|| Duration::from_secs(0))
+    }
+
     fn render<'a>(&'a mut self, session: &'a mut Session) -> Result<(), Error> {
         session.terminal.draw(|frame| {
-            let (actors_rect, buttons_rect) = split_into_actors_and_buttons(frame.size());
+            let window = frame.size();
+            // Set the background color of the entire terminal window.
+            frame.render_widget(create_background_block(), window);
+
+            let (actors_rect, buttons_rect) = split_into_actors_and_buttons(window);
             let actors_viewport = create_actors_viewport(actors_rect);
             let buttons_viewport = create_buttons_viewport(actors_rect);
             self.world.set_viewport(actors_viewport);
-
-            frame.render_widget(create_background_block(), frame.size());
             render_canvas(
                 frame,
                 &mut self.world.actors,
@@ -99,16 +107,20 @@ impl App {
         Ok(())
     }
 
-    fn remaining_timeout(&self) -> Duration {
-        let elapsed = self.last_tick.unwrap_or_else(|| Instant::now()).elapsed();
-        self.tick_rate
-            .checked_sub(elapsed)
-            .unwrap_or_else(|| Duration::from_secs(0))
-    }
-
     fn reset_last_tick(&mut self) -> Instant {
         let now = Instant::now();
         self.last_tick = Some(now);
         now
+    }
+
+    fn wait_for_input_command(&mut self) -> Result<Option<Command>, Error> {
+        if poll(self.remaining_timeout())? {
+            // `poll()` returned true, so an event is available,
+            // so the following call to `read()` will not block.
+            if let Event::Key(key) = read()? {
+                return Ok(Some(Command::from(key)));
+            }
+        }
+        Ok(None)
     }
 }

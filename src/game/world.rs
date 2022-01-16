@@ -6,7 +6,7 @@ use crate::{
 
 use super::{
     actors::{bullet::Bullet, explosion::Explosion, missile::Missile},
-    spawner::Spawner,
+    spawner::spawner::Spawner,
     GameItem,
 };
 
@@ -19,30 +19,41 @@ pub struct World {
 
 impl Default for World {
     fn default() -> Self {
-        let mut obj = Self {
+        Self {
             actors: Vec::new(),
             buttons: Vec::new(),
             spawner: Spawner::default(),
             viewport: None,
-        };
-        obj.restart();
-        obj
+        }
     }
 }
 
 impl TickHandler for World {
     fn handle_tick(&mut self, ticker: &Ticker) {
+        if ticker.first() {
+            self.restart();
+            return;
+        }
+
         self.game_items_iter_mut()
             .for_each(|handler| handler.handle_tick(ticker));
         self.actors.retain(|actor| !actor.deleted());
-        self.actors.extend(self.spawner.actors(ticker));
-        self.spawner.next(); // TODO transition levels.
+
+        let viewport = &self.viewport.unwrap();
+        self.actors.extend(self.spawner.actors(ticker, viewport));
     }
 }
 
 impl World {
-    pub fn set_viewport(&mut self, viewport: Viewport) {
-        self.viewport = Some(viewport);
+    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Vec<Command> {
+        if contains_quit_command(&commands) {
+            return vec![Command::Quit];
+        }
+        commands
+            .into_iter()
+            .flat_map(|command| self.broadcast_command(command))
+            .filter(|command| *command != Command::NOOP)
+            .collect()
     }
 
     pub fn detect_collisions(&mut self) -> Vec<Command> {
@@ -65,15 +76,8 @@ impl World {
         commands
     }
 
-    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Vec<Command> {
-        if contains_quit_command(&commands) {
-            return vec![Command::Quit];
-        }
-        commands
-            .into_iter()
-            .flat_map(|command| self.broadcast_command(command))
-            .filter(|command| *command != Command::NOOP)
-            .collect()
+    pub fn set_viewport(&mut self, viewport: Viewport) {
+        self.viewport = Some(viewport);
     }
 
     fn broadcast_command(&mut self, command: Command) -> Vec<Command> {

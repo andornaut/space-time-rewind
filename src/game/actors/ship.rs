@@ -25,7 +25,6 @@ pub struct Ship {
     deleted: bool,
     disabled_guns: Countdown,
     disabled_missile: Countdown,
-    initialized: bool,
 }
 
 impl CommandHandler for Ship {
@@ -65,18 +64,6 @@ impl CommandHandler for Ship {
     }
 }
 
-impl Default for Ship {
-    fn default() -> Self {
-        Self {
-            coordinates: (0, 0),
-            deleted: false,
-            disabled_guns: Countdown::new(DISABLED_GUNS_COUNT),
-            disabled_missile: Countdown::new(DISABLED_MISSILE_COUNT),
-            initialized: false,
-        }
-    }
-}
-
 impl GameItem for Ship {
     fn deleted(&self) -> bool {
         self.deleted
@@ -89,11 +76,6 @@ impl GameItem for Ship {
 
 impl Renderable for Ship {
     fn render(&mut self, context: &mut Context, viewport: Viewport) {
-        if !self.initialized {
-            self.initialized = true;
-            // Center on first render, because this is the first time that we have the viewport dimensions.
-            self.coordinates = viewport.center();
-        }
         // Prevent the ship from going out of bounds when the viewport is resized.
         self.coordinates = viewport.contain(&self.viewport());
         render_text(
@@ -113,6 +95,17 @@ impl TickHandler for Ship {
     fn handle_tick(&mut self, _: &Ticker) {
         self.disabled_guns.down();
         self.disabled_missile.down();
+    }
+}
+
+impl Ship {
+    pub fn new(coordinates: Coordinates) -> Self {
+        Self {
+            coordinates,
+            deleted: false,
+            disabled_guns: Countdown::new(DISABLED_GUNS_COUNT),
+            disabled_missile: Countdown::new(DISABLED_MISSILE_COUNT),
+        }
     }
 }
 
