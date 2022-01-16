@@ -6,8 +6,8 @@ use crate::{
 
 use super::{
     actors::{bullet::Bullet, explosion::Explosion, missile::Missile},
+    game_item::GameItem,
     spawner::spawner::Spawner,
-    GameItem,
 };
 
 pub struct World {
@@ -45,15 +45,20 @@ impl TickHandler for World {
 }
 
 impl World {
-    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Vec<Command> {
-        if contains_quit_command(&commands) {
-            return vec![Command::Quit];
+    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> bool {
+        if contains_quit_commands(&commands) {
+            return false;
         }
-        commands
+        let commands: Vec<Command> = commands
             .into_iter()
             .flat_map(|command| self.broadcast_command(command))
             .filter(|command| *command != Command::NOOP)
-            .collect()
+            .collect();
+
+        if contains_unhandled_commands(&commands) {
+            panic!("Error: There are unhandled command(s): {:?}", commands);
+        }
+        !contains_quit_commands(&commands) // Returns false to quit.
     }
 
     pub fn detect_collisions(&mut self) -> Vec<Command> {
@@ -82,7 +87,7 @@ impl World {
 
     fn broadcast_command(&mut self, command: Command) -> Vec<Command> {
         let commands = self.notify_handlers(command);
-        if contains_quit_command(&commands) {
+        if contains_quit_commands(&commands) {
             return vec![Command::Quit];
         }
         commands
@@ -123,6 +128,10 @@ impl World {
     }
 }
 
-fn contains_quit_command(commands: &Vec<Command>) -> bool {
+fn contains_quit_commands(commands: &Vec<Command>) -> bool {
     commands.iter().any(|command| *command == Command::Quit)
+}
+
+fn contains_unhandled_commands(commands: &Vec<Command>) -> bool {
+    commands.iter().any(|command| *command != Command::Quit)
 }

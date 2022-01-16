@@ -2,7 +2,7 @@ use crate::{
     clock::ticker::{Frequency, Ticker},
     game::{
         actors::{asteroid::Asteroid, ship::Ship},
-        GameItem,
+        game_item::GameItem,
     },
     view::viewport::Viewport,
 };

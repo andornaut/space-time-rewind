@@ -7,7 +7,7 @@ use crate::{
     },
     color::ColorTheme,
     command::{Command, CommandHandler},
-    game::{GameItem, GameItemKind},
+    game::game_item::{GameItem, GameItemKind},
     view::{
         render::{render_text, Renderable},
         viewport::{Coordinates, Viewport},

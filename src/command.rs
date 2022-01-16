@@ -1,5 +1,5 @@
 use crate::{
-    game::GameItemKind,
+    game::game_item::GameItemKind,
     view::viewport::{Coordinates, Movement},
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};

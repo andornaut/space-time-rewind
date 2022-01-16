@@ -11,7 +11,7 @@ use crate::{
         render::render_canvas,
     },
 };
-use anyhow::{Error, Result};
+use anyhow::Result;
 use crossterm::event::{poll, read, Event};
 use std::time::{Duration, Instant};
 
@@ -41,23 +41,26 @@ impl App {
             self.maybe_tick();
             self.render(session)?;
 
-            for command in self.process_commands()? {
-                match command {
-                    Command::Quit => return Ok(()),
-                    _ => panic!("`World.broadcast_commands` must return an empty Vector or one containing a single item: Command::Quit"),
-                }
+            if !self.process_commands() {
+                // false means quit
+                return Ok(());
             }
         }
     }
 
-    fn process_commands(&mut self) -> Result<Vec<Command>, Error> {
+    fn process_commands(&mut self) -> bool {
         let mut commands = self.world.detect_collisions();
-        let command = self.wait_for_input_command()?;
+        let command = self.wait_for_input_command();
         match command {
-            Some(command) => commands.push(command),
-            None => (),
+            Err(error) => panic!("Error waiting for input: {}", error),
+            Ok(command) => {
+                match command {
+                    Some(command) => commands.push(command),
+                    None => (),
+                }
+                self.world.broadcast_commands(commands)
+            }
         }
-        Ok(self.world.broadcast_commands(commands))
     }
 
     fn maybe_tick(&mut self) {
@@ -79,7 +82,7 @@ impl App {
             .unwrap_or_else(|| Duration::from_secs(0))
     }
 
-    fn render<'a>(&'a mut self, session: &'a mut Session) -> Result<(), Error> {
+    fn render<'a>(&'a mut self, session: &'a mut Session) -> Result<()> {
         session.terminal.draw(|frame| {
             let window = frame.size();
             // Set the background color of the entire terminal window.
@@ -113,7 +116,7 @@ impl App {
         now
     }
 
-    fn wait_for_input_command(&mut self) -> Result<Option<Command>, Error> {
+    fn wait_for_input_command(&mut self) -> Result<Option<Command>> {
         if poll(self.remaining_timeout())? {
             // `poll()` returned true, so an event is available,
             // so the following call to `read()` will not block.

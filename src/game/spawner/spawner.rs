@@ -1,7 +1,7 @@
 use super::levels::{initial, level1};
 use crate::{
     clock::ticker::Ticker,
-    game::{buttons::panel::ButtonPanel, GameItem},
+    game::{buttons::panel::ButtonPanel, game_item::GameItem},
     view::viewport::Viewport,
 };
 

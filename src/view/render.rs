@@ -12,7 +12,7 @@ use tui::{
     Frame,
 };
 
-use crate::{color::ColorTheme, game::GameItem};
+use crate::{color::ColorTheme, game::game_item::GameItem};
 
 use super::viewport::{Coordinates, Viewport};
 
