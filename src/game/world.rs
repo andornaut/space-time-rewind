@@ -1,6 +1,7 @@
 use crate::{
     clock::ticker::{TickHandler, Ticker},
     command::Command,
+    view::viewport::Viewport,
 };
 
 use super::{
@@ -13,6 +14,7 @@ pub struct World {
     pub actors: Vec<Box<dyn GameItem>>,
     pub buttons: Vec<Box<dyn GameItem>>,
     spawner: Spawner,
+    viewport: Option<Viewport>,
 }
 
 impl Default for World {
@@ -21,6 +23,7 @@ impl Default for World {
             actors: Vec::new(),
             buttons: Vec::new(),
             spawner: Spawner::default(),
+            viewport: None,
         };
         obj.restart();
         obj
@@ -38,6 +41,10 @@ impl TickHandler for World {
 }
 
 impl World {
+    pub fn set_viewport(&mut self, viewport: Viewport) {
+        self.viewport = Some(viewport);
+    }
+
     pub fn detect_collisions(&mut self) -> Vec<Command> {
         let mut commands = Vec::new();
         let len = self.actors.len();
@@ -48,7 +55,7 @@ impl World {
             let (left_actors, right_actors) = self.actors.split_at_mut(index + 1);
             let left_actor = &mut left_actors[index];
             for right_actor in right_actors {
-                if left_actor.viewport().overlaps(&right_actor.viewport()) {
+                if left_actor.viewport().intersects(&right_actor.viewport()) {
                     commands.push(left_actor.handle_command(Command::Collide(right_actor.kind())));
                     commands.push(right_actor.handle_command(Command::Collide(left_actor.kind())));
                 }

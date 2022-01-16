@@ -1,4 +1,4 @@
-use crate::{clock::ticker::TickHandler, command::CommandHandler, view::renderer::Renderable};
+use crate::{clock::ticker::TickHandler, command::CommandHandler, view::render::Renderable};
 
 mod actors;
 mod buttons;

@@ -1,15 +1,27 @@
 use tui::layout::{Constraint, Direction, Layout, Rect};
 
+use super::viewport::Viewport;
+
 const BOARD_MIN_HEIGHT: u16 = 10;
 const BUTTON_PANEL_HEIGHT: u16 = 3;
-const MAX_HEIGHT: u16 = 60;
+const MAX_HEIGHT: u16 = 40;
 const MAX_WIDTH: u16 = 79;
 const MIN_HEIGHT: u16 = 1; // TODO change to 20;
-const MIN_WIDTH: u16 = 1; // TODO change to 40;
+const MIN_WIDTH: u16 = 41; // TODO change to 40;
 
-pub fn split_rect(rect: Rect) -> (Rect, Rect) {
-    validate(rect);
+pub fn create_actors_viewport(rect: Rect) -> Viewport {
+    let Rect { width, height, .. } = rect;
+    // Account for the 1px border
+    Viewport::new(width.saturating_sub(2), height.saturating_sub(2))
+}
 
+pub fn create_buttons_viewport(rect: Rect) -> Viewport {
+    let Rect { width, .. } = rect;
+    Viewport::new(width, BUTTON_PANEL_HEIGHT)
+}
+
+pub fn split_into_actors_and_buttons(rect: Rect) -> (Rect, Rect) {
+    //validate(rect);
     let rect = normalize(rect);
     let constraints = [
         Constraint::Min(BOARD_MIN_HEIGHT),
@@ -23,14 +35,15 @@ pub fn split_rect(rect: Rect) -> (Rect, Rect) {
 }
 
 fn normalize(rect: Rect) -> Rect {
-    Rect {
+    let mut normalized_rect = Rect {
         height: MAX_HEIGHT,
         width: MAX_WIDTH,
         ..rect
     }
-    .intersection(rect)
+    .intersection(rect);
+    normalized_rect.y += rect.height.saturating_sub(MAX_HEIGHT);
+    normalized_rect
 }
-
 fn validate(rect: Rect) {
     let Rect { height, width, .. } = rect;
     validate_length(width, MIN_WIDTH, "width");

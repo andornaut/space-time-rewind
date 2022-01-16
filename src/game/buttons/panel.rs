@@ -5,7 +5,7 @@ use crate::{
     command::{Command, CommandHandler},
     game::{GameItem, GameItemKind},
     view::{
-        renderer::Renderable,
+        render::Renderable,
         viewport::{Coordinates, Viewport},
     },
 };
@@ -85,7 +85,7 @@ impl ButtonPanel {
         let (x, y) = self.coordinates;
         let (x_centered, _) = viewport.center();
         let x_panel_offset = self.width() / 2;
-        let x = x + x_centered - x_panel_offset;
+        let x = x.saturating_add(x_centered).saturating_sub(x_panel_offset);
         (x, y)
     }
 

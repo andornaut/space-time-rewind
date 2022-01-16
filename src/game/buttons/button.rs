@@ -8,7 +8,7 @@ use crate::{
     command::{Command, CommandHandler},
     game::{GameItem, GameItemKind},
     view::{
-        renderer::{render_text, Renderable},
+        render::{render_text, Renderable},
         viewport::{Coordinates, Viewport},
     },
 };

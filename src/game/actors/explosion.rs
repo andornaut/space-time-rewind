@@ -9,7 +9,7 @@ use crate::{
     command::CommandHandler,
     game::GameItem,
     view::{
-        renderer::{render_text, Renderable},
+        render::{render_text, Renderable},
         viewport::{Coordinates, Viewport},
     },
 };
@@ -102,8 +102,7 @@ impl GameItem for Explosion {
 }
 
 impl Renderable for Explosion {
-    fn render(&mut self, context: &mut Context, viewport: Viewport) {
-        self.coordinates = viewport.contain(&self.viewport());
+    fn render(&mut self, context: &mut Context, _: Viewport) {
         render_text(
             context,
             self.coordinates,
@@ -137,7 +136,7 @@ impl Explosion {
             coordinates,
             ..Self::default()
         };
-        obj.coordinates = obj.viewport().centered_around_bottom_left().bottom_left();
+        obj.coordinates = obj.viewport().centered_around_bottom_left();
         obj
     }
 }

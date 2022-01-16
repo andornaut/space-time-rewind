@@ -9,7 +9,7 @@ use crate::{
     command::{Command, CommandHandler},
     game::{GameItem, GameItemKind},
     view::{
-        renderer::{render_text, Renderable},
+        render::{render_text, Renderable},
         viewport::{Coordinates, Viewport},
     },
 };
@@ -94,7 +94,7 @@ impl Renderable for Ship {
             // Center on first render, because this is the first time that we have the viewport dimensions.
             self.coordinates = viewport.center();
         }
-        // The ship can go out of bounds when the viewport is resized even if the ship hasn't moved.
+        // Prevent the ship from going out of bounds when the viewport is resized.
         self.coordinates = viewport.contain(&self.viewport());
         render_text(
             context,

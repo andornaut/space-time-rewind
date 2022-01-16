@@ -6,7 +6,7 @@ use crate::{
     command::{Command, CommandHandler},
     game::{GameItem, GameItemKind},
     view::{
-        renderer::{render_text, Renderable},
+        render::{render_text, Renderable},
         viewport::{Coordinates, Viewport},
     },
 };
@@ -58,7 +58,7 @@ impl GameItem for Missile {
 
 impl Renderable for Missile {
     fn render<'a>(&mut self, context: &mut Context, viewport: Viewport) {
-        if viewport.out_of_bounds_partial(&self.viewport()) {
+        if viewport.out_of_bounds_completely(&self.viewport()) {
             self.deleted = true;
             return;
         }

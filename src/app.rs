@@ -7,7 +7,13 @@ use crate::{
     command::Command,
     game::world::World,
     session::Session,
-    view::{rect::split_rect, renderer::render_board, renderer::render_buttons},
+    view::{
+        render::render_canvas,
+        viewport_factory::{
+            create_actors_viewport, create_buttons_viewport, split_into_actors_and_buttons,
+        },
+        widget_factory::{create_actors_block, create_background_block, create_buttons_block},
+    },
 };
 
 const TICK_RATE_MS: u64 = 20;
@@ -68,13 +74,27 @@ impl App {
     }
 
     fn render<'a>(&'a mut self, session: &'a mut Session) -> Result<(), Error> {
-        let actors = &mut self.world.actors;
-        let buttons = &mut self.world.buttons;
-
         session.terminal.draw(|frame| {
-            let (board_rect, buttons_rect) = split_rect(frame.size());
-            render_board(frame, actors, board_rect);
-            render_buttons(frame, buttons, buttons_rect);
+            let (actors_rect, buttons_rect) = split_into_actors_and_buttons(frame.size());
+            let actors_viewport = create_actors_viewport(actors_rect);
+            let buttons_viewport = create_buttons_viewport(actors_rect);
+            self.world.set_viewport(actors_viewport);
+
+            frame.render_widget(create_background_block(), frame.size());
+            render_canvas(
+                frame,
+                &mut self.world.actors,
+                create_actors_block(),
+                actors_rect,
+                actors_viewport,
+            );
+            render_canvas(
+                frame,
+                &mut self.world.buttons,
+                create_buttons_block(),
+                buttons_rect,
+                buttons_viewport,
+            );
         })?;
         Ok(())
     }

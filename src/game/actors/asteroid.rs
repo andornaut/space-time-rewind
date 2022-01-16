@@ -6,7 +6,7 @@ use crate::{
     command::{Command, CommandHandler},
     game::{GameItem, GameItemKind},
     view::{
-        renderer::{render_text, Renderable},
+        render::{render_text, Renderable},
         viewport::{Coordinates, Viewport},
     },
 };
@@ -65,8 +65,7 @@ impl GameItem for Asteroid {
 }
 
 impl Renderable for Asteroid {
-    fn render(&mut self, context: &mut Context, viewport: Viewport) {
-        self.coordinates = viewport.contain(&self.viewport());
+    fn render(&mut self, context: &mut Context, _: Viewport) {
         render_text(context, self.coordinates, TEXT, self.color());
     }
 
