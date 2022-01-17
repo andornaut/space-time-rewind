@@ -8,6 +8,7 @@ use crate::{
     clock::ticker::{TickHandler, Ticker},
     view::viewport::Viewport,
 };
+use anyhow::{anyhow, Result};
 
 pub struct World {
     pub actors: Vec<Box<dyn GameItem>>,
@@ -44,9 +45,9 @@ impl TickHandler for World {
 }
 
 impl World {
-    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> bool {
+    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Result<Command> {
         if contains_quit_commands(&commands) {
-            return false;
+            return Ok(Command::Quit);
         }
         let tertiary_commands: Vec<Command> = commands
             .into_iter()
@@ -55,12 +56,16 @@ impl World {
             .collect();
 
         if contains_unhandled_commands(&tertiary_commands) {
-            panic!(
+            return Err(anyhow!(
                 "Error: There are unhandled command(s): {:?}",
                 tertiary_commands
-            );
+            ));
         }
-        !contains_quit_commands(&tertiary_commands) // Returns false to quit.
+        Ok(if contains_quit_commands(&tertiary_commands) {
+            Command::Quit
+        } else {
+            Command::NOOP
+        })
     }
 
     pub fn detect_collisions(&mut self) -> Vec<Command> {

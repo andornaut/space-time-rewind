@@ -58,7 +58,7 @@ pub fn render_text(
     color: Color,
 ) {
     let (x, y) = coordinates;
-    // Reverse the string, b/c it is stored top->down, but is rendered bottom->up.
+    // Reverse the string, because it is stored top->down, but is rendered bottom->up.
     for (y_offset, line) in text.lines().rev().enumerate() {
         context.print(f64::from(x), f64::from(y) + y_offset as f64, line, color);
     }

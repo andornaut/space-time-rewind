@@ -41,26 +41,19 @@ impl App {
             self.maybe_tick();
             self.render(session)?;
 
-            if !self.process_commands() {
-                // false means quit
+            if let Command::Quit = self.process_commands()? {
                 return Ok(());
             }
         }
     }
 
-    fn process_commands(&mut self) -> bool {
+    fn process_commands(&mut self) -> Result<Command> {
         let mut commands = self.world.detect_collisions();
-        let command = self.wait_for_input_command();
-        match command {
-            Err(error) => panic!("Error waiting for input: {}", error),
-            Ok(command) => {
-                match command {
-                    Some(command) => commands.push(command),
-                    None => (),
-                }
-                self.world.broadcast_commands(commands)
-            }
+        match self.wait_for_input_command()? {
+            Some(command) => commands.push(command),
+            None => (),
         }
+        self.world.broadcast_commands(commands)
     }
 
     fn maybe_tick(&mut self) {

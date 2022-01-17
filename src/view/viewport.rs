@@ -24,16 +24,16 @@ impl Viewport {
         Self { rect }
     }
 
-    pub fn bottom_left(self) -> Coordinates {
+    pub fn bottom_left(&self) -> Coordinates {
         (self.rect.x, self.rect.y)
     }
 
-    pub fn center(self) -> Coordinates {
+    pub fn center(&self) -> Coordinates {
         let (x1, y1) = self.bottom_left();
         (x1 + (self.rect.width / 2), y1 + (self.rect.height / 2))
     }
 
-    pub fn centered_around_bottom_left(self) -> Coordinates {
+    pub fn centered_around_bottom_left(&self) -> Coordinates {
         let (x1, y1) = self.bottom_left();
         (
             x1.saturating_sub(self.rect.width / 2),
@@ -41,7 +41,7 @@ impl Viewport {
         )
     }
 
-    pub fn contain(self, other: &Self) -> Coordinates {
+    pub fn contain(&self, other: &Self) -> Coordinates {
         let (x_bl, y_bl) = other.bottom_left();
         let mut x_bl = x_bl;
         let mut y_bl = y_bl;
@@ -56,23 +56,17 @@ impl Viewport {
         (x_bl, y_bl)
     }
 
-    pub fn out_of_bounds_completely(self, other: &Self) -> bool {
+    pub fn out_of_bounds_completely(&self, other: &Self) -> bool {
         let (x, y) = other.bottom_left();
         let (max_x, max_y) = self.top_right();
         return x > max_x || y > max_y;
     }
 
-    pub fn out_of_bounds_partially(self, other: &Self) -> bool {
-        let (x, y) = other.top_right();
-        let (max_x, max_y) = self.top_right();
-        return x > max_x || y > max_y;
-    }
-
-    pub fn intersects(self, other: &Self) -> bool {
+    pub fn intersects(&self, other: &Self) -> bool {
         self.rect.intersects(other.rect)
     }
 
-    pub fn top_right(self) -> Coordinates {
+    pub fn top_right(&self) -> Coordinates {
         let rect = self.rect;
         let x = rect.x + rect.width;
         let y = rect.y + rect.height;
@@ -126,5 +120,26 @@ mod tests {
 
         assert_eq!(x, 0);
         assert_eq!(y, 0);
+    }
+
+    #[test]
+    fn out_of_bounds_completely_returns_false_when_overlapping() {
+        let bl = Viewport::new_from_coordinates(2, 2, (0, 0));
+        let tr = Viewport::new_from_coordinates(2, 2, (1, 1));
+        assert!(!bl.out_of_bounds_completely(&tr));
+    }
+
+    #[test]
+    fn out_of_bounds_completely_returns_true_when_right_adjacent() {
+        let bl = Viewport::new_from_coordinates(2, 2, (0, 0));
+        let tr = Viewport::new_from_coordinates(2, 2, (2, 0));
+        assert!(!bl.out_of_bounds_completely(&tr));
+    }
+
+    #[test]
+    fn out_of_bounds_completely_returns_true_when_bottom_adjacent() {
+        let bl = Viewport::new_from_coordinates(2, 2, (2, 2));
+        let tr = Viewport::new_from_coordinates(2, 2, (2, 0));
+        assert!(!bl.out_of_bounds_completely(&tr));
     }
 }
