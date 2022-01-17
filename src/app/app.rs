@@ -11,7 +11,7 @@ use crate::{
         session::Session,
     },
 };
-use anyhow::Result;
+use anyhow::{Error, Result};
 use crossterm::event::{poll, read, Event};
 use std::time::{Duration, Instant};
 
@@ -41,10 +41,20 @@ impl App {
             self.maybe_tick();
             self.render(session)?;
 
-            if let Command::Quit = self.process_commands()? {
+            let mut commands = self.world.detect_collisions();
+            self.maybe_add_input_command(&mut commands)?;
+            if let Command::Quit = self.world.broadcast_commands(commands)? {
                 return Ok(());
             }
         }
+    }
+
+    fn maybe_add_input_command(&mut self, commands: &mut Vec<Command>) -> Result<(), Error> {
+        match self.wait_for_input_command()? {
+            Some(command) => commands.push(command),
+            None => (),
+        }
+        Ok(())
     }
 
     fn maybe_tick(&mut self) {
@@ -57,15 +67,6 @@ impl App {
             self.ticker.tick();
             self.world.handle_tick(&self.ticker);
         }
-    }
-
-    fn process_commands(&mut self) -> Result<Command> {
-        let mut commands = self.world.detect_collisions();
-        match self.wait_for_input_command()? {
-            Some(command) => commands.push(command),
-            None => (),
-        }
-        self.world.broadcast_commands(commands)
     }
 
     fn remaining_timeout(&self) -> Duration {

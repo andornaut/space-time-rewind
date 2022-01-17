@@ -1,6 +1,7 @@
-use crate::{app::color::ColorTheme, game::actors::ship::DISABLED_MISSILE_COUNT};
+use crate::app::color::ColorTheme;
 use tui::style::Color;
 
+const DISABLED_MISSILE_COUNT: u16 = 600; // The Missile `Button` needs to use the same value.
 static TEXT_GAME_OVER: &str = "\
 ==============================================
 Game over! Press [r] to restart or [q] to quit
@@ -59,7 +60,6 @@ impl ButtonKind {
 
     pub fn disabled_count(&self) -> u16 {
         match self {
-            // Accord with the value used by the `Ship`.
             // Eventually other button kinds will have their own starting values.
             ButtonKind::Missile => DISABLED_MISSILE_COUNT,
             _ => 0, // `self.disabled` will always be off if initialized to 0.

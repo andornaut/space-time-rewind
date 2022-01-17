@@ -1,7 +1,7 @@
 use crate::{
     app::{
         color::ColorTheme,
-        command::{Command, CommandHandler},
+        command::{Command, CommandHandler, NO_COMMANDS},
     },
     clock::ticker::{Frequency, TickHandler, Ticker},
     game::game_item::{GameItem, GameItemKind},
@@ -40,7 +40,7 @@ impl CommandHandler for Asteroid {
             }
             _ => (),
         };
-        vec![]
+        NO_COMMANDS
     }
 }
 

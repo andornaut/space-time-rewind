@@ -25,13 +25,20 @@ pub struct Button {
 
 impl CommandHandler for Button {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
+        let mut commands = Vec::new();
         match (&self.button_kind, command) {
-            (ButtonKind::Missile, Command::FireMissile) => self.update_counters(),
-            (ButtonKind::Rewind, Command::Rewind) => self.update_counters(),
-            (ButtonKind::Shields, Command::ActivateShields) => self.update_counters(),
+            (ButtonKind::Missile, Command::PressMissileButton) => {
+                self.maybe_fire(&mut commands, Command::FireMissile)
+            }
+            (ButtonKind::Rewind, Command::PressRewindButton) => {
+                self.maybe_fire(&mut commands, Command::FireRewind)
+            }
+            (ButtonKind::Shields, Command::PressShieldsButton) => {
+                self.maybe_fire(&mut commands, Command::FireShields)
+            }
             (_, _) => (),
         }
-        vec![]
+        commands
     }
 }
 
@@ -107,10 +114,11 @@ impl Button {
         }
     }
 
-    fn update_counters(&mut self) {
+    fn maybe_fire(&mut self, commands: &mut Vec<Command>, command: Command) {
         self.active.restart();
         if self.disabled.off() {
             self.disabled.restart();
+            commands.push(command);
         }
     }
 }

@@ -4,7 +4,7 @@ use super::{
     spawner::spawner::Spawner,
 };
 use crate::{
-    app::command::Command,
+    app::command::{Command, NO_COMMANDS},
     clock::ticker::{TickHandler, Ticker},
     view::viewport::Viewport,
 };
@@ -49,18 +49,22 @@ impl World {
         if contains_quit_commands(&commands) {
             return Ok(Command::Quit);
         }
-        let tertiary_commands: Vec<Command> = commands
+        let commands: Vec<Command> = commands
             .into_iter()
             .flat_map(|command| self.broadcast_command(command))
             .collect();
+        let commands = commands
+            .into_iter()
+            .filter(|command| !self.consumed_command(*command))
+            .collect();
 
-        if contains_unhandled_commands(&tertiary_commands) {
+        if contains_unhandled_commands(&commands) {
             return Err(anyhow!(
                 "Error: There are unhandled command(s): {:?}",
-                tertiary_commands
+                commands
             ));
         }
-        Ok(if contains_quit_commands(&tertiary_commands) {
+        Ok(if contains_quit_commands(&commands) {
             Command::Quit
         } else {
             Command::Continue
@@ -103,11 +107,7 @@ impl World {
             .collect()
     }
 
-    fn game_items_iter_mut(&mut self) -> impl Iterator<Item = &mut Box<dyn GameItem>> {
-        self.actors.iter_mut().chain(self.buttons.iter_mut())
-    }
-
-    fn handle_command(&mut self, command: Command) {
+    fn consumed_command(&mut self, command: Command) -> bool {
         match command {
             Command::AddBullet(coordinates) => self.actors.push(Box::new(Bullet::new(coordinates))),
             Command::AddExplosion(coordinates) => {
@@ -117,12 +117,19 @@ impl World {
                 self.actors.push(Box::new(Missile::new(coordinates)))
             }
             Command::Restart => self.restart(),
-            _ => (),
+            _ => return false,
         }
+        true
+    }
+
+    fn game_items_iter_mut(&mut self) -> impl Iterator<Item = &mut Box<dyn GameItem>> {
+        self.actors.iter_mut().chain(self.buttons.iter_mut())
     }
 
     fn notify_handlers(&mut self, command: Command) -> Vec<Command> {
-        self.handle_command(command);
+        if self.consumed_command(command) {
+            return NO_COMMANDS;
+        }
         self.game_items_iter_mut()
             .flat_map(|handler| handler.handle_command(command))
             .collect()

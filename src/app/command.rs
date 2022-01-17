@@ -4,9 +4,11 @@ use crate::{
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
+pub const NO_COMMANDS: Vec<Command> = Vec::new();
+
 pub trait CommandHandler {
     fn handle_command(&mut self, _: Command) -> Vec<Command> {
-        vec![]
+        NO_COMMANDS
     }
 }
 
@@ -24,12 +26,15 @@ pub enum Command {
     AddMissile(Coordinates),
     MoveShip(Movement),
 
-    // Ship controls
-    ActivateShields,
+    // Button commands
+    PressMissileButton,
+    PressRewindButton,
+    PressShieldsButton,
+    // Ship commands
     FireGuns,
     FireMissile,
-    Rewind,
-    // Game controls
+    FireRewind,
+    FireShields,
 }
 
 impl From<KeyEvent> for Command {
@@ -45,10 +50,10 @@ impl From<KeyEvent> for Command {
             KeyCode::Right | KeyCode::Char('d') => Self::MoveShip((1, 0)),
             KeyCode::Left | KeyCode::Char('a') => Self::MoveShip((-1, 0)),
 
-            KeyCode::Char('k') => Self::ActivateShields,
             KeyCode::Char(' ') => Self::FireGuns,
-            KeyCode::Char('j') => Self::FireMissile,
-            KeyCode::Char('l') => Self::Rewind,
+            KeyCode::Char('j') => Self::PressMissileButton,
+            KeyCode::Char('k') => Self::PressShieldsButton,
+            KeyCode::Char('l') => Self::PressRewindButton,
 
             KeyCode::Char('q') => Self::Quit,
             KeyCode::Char('r') => Self::Restart,

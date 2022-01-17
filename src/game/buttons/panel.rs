@@ -1,6 +1,6 @@
 use super::button::Button;
 use crate::{
-    app::command::{Command, CommandHandler},
+    app::command::{Command, CommandHandler, NO_COMMANDS},
     clock::ticker::{TickHandler, Ticker},
     game::game_item::{GameItem, GameItemKind},
     view::{
@@ -22,7 +22,7 @@ impl CommandHandler for ButtonPanel {
         if let Command::GameOver = command {
             self.buttons.clear();
             self.buttons.push(Button::new_game_over());
-            return vec![];
+            return NO_COMMANDS;
         }
         self.buttons
             .iter_mut()

@@ -1,7 +1,7 @@
 use crate::{
     app::{
         color::ColorTheme,
-        command::{Command, CommandHandler},
+        command::{Command, CommandHandler, NO_COMMANDS},
     },
     clock::{
         countdown::Countdown,
@@ -18,14 +18,12 @@ use tui::{style::Color, widgets::canvas::Context};
 static TEXT: &str = "◄◆►";
 
 const DISABLED_GUNS_COUNT: u16 = 5;
-pub const DISABLED_MISSILE_COUNT: u16 = 600; // The Missile `Button` needs to use the same value.
 
 #[derive(Clone, Debug)]
 pub struct Ship {
     coordinates: Coordinates,
     deleted: bool,
     disabled_guns: Countdown,
-    disabled_missile: Countdown,
 }
 
 impl CommandHandler for Ship {
@@ -45,11 +43,8 @@ impl CommandHandler for Ship {
                 }
             }
             Command::FireMissile => {
-                if self.disabled_missile.off() {
-                    self.disabled_missile.restart();
-                    let (cx, cy) = self.viewport().center();
-                    return vec![Command::AddMissile((cx, cy + 1))];
-                }
+                let (cx, cy) = self.viewport().center();
+                return vec![Command::AddMissile((cx, cy + 1))];
             }
             Command::MoveShip((dx, dy)) => {
                 let (x, y) = self.coordinates;
@@ -61,7 +56,7 @@ impl CommandHandler for Ship {
             }
             _ => (),
         }
-        vec![]
+        NO_COMMANDS
     }
 }
 
@@ -95,7 +90,6 @@ impl Renderable for Ship {
 impl TickHandler for Ship {
     fn handle_tick(&mut self, _: &Ticker) {
         self.disabled_guns.down();
-        self.disabled_missile.down();
     }
 }
 
@@ -105,7 +99,6 @@ impl Ship {
             coordinates,
             deleted: false,
             disabled_guns: Countdown::new(DISABLED_GUNS_COUNT),
-            disabled_missile: Countdown::new(DISABLED_MISSILE_COUNT),
         }
     }
 }
