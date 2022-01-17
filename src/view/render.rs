@@ -1,5 +1,5 @@
 use super::viewport::{Coordinates, Viewport};
-use crate::{color::ColorTheme, game::game_item::GameItem};
+use crate::{app::color::ColorTheme, game::game_item::GameItem};
 use std::{cell::RefCell, rc::Rc};
 use tui::{
     backend::Backend,

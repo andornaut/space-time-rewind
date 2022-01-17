@@ -1,4 +1,4 @@
-use crate::{clock::ticker::TickHandler, command::CommandHandler, view::render::Renderable};
+use crate::{app::command::CommandHandler, clock::ticker::TickHandler, view::render::Renderable};
 
 pub trait GameItem: CommandHandler + Renderable + TickHandler {
     fn deleted(&self) -> bool {

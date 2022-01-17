@@ -1,14 +1,14 @@
+use super::command::Command;
 use crate::{
     clock::ticker::{TickHandler, Ticker},
-    command::Command,
     game::world::World,
-    session::Session,
     view::{
         factory::{
             create_actors_block, create_actors_viewport, create_background_block,
             create_buttons_block, create_buttons_viewport, split_into_actors_and_buttons,
         },
         render::render_canvas,
+        session::Session,
     },
 };
 use anyhow::Result;
@@ -82,7 +82,7 @@ impl App {
             .unwrap_or_else(|| Duration::from_secs(0))
     }
 
-    fn render<'a>(&'a mut self, session: &'a mut Session) -> Result<()> {
+    fn render(&mut self, session: &mut Session) -> Result<()> {
         session.terminal.draw(|frame| {
             let window = frame.size();
             // Set the background color of the entire terminal window.

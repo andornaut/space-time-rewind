@@ -1,10 +1,12 @@
 use crate::{
+    app::{
+        color::ColorTheme,
+        command::{Command, CommandHandler},
+    },
     clock::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},
     },
-    color::ColorTheme,
-    command::{Command, CommandHandler},
     game::game_item::{GameItem, GameItemKind},
     view::{
         render::{render_text, Renderable},

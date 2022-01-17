@@ -1,10 +1,10 @@
 use super::button_kind::ButtonKind;
 use crate::{
+    app::command::{Command, CommandHandler},
     clock::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},
     },
-    command::{Command, CommandHandler},
     game::game_item::{GameItem, GameItemKind},
     view::{
         render::{render_text, Renderable},

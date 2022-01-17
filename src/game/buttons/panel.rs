@@ -1,7 +1,7 @@
 use super::button::Button;
 use crate::{
+    app::command::{Command, CommandHandler},
     clock::ticker::{TickHandler, Ticker},
-    command::{Command, CommandHandler},
     game::game_item::{GameItem, GameItemKind},
     view::{
         render::Renderable,

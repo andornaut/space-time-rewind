@@ -2,15 +2,12 @@
 #![feature(mixed_integer_ops)]
 
 use anyhow::Result;
-use app::App;
-use session::Session;
+use app::app::App;
+use view::session::Session;
 
 mod app;
 mod clock;
-mod color;
-mod command;
 mod game;
-mod session;
 mod view;
 
 pub fn run() -> Result<()> {

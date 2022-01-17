@@ -1,5 +1,5 @@
 use super::viewport::Viewport;
-use crate::color::ColorTheme;
+use crate::app::color::ColorTheme;
 use tui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},

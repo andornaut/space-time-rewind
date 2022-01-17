@@ -1,7 +1,9 @@
 use crate::{
+    app::{
+        color::ColorTheme,
+        command::{Command, CommandHandler},
+    },
     clock::ticker::{Frequency, TickHandler, Ticker},
-    color::ColorTheme,
-    command::{Command, CommandHandler},
     game::game_item::{GameItem, GameItemKind},
     view::{
         render::{render_text, Renderable},

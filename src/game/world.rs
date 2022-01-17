@@ -4,8 +4,8 @@ use super::{
     spawner::spawner::Spawner,
 };
 use crate::{
+    app::command::Command,
     clock::ticker::{TickHandler, Ticker},
-    command::Command,
     view::viewport::Viewport,
 };
 
@@ -48,16 +48,19 @@ impl World {
         if contains_quit_commands(&commands) {
             return false;
         }
-        let commands: Vec<Command> = commands
+        let tertiary_commands: Vec<Command> = commands
             .into_iter()
             .flat_map(|command| self.broadcast_command(command))
             .filter(|command| *command != Command::NOOP)
             .collect();
 
-        if contains_unhandled_commands(&commands) {
-            panic!("Error: There are unhandled command(s): {:?}", commands);
+        if contains_unhandled_commands(&tertiary_commands) {
+            panic!(
+                "Error: There are unhandled command(s): {:?}",
+                tertiary_commands
+            );
         }
-        !contains_quit_commands(&commands) // Returns false to quit.
+        !contains_quit_commands(&tertiary_commands) // Returns false to quit.
     }
 
     pub fn detect_collisions(&mut self) -> Vec<Command> {
@@ -85,11 +88,11 @@ impl World {
     }
 
     fn broadcast_command(&mut self, command: Command) -> Vec<Command> {
-        let commands = self.notify_handlers(command);
-        if contains_quit_commands(&commands) {
+        let secondary_commands = self.notify_handlers(command);
+        if contains_quit_commands(&secondary_commands) {
             return vec![Command::Quit];
         }
-        commands
+        secondary_commands
             .into_iter()
             .flat_map(|command| self.notify_handlers(command))
             .collect()
