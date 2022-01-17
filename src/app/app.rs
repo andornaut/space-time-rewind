@@ -13,13 +13,11 @@ use crate::{
 };
 use anyhow::{Error, Result};
 use crossterm::event::{poll, read, Event};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const TICK_RATE_MS: u64 = 20;
 
 pub struct App {
-    last_tick: Option<Instant>,
-    tick_rate: Duration,
     ticker: Ticker,
     world: World,
 }
@@ -27,18 +25,17 @@ pub struct App {
 impl Default for App {
     fn default() -> Self {
         Self {
-            last_tick: None,
-            tick_rate: Duration::from_millis(TICK_RATE_MS),
-            ticker: Ticker::default(),
+            ticker: Ticker::new(Duration::from_millis(TICK_RATE_MS)),
             world: World::default(),
         }
     }
 }
-
 impl App {
     pub fn run(&mut self, session: &mut Session) -> Result<()> {
         loop {
-            self.maybe_tick();
+            if self.ticker.maybe_tick() {
+                self.world.handle_tick(&self.ticker);
+            }
             self.render(session)?;
 
             let mut commands = self.world.detect_collisions();
@@ -55,25 +52,6 @@ impl App {
             None => (),
         }
         Ok(())
-    }
-
-    fn maybe_tick(&mut self) {
-        let last_tick = match self.last_tick {
-            Some(tick) => tick,
-            None => self.reset_last_tick(),
-        };
-        if last_tick.elapsed() >= self.tick_rate {
-            self.reset_last_tick();
-            self.ticker.tick();
-            self.world.handle_tick(&self.ticker);
-        }
-    }
-
-    fn remaining_timeout(&self) -> Duration {
-        let elapsed = self.last_tick.unwrap_or_else(|| Instant::now()).elapsed();
-        self.tick_rate
-            .checked_sub(elapsed)
-            .unwrap_or_else(|| Duration::from_secs(0))
     }
 
     fn render(&mut self, session: &mut Session) -> Result<()> {
@@ -104,14 +82,8 @@ impl App {
         Ok(())
     }
 
-    fn reset_last_tick(&mut self) -> Instant {
-        let now = Instant::now();
-        self.last_tick = Some(now);
-        now
-    }
-
     fn wait_for_input_command(&mut self) -> Result<Option<Command>> {
-        if poll(self.remaining_timeout())? {
+        if poll(self.ticker.remaining_timeout())? {
             // `poll()` returned true, so an event is available,
             // so the following call to `read()` will not block.
             if let Event::Key(key) = read()? {
