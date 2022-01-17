@@ -4,8 +4,8 @@ use crate::{
     game::world::World,
     view::{
         factory::{
-            create_actors_block, create_actors_viewport, create_background_block,
-            create_buttons_block, create_buttons_viewport, split_into_actors_and_buttons,
+            create_actors_block, create_actors_viewport, create_background_block, create_ui_block,
+            create_ui_viewport, split_into_actors_and_ui,
         },
         render::render_canvas,
         session::Session,
@@ -60,9 +60,9 @@ impl App {
             // Set the background color of the entire terminal window.
             frame.render_widget(create_background_block(), window);
 
-            let (actors_rect, buttons_rect) = split_into_actors_and_buttons(window);
+            let (actors_rect, ui_rect) = split_into_actors_and_ui(window);
             let actors_viewport = create_actors_viewport(actors_rect);
-            let buttons_viewport = create_buttons_viewport(actors_rect);
+            let ui_viewport = create_ui_viewport(actors_rect);
             self.world.set_actors_viewport(actors_viewport);
             render_canvas(
                 frame,
@@ -73,10 +73,10 @@ impl App {
             );
             render_canvas(
                 frame,
-                &mut self.world.buttons,
-                create_buttons_block(),
-                buttons_rect,
-                buttons_viewport,
+                &mut self.world.ui,
+                create_ui_block(),
+                ui_rect,
+                ui_viewport,
             );
         })?;
         Ok(())

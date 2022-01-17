@@ -17,7 +17,7 @@ pub enum ColorTheme {
     ExplosionEnd2,
     Ship,
 
-    // Buttons
+    // UI
     DisabledButton,
     GameOver,
     Missile,
@@ -46,7 +46,7 @@ impl From<ColorTheme> for Color {
             ColorTheme::ExplosionEnd2 => Color::Rgb(255, 104, 104),
             ColorTheme::Ship => Color::Cyan,
 
-            // Buttons
+            // UI
             ColorTheme::DisabledButton => Color::Rgb(51, 51, 51),
             ColorTheme::GameOver => Color::Rgb(204, 102, 153),
             ColorTheme::Missile => Color::Rgb(175, 102, 102),

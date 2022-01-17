@@ -12,7 +12,7 @@ use anyhow::{anyhow, Result};
 
 pub struct World {
     pub actors: Vec<Box<dyn GameItem>>,
-    pub buttons: Vec<Box<dyn GameItem>>,
+    pub ui: Vec<Box<dyn GameItem>>,
     actors_viewport: Option<Viewport>,
     spawner: Spawner,
 }
@@ -21,9 +21,9 @@ impl Default for World {
     fn default() -> Self {
         Self {
             actors: Vec::new(),
-            buttons: Vec::new(),
             actors_viewport: None,
             spawner: Spawner::default(),
+            ui: Vec::new(),
         }
     }
 }
@@ -123,7 +123,7 @@ impl World {
     }
 
     fn game_items_iter_mut(&mut self) -> impl Iterator<Item = &mut Box<dyn GameItem>> {
-        self.actors.iter_mut().chain(self.buttons.iter_mut())
+        self.actors.iter_mut().chain(self.ui.iter_mut())
     }
 
     fn notify_handlers(&mut self, command: Command) -> Vec<Command> {
@@ -138,7 +138,7 @@ impl World {
     fn restart(&mut self) {
         self.spawner.restart();
         self.actors.clear(); // Actors are created in `handle_tick`.
-        self.buttons = self.spawner.buttons();
+        self.ui = self.spawner.ui();
     }
 }
 

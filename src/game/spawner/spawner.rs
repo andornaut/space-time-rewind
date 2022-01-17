@@ -1,7 +1,7 @@
 use super::levels::{initial, level1};
 use crate::{
     clock::ticker::Ticker,
-    game::{buttons::panel::ButtonPanel, game_item::GameItem},
+    game::{game_item::GameItem, ui::panel::ButtonPanel},
     view::viewport::Viewport,
 };
 
@@ -46,7 +46,7 @@ impl Spawner {
         actors
     }
 
-    pub fn buttons(&self) -> Vec<Box<dyn GameItem>> {
+    pub fn ui(&self) -> Vec<Box<dyn GameItem>> {
         vec![Box::new(ButtonPanel::default())]
     }
 

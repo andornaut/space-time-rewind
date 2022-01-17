@@ -1,5 +1,5 @@
 mod actors;
-mod buttons;
 pub mod game_item;
 mod spawner;
+mod ui;
 pub mod world;

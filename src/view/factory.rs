@@ -25,7 +25,7 @@ pub fn create_actors_block<'a>() -> Block<'a> {
         ))
 }
 
-pub fn create_buttons_block<'a>() -> Block<'a> {
+pub fn create_ui_block<'a>() -> Block<'a> {
     Block::default().style(Style::default().bg(Color::from(ColorTheme::Bg)))
 }
 
@@ -39,12 +39,12 @@ pub fn create_actors_viewport(rect: Rect) -> Viewport {
     Viewport::new(width.saturating_sub(2), height.saturating_sub(2))
 }
 
-pub fn create_buttons_viewport(rect: Rect) -> Viewport {
+pub fn create_ui_viewport(rect: Rect) -> Viewport {
     let Rect { width, .. } = rect;
     Viewport::new(width, BUTTON_PANEL_HEIGHT)
 }
 
-pub fn split_into_actors_and_buttons(rect: Rect) -> (Rect, Rect) {
+pub fn split_into_actors_and_ui(rect: Rect) -> (Rect, Rect) {
     let rect = normalize(rect);
     let constraints = [
         Constraint::Min(BOARD_MIN_HEIGHT),
