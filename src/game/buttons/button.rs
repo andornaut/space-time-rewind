@@ -24,14 +24,14 @@ pub struct Button {
 }
 
 impl CommandHandler for Button {
-    fn handle_command(&mut self, command: Command) -> Command {
+    fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match (&self.button_kind, command) {
             (ButtonKind::Missile, Command::FireMissile) => self.update_counters(),
             (ButtonKind::Rewind, Command::Rewind) => self.update_counters(),
             (ButtonKind::Shields, Command::ActivateShields) => self.update_counters(),
             (_, _) => (),
         }
-        Command::NOOP
+        vec![]
     }
 }
 

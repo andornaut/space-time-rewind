@@ -13,8 +13,8 @@ use anyhow::{anyhow, Result};
 pub struct World {
     pub actors: Vec<Box<dyn GameItem>>,
     pub buttons: Vec<Box<dyn GameItem>>,
+    actors_viewport: Option<Viewport>,
     spawner: Spawner,
-    viewport: Option<Viewport>,
 }
 
 impl Default for World {
@@ -22,8 +22,8 @@ impl Default for World {
         Self {
             actors: Vec::new(),
             buttons: Vec::new(),
+            actors_viewport: None,
             spawner: Spawner::default(),
-            viewport: None,
         }
     }
 }
@@ -39,7 +39,7 @@ impl TickHandler for World {
             .for_each(|handler| handler.handle_tick(ticker));
         self.actors.retain(|actor| !actor.deleted());
 
-        let viewport = &self.viewport.unwrap();
+        let viewport = &self.actors_viewport.unwrap();
         self.actors.extend(self.spawner.actors(ticker, viewport));
     }
 }
@@ -52,7 +52,6 @@ impl World {
         let tertiary_commands: Vec<Command> = commands
             .into_iter()
             .flat_map(|command| self.broadcast_command(command))
-            .filter(|command| *command != Command::NOOP)
             .collect();
 
         if contains_unhandled_commands(&tertiary_commands) {
@@ -64,7 +63,7 @@ impl World {
         Ok(if contains_quit_commands(&tertiary_commands) {
             Command::Quit
         } else {
-            Command::NOOP
+            Command::Continue
         })
     }
 
@@ -79,17 +78,18 @@ impl World {
             let left_actor = &mut left_actors[index];
             for right_actor in right_actors {
                 if left_actor.viewport().intersects(&right_actor.viewport()) {
-                    commands.push(left_actor.handle_command(Command::Collide(right_actor.kind())));
-                    commands.push(right_actor.handle_command(Command::Collide(left_actor.kind())));
+                    commands
+                        .extend(left_actor.handle_command(Command::Collide(right_actor.kind())));
+                    commands
+                        .extend(right_actor.handle_command(Command::Collide(left_actor.kind())));
                 }
             }
         }
-        commands.retain(|command| *command != Command::NOOP);
         commands
     }
 
-    pub fn set_viewport(&mut self, viewport: Viewport) {
-        self.viewport = Some(viewport);
+    pub fn set_actors_viewport(&mut self, viewport: Viewport) {
+        self.actors_viewport = Some(viewport);
     }
 
     fn broadcast_command(&mut self, command: Command) -> Vec<Command> {
@@ -124,7 +124,7 @@ impl World {
     fn notify_handlers(&mut self, command: Command) -> Vec<Command> {
         self.handle_command(command);
         self.game_items_iter_mut()
-            .map(|handler| handler.handle_command(command))
+            .flat_map(|handler| handler.handle_command(command))
             .collect()
     }
 

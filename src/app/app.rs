@@ -47,15 +47,6 @@ impl App {
         }
     }
 
-    fn process_commands(&mut self) -> Result<Command> {
-        let mut commands = self.world.detect_collisions();
-        match self.wait_for_input_command()? {
-            Some(command) => commands.push(command),
-            None => (),
-        }
-        self.world.broadcast_commands(commands)
-    }
-
     fn maybe_tick(&mut self) {
         let last_tick = match self.last_tick {
             Some(tick) => tick,
@@ -66,6 +57,15 @@ impl App {
             self.ticker.tick();
             self.world.handle_tick(&self.ticker);
         }
+    }
+
+    fn process_commands(&mut self) -> Result<Command> {
+        let mut commands = self.world.detect_collisions();
+        match self.wait_for_input_command()? {
+            Some(command) => commands.push(command),
+            None => (),
+        }
+        self.world.broadcast_commands(commands)
     }
 
     fn remaining_timeout(&self) -> Duration {
@@ -84,7 +84,7 @@ impl App {
             let (actors_rect, buttons_rect) = split_into_actors_and_buttons(window);
             let actors_viewport = create_actors_viewport(actors_rect);
             let buttons_viewport = create_buttons_viewport(actors_rect);
-            self.world.set_viewport(actors_viewport);
+            self.world.set_actors_viewport(actors_viewport);
             render_canvas(
                 frame,
                 &mut self.world.actors,

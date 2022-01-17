@@ -25,7 +25,7 @@ pub struct Missile {
 }
 
 impl CommandHandler for Missile {
-    fn handle_command(&mut self, command: Command) -> Command {
+    fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match command {
             Command::Collide(kind) => {
                 if kind.is_shootable() {
@@ -34,7 +34,7 @@ impl CommandHandler for Missile {
             }
             _ => (),
         }
-        Command::NOOP
+        vec![]
     }
 }
 

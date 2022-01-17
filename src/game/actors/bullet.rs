@@ -21,7 +21,7 @@ pub struct Bullet {
 }
 
 impl CommandHandler for Bullet {
-    fn handle_command(&mut self, command: Command) -> Command {
+    fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match command {
             Command::Collide(kind) => {
                 if kind.is_shootable() {
@@ -30,7 +30,7 @@ impl CommandHandler for Bullet {
             }
             _ => (),
         }
-        Command::NOOP
+        vec![]
     }
 }
 

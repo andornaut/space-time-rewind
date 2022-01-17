@@ -5,16 +5,17 @@ use crate::{
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 pub trait CommandHandler {
-    fn handle_command(&mut self, _: Command) -> Command {
-        Command::NOOP
+    fn handle_command(&mut self, _: Command) -> Vec<Command> {
+        vec![]
     }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Command {
-    // App states
-    NOOP,
-    GameOver,
+    Continue,
+    GameOver, // Display an option to quit or restart
+    Quit,     // Exit the application
+    Restart,
 
     // Actors
     Collide(GameItemKind),
@@ -28,10 +29,7 @@ pub enum Command {
     FireGuns,
     FireMissile,
     Rewind,
-
     // Game controls
-    Quit,
-    Restart,
 }
 
 impl From<KeyEvent> for Command {
@@ -54,7 +52,7 @@ impl From<KeyEvent> for Command {
 
             KeyCode::Char('q') => Self::Quit,
             KeyCode::Char('r') => Self::Restart,
-            _ => Command::NOOP,
+            _ => Command::Continue,
         }
     }
 }

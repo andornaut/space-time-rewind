@@ -18,21 +18,16 @@ pub struct ButtonPanel {
 }
 
 impl CommandHandler for ButtonPanel {
-    fn handle_command(&mut self, command: Command) -> Command {
+    fn handle_command(&mut self, command: Command) -> Vec<Command> {
         if let Command::GameOver = command {
             self.buttons.clear();
             self.buttons.push(Button::new_game_over());
-            return Command::NOOP;
+            return vec![];
         }
-
-        for button in self.buttons.iter_mut() {
-            let secondary_command = button.handle_command(command);
-            if secondary_command != Command::NOOP {
-                // Only one `Button` should respond to a `command`, so we can short circuit here.
-                return secondary_command;
-            }
-        }
-        Command::NOOP
+        self.buttons
+            .iter_mut()
+            .flat_map(|button| button.handle_command(command))
+            .collect()
     }
 }
 

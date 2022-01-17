@@ -29,26 +29,26 @@ pub struct Ship {
 }
 
 impl CommandHandler for Ship {
-    fn handle_command(&mut self, command: Command) -> Command {
+    fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match command {
             Command::Collide(kind) => {
                 if !kind.is_weapon() {
                     self.deleted = true;
-                    return Command::GameOver;
+                    return vec![Command::GameOver];
                 }
             }
             Command::FireGuns => {
                 if self.disabled_guns.off() {
                     self.disabled_guns.restart();
                     let (cx, cy) = self.viewport().center();
-                    return Command::AddBullet((cx, cy + 1));
+                    return vec![Command::AddBullet((cx, cy + 1))];
                 }
             }
             Command::FireMissile => {
                 if self.disabled_missile.off() {
                     self.disabled_missile.restart();
                     let (cx, cy) = self.viewport().center();
-                    return Command::AddMissile((cx, cy + 1));
+                    return vec![Command::AddMissile((cx, cy + 1))];
                 }
             }
             Command::MoveShip((dx, dy)) => {
@@ -61,7 +61,7 @@ impl CommandHandler for Ship {
             }
             _ => (),
         }
-        Command::NOOP
+        vec![]
     }
 }
 

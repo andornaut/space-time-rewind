@@ -25,7 +25,7 @@ pub struct Asteroid {
 }
 
 impl CommandHandler for Asteroid {
-    fn handle_command(&mut self, command: Command) -> Command {
+    fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match command {
             Command::Collide(kind) => {
                 match kind {
@@ -35,12 +35,12 @@ impl CommandHandler for Asteroid {
                 }
                 if self.hp == 0 {
                     self.deleted = true;
-                    return Command::AddExplosion(self.viewport().center());
+                    return vec![Command::AddExplosion(self.viewport().center())];
                 }
             }
             _ => (),
         };
-        Command::NOOP
+        vec![]
     }
 }
 
