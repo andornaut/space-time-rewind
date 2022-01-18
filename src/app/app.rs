@@ -44,13 +44,11 @@ impl App {
                 Some(command) => match command {
                     Command::Quit => return Ok(()),
                     Command::Restart => self.ticker.restart(),
-                    _ => {
-                        commands.push(command);
-                        self.world.broadcast_commands(commands)?;
-                    }
+                    _ => commands.push(command),
                 },
                 None => (),
             }
+            self.world.broadcast_commands(commands)?;
         }
     }
 

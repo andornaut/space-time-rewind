@@ -15,7 +15,7 @@ pub trait CommandHandler {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Command {
     Continue,
-    GameOver, // Display an option to quit or restart
+    GameOver, // Display a prompt to quit or restart
     Quit,     // Exit the application
     Restart,
 
