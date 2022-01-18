@@ -39,6 +39,20 @@ enum AsteroidKind {
 }
 
 impl AsteroidKind {
+    fn color(&self, hp: u8) -> Color {
+        if hp <= self.initial_hp() / 3 {
+            return Color::from(ColorTheme::AsteroidLowHp);
+        }
+        if hp <= (self.initial_hp() as f32 / 1.5) as u8 {
+            return Color::from(ColorTheme::AsteroidMidHp);
+        }
+        Color::from(match self {
+            AsteroidKind::Large => ColorTheme::AsteroidHighHpLarge,
+            AsteroidKind::Medium => ColorTheme::AsteroidHighHpMedium,
+            AsteroidKind::Small => ColorTheme::AsteroidHighHpSmall,
+        })
+    }
+
     fn frequency(&self) -> Frequency {
         match self {
             AsteroidKind::Large => Frequency::Six,
@@ -46,6 +60,7 @@ impl AsteroidKind {
             AsteroidKind::Small => Frequency::Four,
         }
     }
+
     fn initial_hp(&self) -> u8 {
         match self {
             AsteroidKind::Large => 12,
@@ -103,7 +118,12 @@ impl GameItem for Asteroid {
 
 impl Renderable for Asteroid {
     fn render(&mut self, context: &mut Context, _: Viewport) {
-        render_text(context, self.coordinates, self.kind.text(), self.color());
+        render_text(
+            context,
+            self.coordinates,
+            self.kind.text(),
+            self.kind.color(self.hp),
+        );
     }
 
     fn viewport(&self) -> Viewport {
@@ -113,7 +133,7 @@ impl Renderable for Asteroid {
 
 impl TickHandler for Asteroid {
     fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.should(self.kind.frequency()) {
+        if ticker.at(self.kind.frequency()) {
             let (x, y) = self.coordinates;
             if y == 0 {
                 self.deleted = true;
@@ -144,16 +164,6 @@ impl Asteroid {
             hp: kind.initial_hp(),
             kind,
         }
-    }
-
-    fn color(&self) -> Color {
-        if self.hp <= self.kind.initial_hp() / 3 {
-            return Color::from(ColorTheme::AsteroidLowHp);
-        }
-        if self.hp <= (self.kind.initial_hp() as f32 / 1.5) as u8 {
-            return Color::from(ColorTheme::AsteroidMidHp);
-        }
-        Color::from(ColorTheme::AsteroidHighHp)
     }
 
     fn height(&self) -> u16 {

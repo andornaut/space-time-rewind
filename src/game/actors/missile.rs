@@ -69,7 +69,7 @@ impl Renderable for Missile {
 
 impl TickHandler for Missile {
     fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.should(Frequency::Five) {
+        if ticker.at(Frequency::Five) {
             let (x, y) = self.coordinates;
             self.coordinates = (x, y + 1);
         }

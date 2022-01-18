@@ -32,7 +32,9 @@ impl TickHandler for World {
     fn handle_tick(&mut self, ticker: &Ticker) {
         if ticker.number() == 1 {
             // Initialize on tick 1, because the viewport is set on tick 0 when the world is first rendered.
-            self.restart();
+            self.actors.clear(); // Actors are spawned on tick 2.
+            self.spawner.restart();
+            self.ui = self.spawner.ui();
             return;
         }
 
@@ -123,11 +125,5 @@ impl World {
         self.game_items_iter_mut()
             .flat_map(|handler| handler.handle_command(command))
             .collect()
-    }
-
-    fn restart(&mut self) {
-        self.spawner.restart();
-        self.actors.clear(); // Actors are spawned in `handle_tick()`.
-        self.ui = self.spawner.ui();
     }
 }

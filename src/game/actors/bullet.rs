@@ -65,7 +65,7 @@ impl Renderable for Bullet {
 
 impl TickHandler for Bullet {
     fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.should(Frequency::Four) {
+        if ticker.at(Frequency::Four) {
             let (x, y) = self.coordinates;
             self.coordinates = (x, y + 1);
         }

@@ -21,7 +21,7 @@ pub fn initial(viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
 pub fn level1(ticker: &Ticker, viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
     let mut actors: Vec<Box<dyn GameItem>> = Vec::new();
     let (x, y) = viewport.top_right();
-    if ticker.should(Frequency::Ten) {
+    if ticker.at(Frequency::Ten) {
         actors.push(Box::new(Asteroid::new_small((0, y))));
         actors.push(Box::new(Asteroid::new_large((0, y + 4))));
         actors.push(Box::new(Asteroid::new_medium(((x / 2) + 3, y + 6))));

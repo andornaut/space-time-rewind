@@ -7,9 +7,11 @@ pub enum ColorTheme {
     BoardTitleFg,
 
     // Actors
-    AsteroidHighHp,
-    AsteroidMidHp,
+    AsteroidHighHpLarge,
+    AsteroidHighHpMedium,
+    AsteroidHighHpSmall,
     AsteroidLowHp,
+    AsteroidMidHp,
     Bullet,
     ExplosionStart,
     ExplosionMiddle,
@@ -36,9 +38,11 @@ impl From<ColorTheme> for Color {
             ColorTheme::BoardTitleFg => Color::Blue,
 
             // Actors
-            ColorTheme::AsteroidHighHp => Color::Rgb(120, 99, 66),
-            ColorTheme::AsteroidMidHp => Color::Rgb(99, 66, 33),
-            ColorTheme::AsteroidLowHp => Color::Rgb(66, 33, 22),
+            ColorTheme::AsteroidHighHpLarge => Color::Rgb(120, 130, 110),
+            ColorTheme::AsteroidHighHpMedium => Color::Rgb(110, 88, 77),
+            ColorTheme::AsteroidHighHpSmall => Color::Rgb(88, 77, 66),
+            ColorTheme::AsteroidLowHp => Color::Rgb(44, 33, 22),
+            ColorTheme::AsteroidMidHp => Color::Rgb(66, 55, 44),
             ColorTheme::Bullet => Color::Rgb(204, 204, 0),
             ColorTheme::ExplosionStart => Color::Rgb(153, 0, 0),
             ColorTheme::ExplosionMiddle => Color::Rgb(204, 21, 21),

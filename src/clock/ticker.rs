@@ -58,6 +58,11 @@ impl Ticker {
         }
     }
 
+    pub fn at(&self, frequency: Frequency) -> bool {
+        // `number` is initialized to 0, so this will return true for all `frequency` when `self` is first initialized.
+        self.number % u16::from(frequency) == 0
+    }
+
     pub fn maybe_tick(&mut self) -> bool {
         let last_tick = match self.last_tick {
             Some(tick) => tick,
@@ -71,6 +76,10 @@ impl Ticker {
         return should_tick;
     }
 
+    pub fn number(&self) -> u64 {
+        u64::from(self.cycles) * u64::from(MAX_NUMBER) + u64::from(self.number)
+    }
+
     pub fn remaining_timeout(&self) -> Duration {
         let elapsed = self.last_tick.unwrap_or_else(|| Instant::now()).elapsed();
         self.tick_rate
@@ -80,27 +89,17 @@ impl Ticker {
 
     pub fn restart(&mut self) {
         self.cycles = 0;
-        self.last_tick = None;
         self.number = 0;
-    }
-
-    pub fn should(&self, frequency: Frequency) -> bool {
-        // `number` is initialized to 0, so this will return true for all `frequency` when `self` is first initialized.
-        self.number % u16::from(frequency) == 0
+        self.last_tick = None;
     }
 
     pub fn tick(&mut self) {
         self.number = if self.number == MAX_NUMBER {
             self.cycles += 1;
-            1 // Restart at 1, so that `number==0` is only true on the first tick.
+            0
         } else {
             self.number + 1
         };
-    }
-
-    pub fn number(&self) -> u32 {
-        // Will overflow after ~2.75 years at 1 tick every 20ms.
-        u32::from(self.cycles) * u32::from(MAX_NUMBER) + u32::from(self.number)
     }
 
     fn reset_last_tick(&mut self) -> Instant {
@@ -125,9 +124,9 @@ mod tests {
     fn should_is_true_for_any_frequencies_at_start() {
         let ticker = Ticker::new(Duration::from_secs(1));
 
-        assert_eq!(ticker.should(Frequency::One), true);
-        assert_eq!(ticker.should(Frequency::Five), true);
-        assert_eq!(ticker.should(Frequency::Ten), true);
+        assert_eq!(ticker.at(Frequency::One), true);
+        assert_eq!(ticker.at(Frequency::Five), true);
+        assert_eq!(ticker.at(Frequency::Ten), true);
     }
 
     #[test]
@@ -170,7 +169,7 @@ mod tests {
         let mut ticker = Ticker::new(Duration::from_secs(1));
         let mut count = 0;
         for _ in 0..MAX_NUMBER {
-            if ticker.should(frequency) {
+            if ticker.at(frequency) {
                 count += 1;
             }
             ticker.tick();
