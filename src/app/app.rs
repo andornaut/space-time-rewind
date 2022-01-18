@@ -40,8 +40,10 @@ impl App {
 
             let mut commands = self.world.detect_collisions();
             self.maybe_add_input_command(&mut commands)?;
-            if let Command::Quit = self.world.broadcast_commands(commands)? {
-                return Ok(());
+            match self.world.broadcast_commands(commands)? {
+                Command::Quit => return Ok(()),
+                Command::Restart => self.ticker.restart(),
+                _ => (),
             }
         }
     }

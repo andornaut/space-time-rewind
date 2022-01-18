@@ -15,19 +15,19 @@ use tui::{style::Color, widgets::canvas::Context};
 const LIFECYCLE_TRANSITION_COUNT: u16 = 3;
 
 static TEXT_START: &str = "\
-\x20\x20\x20\x20
-\x20▒▒\x20
-\x20\x20\x20\x20";
+\x20\x20\x20\x20\x20\x20
+\x20\x20▒▒\x20\x20
+\x20\x20\x20\x20\x20\x20";
 
 static TEXT_MIDDLE: &str = "\
-\x20░░\x20
+\x20\x20░░\x20\x20
 ░▒▒░
-\x20░░\x20";
+\x20\x20░░\x20\x20";
 
 static TEXT_END: &str = "\
-░▒▒░
-▒░░▒
-░▒▒░";
+░▒▒▒░
+▒░░░▒
+░▒▒▒░";
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Lifecycle {

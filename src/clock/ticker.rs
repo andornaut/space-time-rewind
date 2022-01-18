@@ -42,8 +42,8 @@ impl From<Frequency> for u16 {
 const MAX_NUMBER: u16 = 2048;
 
 pub struct Ticker {
-    pub number: u16,
     cycles: u16,
+    number: u16,
     last_tick: Option<Instant>,
     tick_rate: Duration,
 }
@@ -71,15 +71,17 @@ impl Ticker {
         return should_tick;
     }
 
-    pub fn first(&self) -> bool {
-        self.number == 1
-    }
-
     pub fn remaining_timeout(&self) -> Duration {
         let elapsed = self.last_tick.unwrap_or_else(|| Instant::now()).elapsed();
         self.tick_rate
             .checked_sub(elapsed)
             .unwrap_or_else(|| Duration::from_secs(0))
+    }
+
+    pub fn restart(&mut self) {
+        self.cycles = 0;
+        self.last_tick = None;
+        self.number = 0;
     }
 
     pub fn should(&self, frequency: Frequency) -> bool {
@@ -90,13 +92,13 @@ impl Ticker {
     pub fn tick(&mut self) {
         self.number = if self.number == MAX_NUMBER {
             self.cycles += 1;
-            1
+            1 // Restart at 1, so that `number==0` is only true on the first tick.
         } else {
             self.number + 1
         };
     }
 
-    pub fn ticks(self) -> u32 {
+    pub fn number(&self) -> u32 {
         // Will overflow after ~2.75 years at 1 tick every 20ms.
         u32::from(self.cycles) * u32::from(MAX_NUMBER) + u32::from(self.number)
     }

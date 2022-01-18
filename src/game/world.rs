@@ -30,7 +30,8 @@ impl Default for World {
 
 impl TickHandler for World {
     fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.first() {
+        if ticker.number() == 1 {
+            // Initialize on tick 1, because the viewport is set on tick 0 when the world is rendered.
             self.restart();
             return;
         }
@@ -48,6 +49,9 @@ impl World {
     pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Result<Command> {
         if contains_quit_commands(&commands) {
             return Ok(Command::Quit);
+        }
+        if contains_restart_commands(&commands) {
+            return Ok(Command::Restart);
         }
         let commands: Vec<Command> = commands
             .into_iter()
@@ -116,7 +120,6 @@ impl World {
             Command::AddMissile(coordinates) => {
                 self.actors.push(Box::new(Missile::new(coordinates)))
             }
-            Command::Restart => self.restart(),
             _ => return false,
         }
         true
@@ -137,7 +140,7 @@ impl World {
 
     fn restart(&mut self) {
         self.spawner.restart();
-        self.actors.clear(); // Actors are created in `handle_tick`.
+        self.actors.clear(); // Actors are spawned in `handle_tick()`.
         self.ui = self.spawner.ui();
     }
 }
@@ -146,6 +149,12 @@ fn contains_quit_commands(commands: &Vec<Command>) -> bool {
     commands.iter().any(|command| *command == Command::Quit)
 }
 
+fn contains_restart_commands(commands: &Vec<Command>) -> bool {
+    commands.iter().any(|command| *command == Command::Restart)
+}
+
 fn contains_unhandled_commands(commands: &Vec<Command>) -> bool {
-    commands.iter().any(|command| *command != Command::Quit)
+    commands
+        .iter()
+        .any(|command| *command != Command::Quit && *command != Command::Restart)
 }
