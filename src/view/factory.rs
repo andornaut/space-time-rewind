@@ -48,10 +48,12 @@ pub fn create_ui_viewport(rect: Rect) -> Viewport {
     Viewport::new(width, BUTTON_PANEL_HEIGHT)
 }
 
-pub fn create_canvas<F>(block: Block, x_min: u16, x_max: u16, y_min: u16, y_max: u16) -> Canvas<F>
+pub fn create_canvas<F>(block: Block, viewport: Viewport) -> Canvas<F>
 where
     F: Fn(&mut Context),
 {
+    let (x_min, y_min) = viewport.bottom_left();
+    let (x_max, y_max) = viewport.top_right();
     Canvas::default()
         .background_color(Color::from(ColorTheme::Bg))
         .block(block)

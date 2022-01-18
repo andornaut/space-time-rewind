@@ -84,9 +84,7 @@ fn render_canvas<B: Backend>(
         // Skip rendering the canvas to avoid a panic when `rect` is too small.
         return;
     }
-    let (x_min, y_min) = viewport.bottom_left();
-    let (x_max, y_max) = viewport.top_right();
-    let mut canvas = create_canvas(block, x_min, x_max, y_min, y_max);
+    let mut canvas = create_canvas(block, viewport);
     let renderables = Rc::new(RefCell::new(renderables));
     canvas = canvas.paint(|ctx: &mut Context| {
         for renderable in renderables.borrow_mut().iter_mut() {
