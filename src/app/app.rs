@@ -39,21 +39,19 @@ impl App {
             self.render(session)?;
 
             let mut commands = self.world.detect_collisions();
-            self.maybe_add_input_command(&mut commands)?;
-            match self.world.broadcast_commands(commands)? {
-                Command::Quit => return Ok(()),
-                Command::Restart => self.ticker.restart(),
-                _ => (),
+
+            match self.wait_for_input_command()? {
+                Some(command) => match command {
+                    Command::Quit => return Ok(()),
+                    Command::Restart => self.ticker.restart(),
+                    _ => {
+                        commands.push(command);
+                        self.world.broadcast_commands(commands)?;
+                    }
+                },
+                None => (),
             }
         }
-    }
-
-    fn maybe_add_input_command(&mut self, commands: &mut Vec<Command>) -> Result<(), Error> {
-        match self.wait_for_input_command()? {
-            Some(command) => commands.push(command),
-            None => (),
-        }
-        Ok(())
     }
 
     fn render(&mut self, session: &mut Session) -> Result<()> {

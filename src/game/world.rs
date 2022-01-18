@@ -46,33 +46,23 @@ impl TickHandler for World {
 }
 
 impl World {
-    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Result<Command> {
-        if contains_quit_commands(&commands) {
-            return Ok(Command::Quit);
-        }
-        if contains_restart_commands(&commands) {
-            return Ok(Command::Restart);
-        }
+    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Result<()> {
         let commands: Vec<Command> = commands
             .into_iter()
             .flat_map(|command| self.broadcast_command(command))
             .collect();
-        let commands = commands
+        let unhandled_commands: Vec<Command> = commands
             .into_iter()
             .filter(|command| !self.consumed_command(*command))
             .collect();
 
-        if contains_unhandled_commands(&commands) {
+        if !unhandled_commands.is_empty() {
             return Err(anyhow!(
                 "Error: There are unhandled command(s): {:?}",
-                commands
+                unhandled_commands
             ));
         }
-        Ok(if contains_quit_commands(&commands) {
-            Command::Quit
-        } else {
-            Command::Continue
-        })
+        Ok(())
     }
 
     pub fn detect_collisions(&mut self) -> Vec<Command> {
@@ -102,9 +92,6 @@ impl World {
 
     fn broadcast_command(&mut self, command: Command) -> Vec<Command> {
         let secondary_commands = self.notify_handlers(command);
-        if contains_quit_commands(&secondary_commands) {
-            return vec![Command::Quit];
-        }
         secondary_commands
             .into_iter()
             .flat_map(|command| self.notify_handlers(command))
@@ -143,18 +130,4 @@ impl World {
         self.actors.clear(); // Actors are spawned in `handle_tick()`.
         self.ui = self.spawner.ui();
     }
-}
-
-fn contains_quit_commands(commands: &Vec<Command>) -> bool {
-    commands.iter().any(|command| *command == Command::Quit)
-}
-
-fn contains_restart_commands(commands: &Vec<Command>) -> bool {
-    commands.iter().any(|command| *command == Command::Restart)
-}
-
-fn contains_unhandled_commands(commands: &Vec<Command>) -> bool {
-    commands
-        .iter()
-        .any(|command| *command != Command::Quit && *command != Command::Restart)
 }
