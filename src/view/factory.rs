@@ -3,8 +3,12 @@ use crate::app::color::ColorTheme;
 use tui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
+    symbols::Marker,
     text::Span,
-    widgets::{Block, BorderType, Borders},
+    widgets::{
+        canvas::{Canvas, Context},
+        Block, BorderType, Borders,
+    },
 };
 
 const BOARD_MIN_HEIGHT: u16 = 10;
@@ -42,6 +46,19 @@ pub fn create_actors_viewport(rect: Rect) -> Viewport {
 pub fn create_ui_viewport(rect: Rect) -> Viewport {
     let Rect { width, .. } = rect;
     Viewport::new(width, BUTTON_PANEL_HEIGHT)
+}
+
+pub fn create_canvas<F>(block: Block, x_min: u16, x_max: u16, y_min: u16, y_max: u16) -> Canvas<F>
+where
+    F: Fn(&mut Context),
+{
+    Canvas::default()
+        .background_color(Color::from(ColorTheme::Bg))
+        .block(block)
+        .marker(Marker::Block)
+        // The scaling doesn't work correctly, unless each bounds is 1 less than the top_right position.
+        .x_bounds([f64::from(x_min), f64::from(x_max - 1)])
+        .y_bounds([f64::from(y_min), f64::from(y_max - 1)])
 }
 
 pub fn split_into_actors_and_ui(rect: Rect) -> (Rect, Rect) {
