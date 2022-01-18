@@ -5,7 +5,7 @@ pub type Movement = (i16, i16);
 
 #[derive(Copy, Clone, Debug)]
 pub struct Viewport {
-    pub rect: Rect,
+    rect: Rect,
 }
 
 impl Viewport {
