@@ -11,7 +11,7 @@ use crate::{
         session::Session,
     },
 };
-use anyhow::{Error, Result};
+use anyhow::Result;
 use crossterm::event::{poll, read, Event};
 use std::time::Duration;
 

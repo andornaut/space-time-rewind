@@ -31,7 +31,7 @@ impl Default for World {
 impl TickHandler for World {
     fn handle_tick(&mut self, ticker: &Ticker) {
         if ticker.number() == 1 {
-            // Initialize on tick 1, because the viewport is set on tick 0 when the world is rendered.
+            // Initialize on tick 1, because the viewport is set on tick 0 when the world is first rendered.
             self.restart();
             return;
         }
