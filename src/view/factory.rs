@@ -58,9 +58,8 @@ where
         .background_color(Color::from(ColorTheme::Bg))
         .block(block)
         .marker(Marker::Block)
-        // The scaling doesn't work correctly, unless each bounds is 1 less than the top_right position.
-        .x_bounds([f64::from(x_min), f64::from(x_max - 1)])
-        .y_bounds([f64::from(y_min), f64::from(y_max - 1)])
+        .x_bounds([f64::from(x_min), f64::from(x_max)])
+        .y_bounds([f64::from(y_min), f64::from(y_max)])
 }
 
 pub fn split_into_actors_and_ui(rect: Rect) -> (Rect, Rect) {

@@ -20,6 +20,11 @@ pub enum ColorTheme {
     Ship,
 
     // UI
+    HealthCurrent,
+    HealthHeader,
+    HealthLost,
+    ScoreHeader,
+    ScorePoints,
     DisabledButton,
     GameOver,
     Missile,
@@ -51,6 +56,11 @@ impl From<ColorTheme> for Color {
             ColorTheme::Ship => Color::Cyan,
 
             // UI
+            ColorTheme::HealthCurrent => Color::Rgb(176, 25, 25),
+            ColorTheme::HealthHeader => Color::Rgb(104, 104, 104),
+            ColorTheme::HealthLost => Color::Rgb(153, 153, 153),
+            ColorTheme::ScoreHeader => Color::Rgb(104, 104, 104),
+            ColorTheme::ScorePoints => Color::Rgb(204, 204, 204),
             ColorTheme::DisabledButton => Color::Rgb(51, 51, 51),
             ColorTheme::GameOver => Color::Rgb(204, 102, 153),
             ColorTheme::Missile => Color::Rgb(175, 102, 102),

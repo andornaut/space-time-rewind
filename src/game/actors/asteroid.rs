@@ -7,10 +7,11 @@ use crate::{
     game::game_item::{GameItem, GameItemKind},
     view::{
         render::{render_text, Renderable},
+        util::{chars_height, chars_width},
         viewport::{Coordinates, Viewport},
     },
 };
-use tui::{style::Color, widgets::canvas::Context};
+use tui::widgets::canvas::Context;
 
 static TEXT_LARGE: &str = "\
 \x20▟▒▒▒▓▓▓▒▒▒▓▓▓▓▓▒▓▩\x20\x20\x20\x20\x20
@@ -39,18 +40,18 @@ enum AsteroidKind {
 }
 
 impl AsteroidKind {
-    fn color(&self, hp: u8) -> Color {
+    fn color(&self, hp: u8) -> ColorTheme {
         if hp <= self.initial_hp() / 3 {
-            return Color::from(ColorTheme::AsteroidLowHp);
+            return ColorTheme::AsteroidLowHp;
         }
         if hp <= (self.initial_hp() as f32 / 1.5) as u8 {
-            return Color::from(ColorTheme::AsteroidMidHp);
+            return ColorTheme::AsteroidMidHp;
         }
-        Color::from(match self {
+        match self {
             AsteroidKind::Large => ColorTheme::AsteroidHighHpLarge,
             AsteroidKind::Medium => ColorTheme::AsteroidHighHpMedium,
             AsteroidKind::Small => ColorTheme::AsteroidHighHpSmall,
-        })
+        }
     }
 
     fn frequency(&self) -> Frequency {
@@ -67,6 +68,10 @@ impl AsteroidKind {
             AsteroidKind::Medium => 6,
             AsteroidKind::Small => 3,
         }
+    }
+
+    fn points(&self) -> u8 {
+        self.initial_hp()
     }
 
     fn text(&self) -> &'static str {
@@ -97,7 +102,10 @@ impl CommandHandler for Asteroid {
                 }
                 if self.hp == 0 {
                     self.deleted = true;
-                    return vec![Command::AddExplosion(self.viewport().center())];
+                    return vec![
+                        Command::AddExplosion(self.viewport().center()),
+                        Command::IncreaseScore(self.kind.points()),
+                    ];
                 }
             }
             _ => (),
@@ -167,10 +175,10 @@ impl Asteroid {
     }
 
     fn height(&self) -> u16 {
-        self.kind.text().lines().count() as u16
+        chars_height(self.kind.text())
     }
 
     fn width(&self) -> u16 {
-        self.kind.text().lines().next().unwrap().chars().count() as u16
+        chars_width(self.kind.text())
     }
 }

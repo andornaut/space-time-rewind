@@ -5,9 +5,10 @@ use crate::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},
     },
-    game::game_item::{GameItem, GameItemKind},
+    game::game_item::GameItem,
     view::{
         render::{render_text, Renderable},
+        util::{chars_height, chars_width},
         viewport::{Coordinates, Viewport},
     },
 };
@@ -42,11 +43,7 @@ impl CommandHandler for Button {
     }
 }
 
-impl GameItem for Button {
-    fn kind(&self) -> GameItemKind {
-        GameItemKind::Button
-    }
-}
+impl GameItem for Button {}
 
 impl Renderable for Button {
     fn render(&mut self, context: &mut Context, _: Viewport) {
@@ -88,7 +85,7 @@ impl Button {
     }
 
     pub fn height(&self) -> u16 {
-        self.button_kind.text().lines().count() as u16
+        chars_height(self.button_kind.text())
     }
 
     pub fn set_coordinates(&mut self, coordinates: Coordinates) {
@@ -96,13 +93,7 @@ impl Button {
     }
 
     pub fn width(&self) -> u16 {
-        self.button_kind
-            .text()
-            .lines()
-            .next()
-            .unwrap()
-            .chars()
-            .count() as u16
+        chars_width(self.button_kind.text())
     }
 
     fn new(button_kind: ButtonKind) -> Self {

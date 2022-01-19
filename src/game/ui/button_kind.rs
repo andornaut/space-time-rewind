@@ -1,5 +1,4 @@
 use crate::app::color::ColorTheme;
-use tui::style::Color;
 
 const DISABLED_MISSILE_COUNT: u16 = 600; // The Missile `Button` needs to use the same value.
 static TEXT_GAME_OVER: &str = "\
@@ -28,11 +27,11 @@ pub enum ButtonKind {
 }
 
 impl ButtonKind {
-    pub fn color(&self, active: bool, disabled: bool) -> Color {
+    pub fn color(&self, active: bool, disabled: bool) -> ColorTheme {
         if disabled {
-            return Color::from(ColorTheme::DisabledButton);
+            return ColorTheme::DisabledButton;
         }
-        Color::from(match self {
+        match self {
             ButtonKind::Missile => {
                 if active {
                     ColorTheme::MissileActive
@@ -55,7 +54,7 @@ impl ButtonKind {
                 }
             }
             ButtonKind::GameOver => ColorTheme::GameOver,
-        })
+        }
     }
 
     pub fn disabled_count(&self) -> u16 {

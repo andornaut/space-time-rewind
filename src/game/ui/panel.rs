@@ -2,7 +2,7 @@ use super::button::Button;
 use crate::{
     app::command::{Command, CommandHandler, NO_COMMANDS},
     clock::ticker::{TickHandler, Ticker},
-    game::game_item::{GameItem, GameItemKind},
+    game::game_item::GameItem,
     view::{
         render::Renderable,
         viewport::{Coordinates, Viewport},
@@ -39,20 +39,17 @@ impl Default for ButtonPanel {
                 Button::new_shields(),
                 Button::new_rewind(),
             ],
-            coordinates: (0, 0), // Will center during render()
+            coordinates: (0, 0), // Will be re-aligned during `render()`
         }
     }
 }
 
-impl GameItem for ButtonPanel {
-    fn kind(&self) -> GameItemKind {
-        GameItemKind::Button
-    }
-}
+impl GameItem for ButtonPanel {}
 
 impl Renderable for ButtonPanel {
     fn render(&mut self, context: &mut Context, viewport: Viewport) {
-        self.center_buttons(viewport);
+        self.center(viewport);
+        self.align_buttons();
 
         for button in self.buttons.iter_mut() {
             button.render(context, viewport);
@@ -73,24 +70,25 @@ impl TickHandler for ButtonPanel {
 }
 
 impl ButtonPanel {
-    fn bottom_left_centered(&self, viewport: Viewport) -> Coordinates {
+    fn align_buttons(&mut self) {
         let (x, y) = self.coordinates;
-        let (x_centered, _) = viewport.center();
         let x_panel_offset = self.width() / 2;
-        let x = x.saturating_add(x_centered).saturating_sub(x_panel_offset);
-        (x, y)
-    }
+        let x = x.saturating_sub(x_panel_offset);
 
-    fn center_buttons(&mut self, viewport: Viewport) {
-        let (x, y) = self.bottom_left_centered(viewport);
         for (i, button) in self.buttons.iter_mut().enumerate() {
-            let coordinates = (x + (i as u16 * (button.width() + GUTTER_WIDTH)), y);
-            button.set_coordinates(coordinates);
+            let x_buttons_offset = i as u16 * (button.width() + GUTTER_WIDTH);
+            button.set_coordinates((x + x_buttons_offset, y));
         }
     }
 
+    fn center(&mut self, viewport: Viewport) {
+        let (_, y) = self.coordinates;
+        let (x, _) = viewport.center();
+        self.coordinates = (x, y)
+    }
+
     fn height(&self) -> u16 {
-        self.buttons[0].height()
+        self.buttons[0].height() // All buttons are the same height.
     }
 
     fn width(&self) -> u16 {

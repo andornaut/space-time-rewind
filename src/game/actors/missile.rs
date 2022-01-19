@@ -7,10 +7,11 @@ use crate::{
     game::game_item::{GameItem, GameItemKind},
     view::{
         render::{render_text, Renderable},
+        util::{chars_height, chars_width},
         viewport::{Coordinates, Viewport},
     },
 };
-use tui::{style::Color, widgets::canvas::Context};
+use tui::widgets::canvas::Context;
 
 // \x20 is a quoted space
 static TEXT: &str = "\
@@ -54,12 +55,7 @@ impl Renderable for Missile {
             self.deleted = true;
             return;
         }
-        render_text(
-            context,
-            self.coordinates,
-            TEXT,
-            Color::from(ColorTheme::Missile),
-        );
+        render_text(context, self.coordinates, TEXT, ColorTheme::Missile);
     }
 
     fn viewport(&self) -> Viewport {
@@ -89,9 +85,9 @@ impl Missile {
 }
 
 fn height() -> u16 {
-    TEXT.lines().count() as u16
+    chars_height(TEXT)
 }
 
 fn width() -> u16 {
-    TEXT.lines().next().unwrap().chars().count() as u16
+    chars_width(TEXT)
 }

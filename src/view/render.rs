@@ -3,6 +3,7 @@ use super::{
     viewport::{Coordinates, Viewport},
 };
 use crate::{
+    app::color::ColorTheme,
     game::{game_item::GameItem, world::World},
     view::{
         factory::{
@@ -17,7 +18,8 @@ use std::{cell::RefCell, rc::Rc};
 use tui::{
     backend::Backend,
     layout::Rect,
-    style::Color,
+    style::{Color, Style},
+    text::Span,
     widgets::{canvas::Context, Block},
     Frame,
 };
@@ -34,12 +36,15 @@ pub fn render_text(
     context: &mut Context,
     coordinates: Coordinates,
     text: &'static str,
-    color: Color,
+    color: ColorTheme,
 ) {
     let (x, y) = coordinates;
+    let style = Style::default().fg(Color::from(color));
+
     // Reverse the string, because it is stored top->down, but is rendered bottom->up.
     for (y_offset, line) in text.lines().rev().enumerate() {
-        context.print(f64::from(x), f64::from(y) + y_offset as f64, line, color);
+        let span = Span::styled(line, style);
+        context.print(f64::from(x), f64::from(y) + y_offset as f64, span);
     }
 }
 

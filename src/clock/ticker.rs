@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
 pub trait TickHandler {
-    fn handle_tick(&mut self, ticker: &Ticker);
+    fn handle_tick(&mut self, _: &Ticker) {}
 }
 
 #[derive(Copy, Clone, Debug)]

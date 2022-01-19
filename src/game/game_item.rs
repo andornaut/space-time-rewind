@@ -14,7 +14,6 @@ pub trait GameItem: CommandHandler + Renderable + TickHandler {
 pub enum GameItemKind {
     Asteroid,
     Bullet,
-    Button,
     Missile,
     Ship,
 
@@ -25,13 +24,6 @@ impl GameItemKind {
     pub fn is_shootable(self) -> bool {
         match self {
             GameItemKind::Asteroid => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_weapon(self) -> bool {
-        match self {
-            GameItemKind::Bullet | GameItemKind::Missile => true,
             _ => false,
         }
     }

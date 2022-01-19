@@ -1,7 +1,10 @@
 use super::levels::{initial, level1};
 use crate::{
     clock::ticker::Ticker,
-    game::{game_item::GameItem, ui::panel::ButtonPanel},
+    game::{
+        game_item::GameItem,
+        ui::{health::Health, panel::ButtonPanel, score::Score},
+    },
     view::viewport::Viewport,
 };
 
@@ -47,7 +50,13 @@ impl Spawner {
     }
 
     pub fn ui(&self) -> Vec<Box<dyn GameItem>> {
-        vec![Box::new(ButtonPanel::default())]
+        vec![
+            Box::new(ButtonPanel::default()),
+            // Render the health and score UIs after the button panel, so that they'll be rendered
+            // above the panel when the viewport is too narrow.
+            Box::new(Health::default()),
+            Box::new(Score::default()),
+        ]
     }
 
     pub fn restart(&mut self) {

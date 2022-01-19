@@ -7,10 +7,11 @@ use crate::{
     game::game_item::GameItem,
     view::{
         render::{render_text, Renderable},
+        util::{chars_height, chars_width},
         viewport::{Coordinates, Viewport},
     },
 };
-use tui::{style::Color, widgets::canvas::Context};
+use tui::widgets::canvas::Context;
 
 const LIFECYCLE_TRANSITION_COUNT: u16 = 3;
 
@@ -39,12 +40,12 @@ enum Lifecycle {
 }
 
 impl Lifecycle {
-    fn color(&self) -> Color {
+    fn color(&self) -> ColorTheme {
         match self {
-            Self::Start => Color::from(ColorTheme::ExplosionStart),
-            Self::Middle => Color::from(ColorTheme::ExplosionMiddle),
-            Self::End => Color::from(ColorTheme::ExplosionEnd),
-            Self::End2 => Color::from(ColorTheme::ExplosionEnd2),
+            Self::Start => ColorTheme::ExplosionStart,
+            Self::Middle => ColorTheme::ExplosionMiddle,
+            Self::End => ColorTheme::ExplosionEnd,
+            Self::End2 => ColorTheme::ExplosionEnd2,
             Self::Deleted => panic!("Cannot invoke methods on Lifecycle::Deleted"),
         }
     }
@@ -131,9 +132,9 @@ impl Explosion {
 }
 
 fn height() -> u16 {
-    TEXT_START.lines().count() as u16
+    chars_height(TEXT_START)
 }
 
 fn width() -> u16 {
-    TEXT_START.lines().next().unwrap().chars().count() as u16
+    chars_width(TEXT_START)
 }

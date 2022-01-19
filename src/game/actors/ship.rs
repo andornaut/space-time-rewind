@@ -7,13 +7,17 @@ use crate::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},
     },
-    game::game_item::{GameItem, GameItemKind},
+    game::{
+        game_item::{GameItem, GameItemKind},
+        INITIAL_MAX_HEALTH,
+    },
     view::{
         render::{render_text, Renderable},
+        util::{chars_height, chars_width},
         viewport::{Coordinates, Viewport},
     },
 };
-use tui::{style::Color, widgets::canvas::Context};
+use tui::widgets::canvas::Context;
 
 static TEXT: &str = "◄◆►";
 
@@ -24,15 +28,22 @@ pub struct Ship {
     coordinates: Coordinates,
     deleted: bool,
     disabled_guns: Countdown,
+    health: u8,
 }
 
 impl CommandHandler for Ship {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match command {
             Command::Collide(kind) => {
-                if !kind.is_weapon() {
-                    self.deleted = true;
-                    return vec![Command::GameOver];
+                if let GameItemKind::Asteroid = kind {
+                    self.health = self.health.saturating_sub(1);
+                    let mut commands = vec![Command::Health(self.health, INITIAL_MAX_HEALTH)];
+                    if self.health == 0 {
+                        self.deleted = true;
+                        commands.push(Command::AddExplosion(self.viewport().center()));
+                        commands.push(Command::GameOver);
+                    }
+                    return commands;
                 }
             }
             Command::FireGuns => {
@@ -74,12 +85,7 @@ impl Renderable for Ship {
     fn render(&mut self, context: &mut Context, viewport: Viewport) {
         // Prevent the ship from going out of bounds when the viewport is resized.
         self.coordinates = viewport.contain(&self.viewport());
-        render_text(
-            context,
-            self.coordinates,
-            TEXT,
-            Color::from(ColorTheme::Ship),
-        );
+        render_text(context, self.coordinates, TEXT, ColorTheme::Ship);
     }
 
     fn viewport(&self) -> Viewport {
@@ -99,14 +105,15 @@ impl Ship {
             coordinates,
             deleted: false,
             disabled_guns: Countdown::new(DISABLED_GUNS_COUNT),
+            health: INITIAL_MAX_HEALTH,
         }
     }
 }
 
 fn height() -> u16 {
-    TEXT.lines().count() as u16
+    chars_height(TEXT)
 }
 
 fn width() -> u16 {
-    TEXT.lines().next().unwrap().chars().count() as u16
+    chars_width(TEXT)
 }

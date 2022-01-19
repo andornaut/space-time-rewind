@@ -7,10 +7,11 @@ use crate::{
     game::game_item::{GameItem, GameItemKind},
     view::{
         render::{render_text, Renderable},
+        util::{chars_height, chars_width},
         viewport::{Coordinates, Viewport},
     },
 };
-use tui::{style::Color, widgets::canvas::Context};
+use tui::widgets::canvas::Context;
 
 static TEXT: &str = "•";
 
@@ -50,12 +51,7 @@ impl Renderable for Bullet {
             self.deleted = true;
             return;
         }
-        render_text(
-            context,
-            self.coordinates,
-            TEXT,
-            Color::from(ColorTheme::Bullet),
-        );
+        render_text(context, self.coordinates, TEXT, ColorTheme::Bullet);
     }
 
     fn viewport(&self) -> Viewport {
@@ -82,9 +78,9 @@ impl Bullet {
 }
 
 fn height() -> u16 {
-    TEXT.lines().count() as u16
+    chars_height(TEXT)
 }
 
 fn width() -> u16 {
-    TEXT.lines().next().unwrap().chars().count() as u16
+    chars_width(TEXT)
 }
