@@ -23,7 +23,6 @@ static TEXT: &str = "◄◆►";
 
 const DISABLED_GUNS_COUNT: u16 = 5;
 
-#[derive(Clone, Debug)]
 pub struct Ship {
     coordinates: Coordinates,
     deleted: bool,
@@ -82,7 +81,7 @@ impl GameItem for Ship {
 }
 
 impl Renderable for Ship {
-    fn render(&mut self, context: &mut Context, viewport: Viewport) {
+    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
         // Prevent the ship from going out of bounds when the viewport is resized.
         self.coordinates = viewport.contain(&self.viewport());
         render_text(context, self.coordinates, TEXT, ColorTheme::Ship);

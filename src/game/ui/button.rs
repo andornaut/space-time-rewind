@@ -16,7 +16,6 @@ use tui::widgets::canvas::Context;
 
 const ACTIVE_COUNT: u16 = 8;
 
-#[derive(Clone, Debug)]
 pub struct Button {
     active: Countdown,
     button_kind: ButtonKind,
@@ -46,7 +45,7 @@ impl CommandHandler for Button {
 impl GameItem for Button {}
 
 impl Renderable for Button {
-    fn render(&mut self, context: &mut Context, _: Viewport) {
+    fn render(&mut self, context: &mut Context, _: &Viewport) {
         render_text(
             context,
             self.coordinates,
@@ -97,11 +96,12 @@ impl Button {
     }
 
     fn new(button_kind: ButtonKind) -> Self {
+        let disabled_count = button_kind.disabled_count();
         Self {
             active: Countdown::new(ACTIVE_COUNT),
             button_kind,
             coordinates: (0, 0), // `ButtonPanel` will update the coordinates before rendering.
-            disabled: Countdown::new(button_kind.disabled_count()),
+            disabled: Countdown::new(disabled_count),
         }
     }
 

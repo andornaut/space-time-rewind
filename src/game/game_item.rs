@@ -10,7 +10,7 @@ pub trait GameItem: CommandHandler + Renderable + TickHandler {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug)]
 pub enum GameItemKind {
     Asteroid,
     Bullet,

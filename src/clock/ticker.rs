@@ -4,7 +4,7 @@ pub trait TickHandler {
     fn handle_tick(&mut self, _: &Ticker) {}
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub enum Frequency {
     One,
     Two,

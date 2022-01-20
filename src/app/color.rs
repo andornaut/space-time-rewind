@@ -1,6 +1,6 @@
 use tui::style::Color;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub enum ColorTheme {
     Bg,
     BoardBorderFg,

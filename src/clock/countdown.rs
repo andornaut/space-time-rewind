@@ -1,4 +1,3 @@
-#[derive(Clone, Debug, Default)]
 pub struct Countdown {
     current: u16,
     starting_from: u16,

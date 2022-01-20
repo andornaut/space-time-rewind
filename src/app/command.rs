@@ -12,7 +12,7 @@ pub trait CommandHandler {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug)]
 pub enum Command {
     Continue,
     GameOver, // Display a prompt to quit or restart

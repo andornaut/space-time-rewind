@@ -23,7 +23,6 @@ const GUTTER_WIDTH: u16 = 1;
 const HEIGHT: u16 = 2;
 static TEXT_HEADER: &'static str = "Score";
 
-#[derive(Clone, Debug)]
 pub struct Score {
     coordinates: Coordinates,
     score: u32,
@@ -47,7 +46,7 @@ impl Default for Score {
 impl GameItem for Score {}
 
 impl Renderable for Score {
-    fn render(&mut self, context: &mut Context, viewport: Viewport) {
+    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
         let width = self.width();
         // One of these offsets will be 0.
         let header_offset = width - chars_width(TEXT_HEADER);
@@ -83,7 +82,7 @@ impl Score {
         }
     }
 
-    fn align(&mut self, viewport: Viewport) {
+    fn align(&mut self, viewport: &Viewport) {
         let (x, _) = viewport.top_right();
         let (_, y) = viewport.bottom_left();
         self.coordinates = (

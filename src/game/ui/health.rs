@@ -22,7 +22,6 @@ static TEXT_HEADER: &'static str = "Health ";
 static TEXT_HEALTH_CURRENT: &'static str = "▮";
 static TEXT_HEALTH_LOST: &'static str = "▯";
 
-#[derive(Clone, Debug)]
 pub struct Health {
     coordinates: Coordinates,
     current: u8,
@@ -50,7 +49,7 @@ impl Default for Health {
 impl GameItem for Health {}
 
 impl Renderable for Health {
-    fn render(&mut self, context: &mut Context, _: Viewport) {
+    fn render(&mut self, context: &mut Context, _: &Viewport) {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::HealthHeader);
         let current = span(self.text_current(), ColorTheme::HealthCurrent);
         let lost = span(self.text_lost(), ColorTheme::HealthLost);

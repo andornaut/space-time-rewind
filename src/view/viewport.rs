@@ -3,7 +3,7 @@ use tui::layout::Rect;
 pub type Coordinates = (u16, u16);
 pub type Movement = (i16, i16);
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct Viewport {
     rect: Rect,
 }

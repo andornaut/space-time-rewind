@@ -47,7 +47,7 @@ impl Default for ButtonPanel {
 impl GameItem for ButtonPanel {}
 
 impl Renderable for ButtonPanel {
-    fn render(&mut self, context: &mut Context, viewport: Viewport) {
+    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
         self.center(viewport);
         self.align_buttons();
 
@@ -81,7 +81,7 @@ impl ButtonPanel {
         }
     }
 
-    fn center(&mut self, viewport: Viewport) {
+    fn center(&mut self, viewport: &Viewport) {
         let (_, y) = self.coordinates;
         let (x, _) = viewport.center();
         self.coordinates = (x, y)

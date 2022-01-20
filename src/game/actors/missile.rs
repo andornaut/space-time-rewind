@@ -19,7 +19,6 @@ static TEXT: &str = "\
 ◊╬╬╬◊
  ▾▾▾\x20";
 
-#[derive(Clone, Debug)]
 pub struct Missile {
     coordinates: Coordinates,
     deleted: bool,
@@ -50,7 +49,7 @@ impl GameItem for Missile {
 }
 
 impl Renderable for Missile {
-    fn render<'a>(&mut self, context: &mut Context, viewport: Viewport) {
+    fn render<'a>(&mut self, context: &mut Context, viewport: &Viewport) {
         if viewport.out_of_bounds_completely(&self.viewport()) {
             self.deleted = true;
             return;

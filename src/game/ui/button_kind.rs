@@ -18,7 +18,6 @@ static TEXT_SHIELDS: &str = "\
 │Shields [k]│
 ╰───────────╯";
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ButtonKind {
     GameOver,
     Missile,

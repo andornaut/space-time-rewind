@@ -32,7 +32,6 @@ static TEXT_SMALL: &str = "\
 ▜▓▓▞
 ▩▒▓▛";
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum AsteroidKind {
     Large,
     Medium,
@@ -83,7 +82,6 @@ impl AsteroidKind {
     }
 }
 
-#[derive(Clone, Debug)]
 pub struct Asteroid {
     coordinates: Coordinates,
     deleted: bool,
@@ -125,7 +123,7 @@ impl GameItem for Asteroid {
 }
 
 impl Renderable for Asteroid {
-    fn render(&mut self, context: &mut Context, _: Viewport) {
+    fn render(&mut self, context: &mut Context, _: &Viewport) {
         render_text(
             context,
             self.coordinates,

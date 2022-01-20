@@ -30,7 +30,6 @@ static TEXT_END: &str = "\
 ▒░░░▒
 ░▒▒▒░";
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Lifecycle {
     Start,
     Middle,
@@ -71,7 +70,6 @@ impl Lifecycle {
     }
 }
 
-#[derive(Clone, Debug)]
 pub struct Explosion {
     coordinates: Coordinates,
     deleted: bool,
@@ -88,7 +86,7 @@ impl GameItem for Explosion {
 }
 
 impl Renderable for Explosion {
-    fn render(&mut self, context: &mut Context, _: Viewport) {
+    fn render(&mut self, context: &mut Context, _: &Viewport) {
         render_text(
             context,
             self.coordinates,

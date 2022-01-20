@@ -8,21 +8,20 @@ use crate::{
     view::viewport::Viewport,
 };
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Level {
     Initial,
     Level1,
 }
 
 impl Level {
-    fn next(self, _: &Ticker) -> Self {
+    fn next(&self, _: &Ticker) -> Self {
         match self {
             // TODO Advance levels. Consider using `Countdown` or `Ticker` to time the advancement.
             _ => Self::Level1,
         }
     }
 
-    fn spawn(self, ticker: &Ticker, viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
+    fn spawn(&self, ticker: &Ticker, viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
         match self {
             Self::Initial => initial(viewport),
             Self::Level1 => level1(ticker, viewport),

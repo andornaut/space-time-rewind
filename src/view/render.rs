@@ -27,7 +27,7 @@ use tui::{
 const MIN_CANVAS_LENGTH: u16 = 3;
 
 pub trait Renderable {
-    fn render(&mut self, context: &mut Context, viewport: Viewport);
+    fn render(&mut self, context: &mut Context, viewport: &Viewport);
 
     fn viewport(&self) -> Viewport;
 }
@@ -93,7 +93,7 @@ fn render_canvas<B: Backend>(
     let renderables = Rc::new(RefCell::new(renderables));
     canvas = canvas.paint(|ctx: &mut Context| {
         for renderable in renderables.borrow_mut().iter_mut() {
-            renderable.render(ctx, viewport);
+            renderable.render(ctx, &viewport.clone());
         }
     });
     frame.render_widget(canvas, rect);

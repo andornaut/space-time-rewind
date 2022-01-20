@@ -15,7 +15,6 @@ use tui::widgets::canvas::Context;
 
 static TEXT: &str = "•";
 
-#[derive(Clone, Debug)]
 pub struct Bullet {
     coordinates: Coordinates,
     deleted: bool,
@@ -46,7 +45,7 @@ impl GameItem for Bullet {
 }
 
 impl Renderable for Bullet {
-    fn render(&mut self, context: &mut Context, viewport: Viewport) {
+    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
         if viewport.out_of_bounds_completely(&self.viewport()) {
             self.deleted = true;
             return;
