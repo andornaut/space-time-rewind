@@ -5,7 +5,7 @@ pub type Movement = (i16, i16);
 
 #[derive(Copy, Clone)]
 pub struct Viewport {
-    rect: Rect,
+    pub rect: Rect,
 }
 
 impl Viewport {
@@ -69,8 +69,8 @@ impl Viewport {
 
     pub fn top_right(&self) -> Coordinates {
         let rect = self.rect;
-        let x = rect.x + rect.width - 1;
-        let y = rect.y + rect.height - 1;
+        let x = rect.x + rect.width.saturating_sub(1);
+        let y = rect.y + rect.height.saturating_sub(1);
         (x, y)
     }
 }

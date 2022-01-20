@@ -16,9 +16,16 @@ use tui::widgets::canvas::Context;
 
 const ACTIVE_COUNT: u16 = 8;
 
+#[derive(Copy, Clone)]
+pub enum ButtonSize {
+    Condensed,
+    Full,
+}
+
 pub struct Button {
     active: Countdown,
     button_kind: ButtonKind,
+    button_size: ButtonSize,
     coordinates: Coordinates,
     disabled: Countdown,
 }
@@ -45,11 +52,16 @@ impl CommandHandler for Button {
 impl GameItem for Button {}
 
 impl Renderable for Button {
-    fn render(&mut self, context: &mut Context, _: &Viewport) {
+    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
+        self.button_size = if viewport.rect.width < 68 {
+            ButtonSize::Condensed
+        } else {
+            ButtonSize::Full
+        };
         render_text(
             context,
             self.coordinates,
-            self.button_kind.text(),
+            self.button_kind.text(self.button_size),
             self.button_kind.color(self.active.on(), self.disabled.on()),
         );
     }
@@ -84,7 +96,7 @@ impl Button {
     }
 
     pub fn height(&self) -> u16 {
-        chars_height(self.button_kind.text())
+        chars_height(self.button_kind.text(self.button_size))
     }
 
     pub fn set_coordinates(&mut self, coordinates: Coordinates) {
@@ -92,7 +104,7 @@ impl Button {
     }
 
     pub fn width(&self) -> u16 {
-        chars_width(self.button_kind.text())
+        chars_width(self.button_kind.text(self.button_size))
     }
 
     fn new(button_kind: ButtonKind) -> Self {
@@ -100,6 +112,7 @@ impl Button {
         Self {
             active: Countdown::new(ACTIVE_COUNT),
             button_kind,
+            button_size: ButtonSize::Full,
             coordinates: (0, 0), // `ButtonPanel` will update the coordinates before rendering.
             disabled: Countdown::new(disabled_count),
         }

@@ -1,19 +1,33 @@
 use crate::app::color::ColorTheme;
 
+use super::button::ButtonSize;
+
 const DISABLED_MISSILE_COUNT: u16 = 600; // The Missile `Button` needs to use the same value.
 static TEXT_GAME_OVER: &str = "\
 ==============================================
 Game over! Press [r] to restart or [q] to quit
 ==============================================";
-static TEXT_MISSILE: &str = "\
+static TEXT_MISSILE_CONDENSED: &str = "\
+╭───╮
+│[j]│
+╰───╯";
+static TEXT_MISSILE_FULL: &str = "\
 ╭───────────╮
 │Missile [j]│
 ╰───────────╯";
-static TEXT_REWIND: &str = "\
+static TEXT_REWIND_CONDENSED: &str = "\
+╭───╮
+│[l]│
+╰───╯";
+static TEXT_REWIND_FULL: &str = "\
 ╭───────────╮
 │Rewind! [l]│
 ╰───────────╯";
-static TEXT_SHIELDS: &str = "\
+static TEXT_SHIELDS_CONDENSED: &str = "\
+╭───╮
+│[k]│
+╰───╯";
+static TEXT_SHIELDS_FULL: &str = "\
 ╭───────────╮
 │Shields [k]│
 ╰───────────╯";
@@ -64,12 +78,15 @@ impl ButtonKind {
         }
     }
 
-    pub fn text(&self) -> &'static str {
-        match self {
-            ButtonKind::GameOver => TEXT_GAME_OVER,
-            ButtonKind::Missile => TEXT_MISSILE,
-            ButtonKind::Rewind => TEXT_REWIND,
-            ButtonKind::Shields => TEXT_SHIELDS,
+    pub fn text(&self, size: ButtonSize) -> &'static str {
+        match (self, size) {
+            (ButtonKind::GameOver, _) => TEXT_GAME_OVER,
+            (ButtonKind::Missile, ButtonSize::Condensed) => TEXT_MISSILE_CONDENSED,
+            (ButtonKind::Missile, ButtonSize::Full) => TEXT_MISSILE_FULL,
+            (ButtonKind::Rewind, ButtonSize::Condensed) => TEXT_REWIND_CONDENSED,
+            (ButtonKind::Rewind, ButtonSize::Full) => TEXT_REWIND_FULL,
+            (ButtonKind::Shields, ButtonSize::Condensed) => TEXT_SHIELDS_CONDENSED,
+            (ButtonKind::Shields, ButtonSize::Full) => TEXT_SHIELDS_FULL,
         }
     }
 }

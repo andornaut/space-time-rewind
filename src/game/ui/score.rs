@@ -86,7 +86,7 @@ impl Score {
         let (x, _) = viewport.top_right();
         let (_, y) = viewport.bottom_left();
         self.coordinates = (
-            x.saturating_sub(self.width()) - GUTTER_WIDTH,
+            x.saturating_sub(self.width()).saturating_sub(GUTTER_WIDTH),
             y + GUTTER_WIDTH,
         );
     }

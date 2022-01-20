@@ -50,11 +50,11 @@ impl Spawner {
 
     pub fn ui(&self) -> Vec<Box<dyn GameItem>> {
         vec![
-            Box::new(ButtonPanel::default()),
-            // Render the health and score UIs after the button panel, so that they'll be rendered
-            // above the panel when the viewport is too narrow.
+            // Render the health and score UIs before the button panel, so that they'll be rendered
+            // below it when the viewport is very narrow.
             Box::new(Health::default()),
             Box::new(Score::default()),
+            Box::new(ButtonPanel::default()),
         ]
     }
 
