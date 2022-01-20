@@ -9,12 +9,12 @@ use crate::{
 };
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum LevelState {
+pub enum Level {
     Initial,
     Level1,
 }
 
-impl LevelState {
+impl Level {
     fn next(self, _: &Ticker) -> Self {
         match self {
             // TODO Advance levels. Consider using `Countdown` or `Ticker` to time the advancement.
@@ -31,13 +31,13 @@ impl LevelState {
 }
 
 pub struct Spawner {
-    level: LevelState,
+    level: Level,
 }
 
 impl Default for Spawner {
     fn default() -> Self {
         Spawner {
-            level: LevelState::Initial,
+            level: Level::Initial,
         }
     }
 }
@@ -60,6 +60,6 @@ impl Spawner {
     }
 
     pub fn restart(&mut self) {
-        self.level = LevelState::Initial;
+        self.level = Level::Initial;
     }
 }
