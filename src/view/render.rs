@@ -1,5 +1,5 @@
 use super::{
-    factory::create_canvas,
+    factory::{create_canvas, create_error_message, WINDOW_MIN_HEIGHT, WINDOW_MIN_WIDTH},
     viewport::{Coordinates, Viewport},
 };
 use crate::{
@@ -50,9 +50,18 @@ pub fn render_text(
 
 pub fn render(session: &mut Session, world: &mut World) -> Result<()> {
     session.terminal.draw(|frame| {
-        let (actors_rect, ui_rect) = split_into_actors_and_ui(frame.size());
+        let window = frame.size();
+        let (actors_rect, ui_rect) = split_into_actors_and_ui(window);
         let actors_viewport = create_actors_viewport(actors_rect);
+
+        // Must always set `actors_viewport` even if not rendering it, because
+        // `CommandHandlers` and `TickHandlers` may expect it be to `Some()`.
         world.set_actors_viewport(actors_viewport);
+
+        if window.height < WINDOW_MIN_HEIGHT || window.width < WINDOW_MIN_WIDTH {
+            frame.render_widget(create_error_message(), window);
+            return;
+        }
 
         render_background(frame);
         render_canvas(

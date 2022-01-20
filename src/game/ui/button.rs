@@ -1,11 +1,13 @@
 use super::button_kind::ButtonKind;
 use crate::{
-    app::command::{Command, CommandHandler},
+    app::{
+        app::TICKS_PER_SECOND,
+        command::{Command, CommandHandler},
+    },
     clock::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},
     },
-    game::game_item::GameItem,
     view::{
         render::{render_text, Renderable},
         util::{chars_height, chars_width},
@@ -14,7 +16,8 @@ use crate::{
 };
 use tui::widgets::canvas::Context;
 
-const ACTIVE_COUNT: u16 = 8;
+const ACTIVE_COUNT: u16 = TICKS_PER_SECOND / 10; // 10ms
+const MIN_FULL_WIDTH: u16 = 71;
 
 #[derive(Copy, Clone)]
 pub enum ButtonSize {
@@ -28,6 +31,7 @@ pub struct Button {
     button_size: ButtonSize,
     coordinates: Coordinates,
     disabled: Countdown,
+    disabled_override: bool,
 }
 
 impl CommandHandler for Button {
@@ -36,6 +40,11 @@ impl CommandHandler for Button {
         match (&self.button_kind, command) {
             (ButtonKind::Missile, Command::PressMissileButton) => {
                 self.maybe_fire(&mut commands, Command::FireMissile)
+            }
+            (ButtonKind::Missile, Command::UpdateMissiles(current, _)) => {
+                if current == 0 {
+                    self.disabled_override = true;
+                }
             }
             (ButtonKind::Rewind, Command::PressRewindButton) => {
                 self.maybe_fire(&mut commands, Command::FireRewind)
@@ -49,11 +58,9 @@ impl CommandHandler for Button {
     }
 }
 
-impl GameItem for Button {}
-
 impl Renderable for Button {
     fn render(&mut self, context: &mut Context, viewport: &Viewport) {
-        self.button_size = if viewport.rect.width < 68 {
+        self.button_size = if viewport.rect.width < MIN_FULL_WIDTH {
             ButtonSize::Condensed
         } else {
             ButtonSize::Full
@@ -62,7 +69,10 @@ impl Renderable for Button {
             context,
             self.coordinates,
             self.button_kind.text(self.button_size),
-            self.button_kind.color(self.active.on(), self.disabled.on()),
+            self.button_kind.color(
+                self.active.on(),
+                self.disabled.on() || self.disabled_override,
+            ),
         );
     }
 
@@ -95,12 +105,12 @@ impl Button {
         Self::new(ButtonKind::Shields)
     }
 
-    pub fn height(&self) -> u16 {
-        chars_height(self.button_kind.text(self.button_size))
-    }
-
     pub fn set_coordinates(&mut self, coordinates: Coordinates) {
         self.coordinates = coordinates;
+    }
+
+    pub fn height(&self) -> u16 {
+        chars_height(self.button_kind.text(self.button_size))
     }
 
     pub fn width(&self) -> u16 {
@@ -115,12 +125,13 @@ impl Button {
             button_size: ButtonSize::Full,
             coordinates: (0, 0), // `ButtonPanel` will update the coordinates before rendering.
             disabled: Countdown::new(disabled_count),
+            disabled_override: false,
         }
     }
 
     fn maybe_fire(&mut self, commands: &mut Vec<Command>, command: Command) {
-        self.active.restart();
-        if self.disabled.off() {
+        if self.disabled.off() && !self.disabled_override {
+            self.active.restart();
             self.disabled.restart();
             commands.push(command);
         }

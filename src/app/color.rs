@@ -5,6 +5,8 @@ pub enum ColorTheme {
     Bg,
     BoardBorderFg,
     BoardTitleFg,
+    ErrorBg,
+    ErrorFg,
 
     // Actors
     AsteroidHighHpLarge,
@@ -13,34 +15,48 @@ pub enum ColorTheme {
     AsteroidLowHp,
     AsteroidMidHp,
     Bullet,
-    ExplosionStart,
-    ExplosionMiddle,
     ExplosionEnd,
-    ExplosionEnd2,
+    ExplosionMiddle1,
+    ExplosionMiddle2,
+    ExplosionStart,
+    Missile,
     Ship,
+    ShipShields,
 
     // UI
+    DisabledButton,
+    GameOver,
     HealthCurrent,
     HealthHeader,
     HealthLost,
+    MissileButton,
+    MissileButtonActive,
+    MissilesCurrent,
+    MissilesHeader,
+    MissilesLost,
+    RewindButton,
+    RewindButtonActive,
     ScoreHeader,
     ScorePoints,
-    DisabledButton,
-    GameOver,
-    Missile,
-    MissileActive,
-    Rewind,
-    RewindActive,
-    Shield,
-    ShieldActive,
+    ShieldsButton,
+    ShieldsButtonActive,
 }
 
 impl From<ColorTheme> for Color {
     fn from(color_theme: ColorTheme) -> Self {
+        let dark_grey = Color::Rgb(51, 51, 51);
+        let grey = Color::Rgb(104, 104, 104);
+        let red = Color::Rgb(204, 25, 25);
+        let black = Color::Rgb(21, 21, 21);
+        let missiles_on = Color::Rgb(255, 153, 204);
+        let missiles_off = Color::Rgb(175, 51, 102);
+        let shields_on = Color::Rgb(153, 204, 255);
         match color_theme {
-            ColorTheme::Bg => Color::Rgb(21, 21, 21),
+            ColorTheme::Bg => black,
             ColorTheme::BoardBorderFg => Color::Rgb(128, 128, 128),
             ColorTheme::BoardTitleFg => Color::Blue,
+            ColorTheme::ErrorBg => red,
+            ColorTheme::ErrorFg => black,
 
             // Actors
             ColorTheme::AsteroidHighHpLarge => Color::Rgb(120, 130, 110),
@@ -49,26 +65,31 @@ impl From<ColorTheme> for Color {
             ColorTheme::AsteroidLowHp => Color::Rgb(44, 33, 22),
             ColorTheme::AsteroidMidHp => Color::Rgb(66, 55, 44),
             ColorTheme::Bullet => Color::Rgb(204, 204, 0),
+            ColorTheme::Missile => missiles_off,
+            ColorTheme::ExplosionEnd => Color::Rgb(255, 104, 104),
+            ColorTheme::ExplosionMiddle1 => red,
+            ColorTheme::ExplosionMiddle2 => Color::Rgb(255, 51, 51),
             ColorTheme::ExplosionStart => Color::Rgb(153, 0, 0),
-            ColorTheme::ExplosionMiddle => Color::Rgb(204, 21, 21),
-            ColorTheme::ExplosionEnd => Color::Rgb(255, 51, 51),
-            ColorTheme::ExplosionEnd2 => Color::Rgb(255, 104, 104),
-            ColorTheme::Ship => Color::Cyan,
+            ColorTheme::Ship => Color::Rgb(51, 153, 204),
+            ColorTheme::ShipShields => shields_on,
 
             // UI
-            ColorTheme::HealthCurrent => Color::Rgb(176, 25, 25),
-            ColorTheme::HealthHeader => Color::Rgb(104, 104, 104),
-            ColorTheme::HealthLost => Color::Rgb(153, 153, 153),
-            ColorTheme::ScoreHeader => Color::Rgb(104, 104, 104),
-            ColorTheme::ScorePoints => Color::Rgb(204, 204, 204),
-            ColorTheme::DisabledButton => Color::Rgb(51, 51, 51),
+            ColorTheme::DisabledButton => dark_grey,
             ColorTheme::GameOver => Color::Rgb(204, 102, 153),
-            ColorTheme::Missile => Color::Rgb(175, 102, 102),
-            ColorTheme::MissileActive => Color::Rgb(255, 204, 204),
-            ColorTheme::Rewind => Color::Rgb(102, 175, 102),
-            ColorTheme::RewindActive => Color::Rgb(204, 255, 204),
-            ColorTheme::Shield => Color::Rgb(102, 102, 175),
-            ColorTheme::ShieldActive => Color::Rgb(204, 204, 255),
+            ColorTheme::HealthCurrent => red,
+            ColorTheme::HealthHeader => grey,
+            ColorTheme::HealthLost => grey,
+            ColorTheme::MissileButton => missiles_off,
+            ColorTheme::MissileButtonActive => missiles_on,
+            ColorTheme::MissilesCurrent => missiles_off,
+            ColorTheme::MissilesHeader => grey,
+            ColorTheme::MissilesLost => grey,
+            ColorTheme::RewindButton => Color::Rgb(102, 175, 51),
+            ColorTheme::RewindButtonActive => Color::Rgb(204, 255, 153),
+            ColorTheme::ScoreHeader => grey,
+            ColorTheme::ScorePoints => Color::Rgb(204, 204, 204),
+            ColorTheme::ShieldsButton => Color::Rgb(51, 102, 175),
+            ColorTheme::ShieldsButtonActive => shields_on,
         }
     }
 }

@@ -57,6 +57,20 @@ impl Viewport {
         (x_bl, y_bl)
     }
 
+    pub fn grow(&self, wider_width: u16, taller_height: u16) -> Coordinates {
+        let (x, y) = self.bottom_left();
+        let x_offset = wider_width.saturating_sub(self.rect.width) / 2;
+        let y_offset = taller_height.saturating_sub(self.rect.height) / 2;
+        (x.saturating_sub(x_offset), y.saturating_sub(y_offset))
+    }
+
+    pub fn shrink(&self, narrower_width: u16, shorter_height: u16) -> Coordinates {
+        let (x, y) = self.bottom_left();
+        let x_offset = self.rect.width.saturating_sub(narrower_width) / 2;
+        let y_offset = self.rect.height.saturating_sub(shorter_height) / 2;
+        (x + x_offset, y + y_offset)
+    }
+
     pub fn out_of_bounds_completely(&self, other: &Self) -> bool {
         let (x, y) = other.bottom_left();
         let (max_x, max_y) = self.top_right();

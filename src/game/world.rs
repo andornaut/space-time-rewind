@@ -69,11 +69,7 @@ impl World {
 
     pub fn detect_collisions(&mut self) -> Vec<Command> {
         let mut commands = Vec::new();
-        let len = self.actors.len();
-        if len == 0 {
-            return commands;
-        }
-        for index in 0..len - 1 {
+        for index in 0..self.actors.len().saturating_sub(1) {
             let (left_actors, right_actors) = self.actors.split_at_mut(index + 1);
             let left_actor = &mut left_actors[index];
             for right_actor in right_actors {
@@ -93,11 +89,15 @@ impl World {
     }
 
     fn broadcast_command(&mut self, command: Command) -> Vec<Command> {
-        let secondary_commands = self.notify_handlers(command);
-        secondary_commands
-            .into_iter()
-            .flat_map(|command| self.notify_handlers(command))
-            .collect()
+        // Broadcast 3 command->command loops
+        let mut commands = self.notify_handlers(command);
+        for _ in 0..2 {
+            commands = commands
+                .into_iter()
+                .flat_map(|command| self.notify_handlers(command))
+                .collect();
+        }
+        commands
     }
 
     fn consumed_command(&mut self, command: Command) -> bool {

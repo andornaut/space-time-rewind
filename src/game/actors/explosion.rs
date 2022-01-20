@@ -1,5 +1,5 @@
 use crate::{
-    app::{color::ColorTheme, command::CommandHandler},
+    app::{app::TICKS_PER_SECOND, color::ColorTheme, command::CommandHandler},
     clock::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},
@@ -13,7 +13,7 @@ use crate::{
 };
 use tui::widgets::canvas::Context;
 
-const LIFECYCLE_TRANSITION_COUNT: u16 = 3;
+const LIFECYCLE_TRANSITION_COUNT: u16 = TICKS_PER_SECOND / 16; // 62.5ms
 
 static TEXT_START: &str = "\
 \x20\x20\x20\x20\x20\x20
@@ -22,7 +22,7 @@ static TEXT_START: &str = "\
 
 static TEXT_MIDDLE: &str = "\
 \x20\x20░░\x20\x20
-░▒▒░
+\x20░▒▒░\x20
 \x20\x20░░\x20\x20";
 
 static TEXT_END: &str = "\
@@ -42,9 +42,9 @@ impl Lifecycle {
     fn color(&self) -> ColorTheme {
         match self {
             Self::Start => ColorTheme::ExplosionStart,
-            Self::Middle => ColorTheme::ExplosionMiddle,
-            Self::End => ColorTheme::ExplosionEnd,
-            Self::End2 => ColorTheme::ExplosionEnd2,
+            Self::Middle => ColorTheme::ExplosionMiddle1,
+            Self::End => ColorTheme::ExplosionMiddle2,
+            Self::End2 => ColorTheme::ExplosionMiddle2,
             Self::Deleted => panic!("Cannot invoke methods on Lifecycle::Deleted"),
         }
     }

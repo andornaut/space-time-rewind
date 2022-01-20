@@ -1,8 +1,10 @@
-use crate::app::color::ColorTheme;
+use crate::app::{app::TICKS_PER_SECOND, color::ColorTheme};
 
 use super::button::ButtonSize;
 
-const DISABLED_MISSILE_COUNT: u16 = 600; // The Missile `Button` needs to use the same value.
+const DISABLED_MISSILE_COUNT: u16 = TICKS_PER_SECOND * 15; // 15 seconds
+const DISABLED_SHIELDS_COUNT: u16 = TICKS_PER_SECOND * 30; // 30 seconds
+
 static TEXT_GAME_OVER: &str = "\
 ==============================================
 Game over! Press [r] to restart or [q] to quit
@@ -41,29 +43,32 @@ pub enum ButtonKind {
 
 impl ButtonKind {
     pub fn color(&self, active: bool, disabled: bool) -> ColorTheme {
-        if disabled {
-            return ColorTheme::DisabledButton;
-        }
         match self {
             ButtonKind::Missile => {
                 if active {
-                    ColorTheme::MissileActive
+                    ColorTheme::MissileButtonActive
+                } else if disabled {
+                    ColorTheme::DisabledButton
                 } else {
-                    ColorTheme::Missile
+                    ColorTheme::MissileButton
                 }
             }
             ButtonKind::Rewind => {
                 if active {
-                    ColorTheme::RewindActive
+                    ColorTheme::RewindButtonActive
+                } else if disabled {
+                    ColorTheme::DisabledButton
                 } else {
-                    ColorTheme::Rewind
+                    ColorTheme::RewindButton
                 }
             }
             ButtonKind::Shields => {
                 if active {
-                    ColorTheme::ShieldActive
+                    ColorTheme::ShieldsButtonActive
+                } else if disabled {
+                    ColorTheme::DisabledButton
                 } else {
-                    ColorTheme::Shield
+                    ColorTheme::ShieldsButton
                 }
             }
             ButtonKind::GameOver => ColorTheme::GameOver,
@@ -72,8 +77,8 @@ impl ButtonKind {
 
     pub fn disabled_count(&self) -> u16 {
         match self {
-            // Eventually other button kinds will have their own starting values.
             ButtonKind::Missile => DISABLED_MISSILE_COUNT,
+            ButtonKind::Shields => DISABLED_SHIELDS_COUNT,
             _ => 0, // `self.disabled` will always be off if initialized to 0.
         }
     }

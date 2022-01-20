@@ -1,21 +1,25 @@
 use super::viewport::Viewport;
 use crate::app::color::ColorTheme;
 use tui::{
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     symbols::Marker,
     text::Span,
     widgets::{
         canvas::{Canvas, Context},
-        Block, BorderType, Borders,
+        Block, BorderType, Borders, Paragraph, Wrap,
     },
 };
 
-const BOARD_MIN_HEIGHT: u16 = 10;
-const BUTTON_PANEL_HEIGHT: u16 = 3;
+const ACTORS_MIN_HEIGHT: u16 = 10;
+const UI_HEIGHT: u16 = 3;
+pub const WINDOW_MIN_HEIGHT: u16 = ACTORS_MIN_HEIGHT + UI_HEIGHT;
+pub const WINDOW_MIN_WIDTH: u16 = 47;
+
 const MAX_HEIGHT: u16 = 40;
 const MAX_WIDTH: u16 = 79;
-static ACTORS_TITLE: &str = "Space-Time-Rewind!";
+static TITLE: &str = "Space-Time-Rewind!";
+static ERROR_MESSAGE_RESIZE: &str = "Please increase the size of the terminal window";
 
 pub fn create_actors_block<'a>() -> Block<'a> {
     Block::default()
@@ -24,9 +28,30 @@ pub fn create_actors_block<'a>() -> Block<'a> {
         .borders(Borders::ALL)
         .style(Style::default().bg(Color::from(ColorTheme::Bg)))
         .title(Span::styled(
-            ACTORS_TITLE,
+            TITLE,
             Style::default().fg(Color::from(ColorTheme::BoardTitleFg)),
         ))
+}
+
+pub fn create_error_message<'a>() -> Paragraph<'a> {
+    let block = Block::default()
+        .border_style(Style::default().fg(Color::from(ColorTheme::ErrorBg)))
+        .border_type(BorderType::Rounded)
+        .borders(Borders::ALL)
+        .style(Style::default().bg(Color::from(ColorTheme::Bg)))
+        .title(Span::styled(
+            TITLE,
+            Style::default().fg(Color::from(ColorTheme::ErrorBg)),
+        ));
+    Paragraph::new(ERROR_MESSAGE_RESIZE)
+        .style(
+            Style::default()
+                .bg(Color::from(ColorTheme::ErrorBg))
+                .fg(Color::from(ColorTheme::ErrorFg)),
+        )
+        .block(block)
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true })
 }
 
 pub fn create_ui_block<'a>() -> Block<'a> {
@@ -45,7 +70,7 @@ pub fn create_actors_viewport(rect: Rect) -> Viewport {
 
 pub fn create_ui_viewport(rect: Rect) -> Viewport {
     let Rect { width, .. } = rect;
-    Viewport::new(width, BUTTON_PANEL_HEIGHT)
+    Viewport::new(width, UI_HEIGHT)
 }
 
 pub fn create_canvas<F>(block: Block, viewport: Viewport) -> Canvas<F>
@@ -65,8 +90,8 @@ where
 pub fn split_into_actors_and_ui(rect: Rect) -> (Rect, Rect) {
     let rect = normalize(rect);
     let constraints = [
-        Constraint::Min(BOARD_MIN_HEIGHT),
-        Constraint::Length(BUTTON_PANEL_HEIGHT),
+        Constraint::Min(ACTORS_MIN_HEIGHT),
+        Constraint::Length(UI_HEIGHT),
     ];
     let rects = Layout::default()
         .direction(Direction::Vertical)

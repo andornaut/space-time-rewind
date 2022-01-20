@@ -9,6 +9,7 @@ use crossterm::event::{poll, read, Event};
 use std::time::Duration;
 
 const TICK_RATE_MS: u64 = 20;
+pub const TICKS_PER_SECOND: u16 = 1000 / TICK_RATE_MS as u16;
 
 pub struct App {
     ticker: Ticker,

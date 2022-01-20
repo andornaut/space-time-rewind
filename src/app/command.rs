@@ -16,7 +16,8 @@ pub trait CommandHandler {
 pub enum Command {
     Continue,
     GameOver, // Display a prompt to quit or restart
-    Health(u8, u8),
+    UpdateHealth(u8, u8),
+    UpdateMissiles(u8, u8),
     IncreaseScore(u8),
     Quit, // Exit the application
     Restart,
