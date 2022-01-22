@@ -45,13 +45,16 @@ pub enum ColorTheme {
 }
 
 const BLACK: Color = Color::Rgb(21, 21, 21);
-const BLUE_DARK: Color = Color::Rgb(51, 102, 175);
+const BLUE: Color = Color::Rgb(51, 102, 175);
 const BLUE_LIGHT: Color = Color::Rgb(153, 204, 255);
+const GREEN: Color = Color::Rgb(102, 175, 51);
+const GREEN_LIGHT: Color = Color::Rgb(153, 255, 153);
 const GREY: Color = Color::Rgb(104, 104, 104);
 const GREY_DARK: Color = Color::Rgb(51, 51, 51);
 const GREY_LIGHT: Color = Color::Rgb(204, 204, 204);
-const PINK_DARK: Color = Color::Rgb(204, 104, 204);
-const PINK_LIGHT: Color = Color::Rgb(175, 51, 175);
+const GREY_MEDIUM_LIGHT: Color = Color::Rgb(153, 153, 153);
+const PINK: Color = Color::Rgb(175, 51, 175);
+const PINK_LIGHT: Color = Color::Rgb(255, 153, 255);
 const RED: Color = Color::Rgb(204, 25, 25);
 
 impl From<ColorTheme> for Color {
@@ -59,7 +62,7 @@ impl From<ColorTheme> for Color {
         match color_theme {
             ColorTheme::Bg => BLACK,
             ColorTheme::BoardBorderFg => GREY,
-            ColorTheme::BoardTitleFg => GREY,
+            ColorTheme::BoardTitleFg => GREY_MEDIUM_LIGHT,
             ColorTheme::ErrorBg => RED,
             ColorTheme::ErrorFg => BLACK,
 
@@ -74,9 +77,9 @@ impl From<ColorTheme> for Color {
             ColorTheme::ExplosionMiddle1 => RED,
             ColorTheme::ExplosionMiddle2 => Color::Rgb(255, 51, 51),
             ColorTheme::ExplosionStart => Color::Rgb(153, 0, 0),
-            ColorTheme::Missile => PINK_LIGHT,
+            ColorTheme::Missile => PINK,
             ColorTheme::PowerUpHealth => RED,
-            ColorTheme::PowerUpMissile => PINK_LIGHT,
+            ColorTheme::PowerUpMissile => PINK,
             ColorTheme::Ship => Color::Rgb(51, 153, 204),
             ColorTheme::ShipShields => BLUE_LIGHT,
 
@@ -86,16 +89,16 @@ impl From<ColorTheme> for Color {
             ColorTheme::HealthCurrent => RED,
             ColorTheme::HealthHeader => GREY,
             ColorTheme::HealthLost => GREY,
-            ColorTheme::MissileButton => PINK_LIGHT,
-            ColorTheme::MissileButtonActive => PINK_DARK,
-            ColorTheme::MissilesCurrent => PINK_LIGHT,
+            ColorTheme::MissileButton => PINK,
+            ColorTheme::MissileButtonActive => PINK_LIGHT,
+            ColorTheme::MissilesCurrent => PINK,
             ColorTheme::MissilesHeader => GREY,
             ColorTheme::MissilesLost => GREY,
-            ColorTheme::RewindButton => Color::Rgb(102, 175, 51),
-            ColorTheme::RewindButtonActive => Color::Rgb(204, 255, 153),
+            ColorTheme::RewindButton => GREEN,
+            ColorTheme::RewindButtonActive => GREEN_LIGHT,
             ColorTheme::ScoreHeader => GREY,
             ColorTheme::ScorePoints => GREY_LIGHT,
-            ColorTheme::ShieldsButton => BLUE_DARK,
+            ColorTheme::ShieldsButton => BLUE,
             ColorTheme::ShieldsButtonActive => BLUE_LIGHT,
         }
     }
