@@ -26,13 +26,10 @@ pub struct Missile {
 
 impl CommandHandler for Missile {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
-        match command {
-            Command::Collide(kind) => {
-                if kind.is_shootable() {
-                    self.deleted = true
-                }
+        if let Command::Collide(kind) = command {
+            if kind.is_shootable() {
+                self.deleted = true
             }
-            _ => (),
         }
         NO_COMMANDS
     }

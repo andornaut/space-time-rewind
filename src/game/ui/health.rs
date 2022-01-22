@@ -30,12 +30,9 @@ pub struct Health {
 
 impl CommandHandler for Health {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
-        match command {
-            Command::UpdateHealth(current, max) => {
-                self.current = current;
-                self.max = max;
-            }
-            _ => (),
+        if let Command::UpdateHealth(current, max) = command {
+            self.current = current;
+            self.max = max;
         }
         NO_COMMANDS
     }

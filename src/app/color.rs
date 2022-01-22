@@ -20,6 +20,8 @@ pub enum ColorTheme {
     ExplosionMiddle2,
     ExplosionStart,
     Missile,
+    PowerUpHealth,
+    PowerUpMissile,
     Ship,
     ShipShields,
 
@@ -42,21 +44,24 @@ pub enum ColorTheme {
     ShieldsButtonActive,
 }
 
+const BLACK: Color = Color::Rgb(21, 21, 21);
+const BLUE_DARK: Color = Color::Rgb(51, 102, 175);
+const BLUE_LIGHT: Color = Color::Rgb(153, 204, 255);
+const GREY: Color = Color::Rgb(104, 104, 104);
+const GREY_DARK: Color = Color::Rgb(51, 51, 51);
+const GREY_LIGHT: Color = Color::Rgb(204, 204, 204);
+const PINK_DARK: Color = Color::Rgb(204, 104, 204);
+const PINK_LIGHT: Color = Color::Rgb(175, 51, 175);
+const RED: Color = Color::Rgb(204, 25, 25);
+
 impl From<ColorTheme> for Color {
     fn from(color_theme: ColorTheme) -> Self {
-        let dark_grey = Color::Rgb(51, 51, 51);
-        let grey = Color::Rgb(104, 104, 104);
-        let red = Color::Rgb(204, 25, 25);
-        let black = Color::Rgb(21, 21, 21);
-        let missiles_on = Color::Rgb(255, 153, 204);
-        let missiles_off = Color::Rgb(175, 51, 102);
-        let shields_on = Color::Rgb(153, 204, 255);
         match color_theme {
-            ColorTheme::Bg => black,
-            ColorTheme::BoardBorderFg => Color::Rgb(128, 128, 128),
-            ColorTheme::BoardTitleFg => Color::Blue,
-            ColorTheme::ErrorBg => red,
-            ColorTheme::ErrorFg => black,
+            ColorTheme::Bg => BLACK,
+            ColorTheme::BoardBorderFg => GREY,
+            ColorTheme::BoardTitleFg => GREY,
+            ColorTheme::ErrorBg => RED,
+            ColorTheme::ErrorFg => BLACK,
 
             // Actors
             ColorTheme::AsteroidHighHpLarge => Color::Rgb(120, 130, 110),
@@ -65,31 +70,33 @@ impl From<ColorTheme> for Color {
             ColorTheme::AsteroidLowHp => Color::Rgb(44, 33, 22),
             ColorTheme::AsteroidMidHp => Color::Rgb(66, 55, 44),
             ColorTheme::Bullet => Color::Rgb(204, 204, 0),
-            ColorTheme::Missile => missiles_off,
             ColorTheme::ExplosionEnd => Color::Rgb(255, 104, 104),
-            ColorTheme::ExplosionMiddle1 => red,
+            ColorTheme::ExplosionMiddle1 => RED,
             ColorTheme::ExplosionMiddle2 => Color::Rgb(255, 51, 51),
             ColorTheme::ExplosionStart => Color::Rgb(153, 0, 0),
+            ColorTheme::Missile => PINK_LIGHT,
+            ColorTheme::PowerUpHealth => RED,
+            ColorTheme::PowerUpMissile => PINK_LIGHT,
             ColorTheme::Ship => Color::Rgb(51, 153, 204),
-            ColorTheme::ShipShields => shields_on,
+            ColorTheme::ShipShields => BLUE_LIGHT,
 
             // UI
-            ColorTheme::DisabledButton => dark_grey,
+            ColorTheme::DisabledButton => GREY_DARK,
             ColorTheme::GameOver => Color::Rgb(204, 102, 153),
-            ColorTheme::HealthCurrent => red,
-            ColorTheme::HealthHeader => grey,
-            ColorTheme::HealthLost => grey,
-            ColorTheme::MissileButton => missiles_off,
-            ColorTheme::MissileButtonActive => missiles_on,
-            ColorTheme::MissilesCurrent => missiles_off,
-            ColorTheme::MissilesHeader => grey,
-            ColorTheme::MissilesLost => grey,
+            ColorTheme::HealthCurrent => RED,
+            ColorTheme::HealthHeader => GREY,
+            ColorTheme::HealthLost => GREY,
+            ColorTheme::MissileButton => PINK_LIGHT,
+            ColorTheme::MissileButtonActive => PINK_DARK,
+            ColorTheme::MissilesCurrent => PINK_LIGHT,
+            ColorTheme::MissilesHeader => GREY,
+            ColorTheme::MissilesLost => GREY,
             ColorTheme::RewindButton => Color::Rgb(102, 175, 51),
             ColorTheme::RewindButtonActive => Color::Rgb(204, 255, 153),
-            ColorTheme::ScoreHeader => grey,
-            ColorTheme::ScorePoints => Color::Rgb(204, 204, 204),
-            ColorTheme::ShieldsButton => Color::Rgb(51, 102, 175),
-            ColorTheme::ShieldsButtonActive => shields_on,
+            ColorTheme::ScoreHeader => GREY,
+            ColorTheme::ScorePoints => GREY_LIGHT,
+            ColorTheme::ShieldsButton => BLUE_DARK,
+            ColorTheme::ShieldsButtonActive => BLUE_LIGHT,
         }
     }
 }

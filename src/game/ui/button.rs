@@ -27,17 +27,17 @@ pub enum ButtonSize {
 
 pub struct Button {
     active: Countdown,
-    button_kind: ButtonKind,
-    button_size: ButtonSize,
     coordinates: Coordinates,
     disabled: Countdown,
     disabled_override: bool,
+    kind: ButtonKind,
+    size: ButtonSize,
 }
 
 impl CommandHandler for Button {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         let mut commands = Vec::new();
-        match (&self.button_kind, command) {
+        match (&self.kind, command) {
             (ButtonKind::Missile, Command::PressMissileButton) => {
                 self.maybe_fire(&mut commands, Command::FireMissile)
             }
@@ -60,7 +60,7 @@ impl CommandHandler for Button {
 
 impl Renderable for Button {
     fn render(&mut self, context: &mut Context, viewport: &Viewport) {
-        self.button_size = if viewport.rect.width < MIN_FULL_WIDTH {
+        self.size = if viewport.rect.width < MIN_FULL_WIDTH {
             ButtonSize::Condensed
         } else {
             ButtonSize::Full
@@ -68,8 +68,8 @@ impl Renderable for Button {
         render_text(
             context,
             self.coordinates,
-            self.button_kind.text(self.button_size),
-            self.button_kind.color(
+            self.kind.text(self.size),
+            self.kind.color(
                 self.active.on(),
                 self.disabled.on() || self.disabled_override,
             ),
@@ -110,22 +110,22 @@ impl Button {
     }
 
     pub fn height(&self) -> u16 {
-        chars_height(self.button_kind.text(self.button_size))
+        chars_height(self.kind.text(self.size))
     }
 
     pub fn width(&self) -> u16 {
-        chars_width(self.button_kind.text(self.button_size))
+        chars_width(self.kind.text(self.size))
     }
 
     fn new(button_kind: ButtonKind) -> Self {
         let disabled_count = button_kind.disabled_count();
         Self {
             active: Countdown::new(ACTIVE_COUNT),
-            button_kind,
-            button_size: ButtonSize::Full,
             coordinates: (0, 0), // `ButtonPanel` will update the coordinates before rendering.
             disabled: Countdown::new(disabled_count),
             disabled_override: false,
+            kind: button_kind,
+            size: ButtonSize::Full,
         }
     }
 

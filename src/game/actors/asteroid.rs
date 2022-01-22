@@ -47,25 +47,25 @@ impl AsteroidKind {
             return ColorTheme::AsteroidMidHp;
         }
         match self {
-            AsteroidKind::Large => ColorTheme::AsteroidHighHpLarge,
-            AsteroidKind::Medium => ColorTheme::AsteroidHighHpMedium,
-            AsteroidKind::Small => ColorTheme::AsteroidHighHpSmall,
+            Self::Large => ColorTheme::AsteroidHighHpLarge,
+            Self::Medium => ColorTheme::AsteroidHighHpMedium,
+            Self::Small => ColorTheme::AsteroidHighHpSmall,
         }
     }
 
     fn frequency(&self) -> Frequency {
         match self {
-            AsteroidKind::Large => Frequency::Six,
-            AsteroidKind::Medium => Frequency::Five,
-            AsteroidKind::Small => Frequency::Four,
+            Self::Large => Frequency::Six,
+            Self::Medium => Frequency::Five,
+            Self::Small => Frequency::Four,
         }
     }
 
     fn initial_hp(&self) -> u8 {
         match self {
-            AsteroidKind::Large => 12,
-            AsteroidKind::Medium => 6,
-            AsteroidKind::Small => 3,
+            Self::Large => 12,
+            Self::Medium => 6,
+            Self::Small => 3,
         }
     }
 
@@ -75,9 +75,9 @@ impl AsteroidKind {
 
     fn text(&self) -> &'static str {
         match self {
-            AsteroidKind::Large => TEXT_LARGE,
-            AsteroidKind::Medium => TEXT_MEDIUM,
-            AsteroidKind::Small => TEXT_SMALL,
+            Self::Large => TEXT_LARGE,
+            Self::Medium => TEXT_MEDIUM,
+            Self::Small => TEXT_SMALL,
         }
     }
 }
@@ -91,23 +91,20 @@ pub struct Asteroid {
 
 impl CommandHandler for Asteroid {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
-        match command {
-            Command::Collide(kind) => {
-                match kind {
-                    GameItemKind::Bullet => self.hp = self.hp.saturating_sub(1),
-                    GameItemKind::Missile | GameItemKind::Ship => self.hp = 0,
-                    _ => (),
-                }
-                if self.hp == 0 {
-                    self.deleted = true;
-                    return vec![
-                        Command::AddExplosion(self.viewport().center()),
-                        Command::IncreaseScore(self.kind.points()),
-                    ];
-                }
+        if let Command::Collide(kind) = command {
+            match kind {
+                GameItemKind::Bullet => self.hp = self.hp.saturating_sub(1),
+                GameItemKind::Missile | GameItemKind::Ship => self.hp = 0,
+                _ => (),
             }
-            _ => (),
-        };
+            if self.hp == 0 {
+                self.deleted = true;
+                return vec![
+                    Command::AddExplosion(self.viewport().center()),
+                    Command::IncreaseScore(self.kind.points()),
+                ];
+            }
+        }
         NO_COMMANDS
     }
 }

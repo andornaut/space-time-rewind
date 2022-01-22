@@ -30,9 +30,8 @@ pub struct Score {
 
 impl CommandHandler for Score {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
-        match command {
-            Command::IncreaseScore(number) => self.score += u32::from(number),
-            _ => (),
+        if let Command::IncreaseScore(number) = command {
+            self.score += u32::from(number);
         }
         NO_COMMANDS
     }

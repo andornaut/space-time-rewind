@@ -44,7 +44,7 @@ pub enum ButtonKind {
 impl ButtonKind {
     pub fn color(&self, active: bool, disabled: bool) -> ColorTheme {
         match self {
-            ButtonKind::Missile => {
+            Self::Missile => {
                 if active {
                     ColorTheme::MissileButtonActive
                 } else if disabled {
@@ -53,7 +53,7 @@ impl ButtonKind {
                     ColorTheme::MissileButton
                 }
             }
-            ButtonKind::Rewind => {
+            Self::Rewind => {
                 if active {
                     ColorTheme::RewindButtonActive
                 } else if disabled {
@@ -62,7 +62,7 @@ impl ButtonKind {
                     ColorTheme::RewindButton
                 }
             }
-            ButtonKind::Shields => {
+            Self::Shields => {
                 if active {
                     ColorTheme::ShieldsButtonActive
                 } else if disabled {
@@ -71,7 +71,7 @@ impl ButtonKind {
                     ColorTheme::ShieldsButton
                 }
             }
-            ButtonKind::GameOver => ColorTheme::GameOver,
+            Self::GameOver => ColorTheme::GameOver,
         }
     }
 

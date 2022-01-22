@@ -78,6 +78,18 @@ impl CommandHandler for Ship {
                 self.coordinates = self.viewport().grow(wider_width, taller_height);
                 self.enabled_shields.restart();
             }
+            Command::IncreaseHealth(number) => {
+                if self.health != INITIAL_MAX_HEALTH {
+                    self.health += number;
+                    return vec![Command::UpdateHealth(self.health, INITIAL_MAX_HEALTH)];
+                }
+            }
+            Command::IncreaseMissiles(number) => {
+                if self.missiles != INITIAL_MAX_MISSILES {
+                    self.missiles += number;
+                    return vec![Command::UpdateMissiles(self.missiles, INITIAL_MAX_MISSILES)];
+                }
+            }
             Command::MoveShip((dx, dy)) => {
                 let (x, y) = self.coordinates;
                 let width = i16::try_from(self.width()).unwrap();

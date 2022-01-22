@@ -18,6 +18,8 @@ pub enum Command {
     GameOver, // Display a prompt to quit or restart
     UpdateHealth(u8, u8),
     UpdateMissiles(u8, u8),
+    IncreaseHealth(u8),
+    IncreaseMissiles(u8),
     IncreaseScore(u8),
     Quit, // Exit the application
     Restart,

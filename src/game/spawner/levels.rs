@@ -1,7 +1,7 @@
 use crate::{
     clock::ticker::{Frequency, Ticker},
     game::{
-        actors::{asteroid::Asteroid, ship::Ship},
+        actors::{asteroid::Asteroid, power_up::PowerUp, ship::Ship},
         game_item::GameItem,
     },
     view::viewport::Viewport,
@@ -24,6 +24,8 @@ pub fn level1(ticker: &Ticker, viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
     if ticker.at(Frequency::Ten) {
         actors.push(Box::new(Asteroid::new_small((0, y))));
         actors.push(Box::new(Asteroid::new_large((0, y + 4))));
+        actors.push(Box::new(PowerUp::new_health(((x / 2) - 3, y + 5))));
+        actors.push(Box::new(PowerUp::new_missile(((x / 2) - 3, y - 5))));
         actors.push(Box::new(Asteroid::new_medium(((x / 2) + 3, y + 6))));
         actors.push(Box::new(Asteroid::new_medium((x.saturating_sub(10), y))));
     }

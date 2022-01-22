@@ -30,12 +30,9 @@ pub struct MissilesAmount {
 
 impl CommandHandler for MissilesAmount {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
-        match command {
-            Command::UpdateMissiles(current, max) => {
-                self.current = current;
-                self.max = max;
-            }
-            _ => (),
+        if let Command::UpdateMissiles(current, max) = command {
+            self.current = current;
+            self.max = max;
         }
         NO_COMMANDS
     }
