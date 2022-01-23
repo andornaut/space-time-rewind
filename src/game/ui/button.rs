@@ -42,9 +42,7 @@ impl CommandHandler for Button {
                 self.maybe_fire(&mut commands, Command::FireMissile)
             }
             (ButtonKind::Missile, Command::UpdateMissiles(current, _)) => {
-                if current == 0 {
-                    self.disabled_override = true;
-                }
+                self.disabled_override = current == 0;
             }
             (ButtonKind::Rewind, Command::PressRewindButton) => {
                 self.maybe_fire(&mut commands, Command::FireRewind)

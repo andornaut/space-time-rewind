@@ -2,7 +2,6 @@ use crate::app::{app::TICKS_PER_SECOND, color::ColorTheme};
 
 use super::button::ButtonSize;
 
-const DISABLED_MISSILE_COUNT: u16 = TICKS_PER_SECOND * 15; // 15 seconds
 const DISABLED_SHIELDS_COUNT: u16 = TICKS_PER_SECOND * 30; // 30 seconds
 
 static TEXT_GAME_OVER: &str = "\
@@ -77,7 +76,6 @@ impl ButtonKind {
 
     pub fn disabled_count(&self) -> u16 {
         match self {
-            ButtonKind::Missile => DISABLED_MISSILE_COUNT,
             ButtonKind::Shields => DISABLED_SHIELDS_COUNT,
             _ => 0, // `self.disabled` will always be off if initialized to 0.
         }
