@@ -13,11 +13,9 @@ use crate::{
 };
 use tui::widgets::canvas::Context;
 
-// \x20 is a quoted space
-static TEXT: &str = "\
-\x20/▲\\\x20
-◊╬╬╬◊
- ▾▾▾\x20";
+static TEXT: &str = "  ▄\x20\x20
+▟███▙
+▀▜ ▛▀";
 
 pub struct Missile {
     coordinates: Coordinates,
