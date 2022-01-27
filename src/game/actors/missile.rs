@@ -20,6 +20,8 @@ static TEXT: &str = "  ▄\x20\x20
 pub struct Missile {
     coordinates: Coordinates,
     deleted: bool,
+    height: u16,
+    width: u16,
 }
 
 impl CommandHandler for Missile {
@@ -53,7 +55,7 @@ impl Renderable for Missile {
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(width(), height(), self.coordinates)
+        Viewport::new_from_coordinates(self.width, self.height, self.coordinates)
     }
 }
 
@@ -70,18 +72,13 @@ impl Missile {
     pub fn new(coordinates: Coordinates) -> Self {
         // The given coordinates are relative to the center of a ship, so left-align.
         let (x, y) = coordinates;
-        let x = x.saturating_sub(width().saturating_div(2));
+        let width = chars_width(TEXT);
+        let x = x.saturating_sub(width.saturating_div(2));
         Self {
             coordinates: (x, y),
             deleted: false,
+            height: chars_height(TEXT),
+            width,
         }
     }
-}
-
-fn height() -> u16 {
-    chars_height(TEXT)
-}
-
-fn width() -> u16 {
-    chars_width(TEXT)
 }

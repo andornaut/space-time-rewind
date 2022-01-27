@@ -114,14 +114,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn starts_at_0() {
+    fn number_is_0_when_new() {
         let ticker = Ticker::new(Duration::from_secs(1));
 
         assert_eq!(ticker.number, 0);
     }
 
     #[test]
-    fn should_is_true_for_any_frequencies_at_start() {
+    fn at_returns_true_for_any_frequency_when_new() {
         let ticker = Ticker::new(Duration::from_secs(1));
 
         assert_eq!(ticker.at(Frequency::One), true);
@@ -151,17 +151,17 @@ mod tests {
     }
 
     #[test]
-    fn tick_speed_one_fires_every_time() {
+    fn frequency_one_fires_every_time() {
         assert_eq!(count_in_1_cycle(Frequency::One), MAX_NUMBER);
     }
 
     #[test]
-    fn tick_speed_two_fires_half_the_time() {
+    fn frequency_two_fires_half_the_time() {
         assert_eq!(count_in_1_cycle(Frequency::Two), MAX_NUMBER / 2);
     }
 
     #[test]
-    fn tick_speed_twelve_fires_once() {
+    fn frequency_twelve_fires_once() {
         assert_eq!(count_in_1_cycle(Frequency::Twelve), 1);
     }
 

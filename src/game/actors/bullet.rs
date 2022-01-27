@@ -18,6 +18,8 @@ static TEXT: &str = "•";
 pub struct Bullet {
     coordinates: Coordinates,
     deleted: bool,
+    height: u16,
+    width: u16,
 }
 
 impl CommandHandler for Bullet {
@@ -51,7 +53,7 @@ impl Renderable for Bullet {
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(width(), height(), self.coordinates)
+        Viewport::new_from_coordinates(self.width, self.height, self.coordinates)
     }
 }
 
@@ -69,14 +71,8 @@ impl Bullet {
         Self {
             coordinates,
             deleted: false,
+            height: chars_height(TEXT),
+            width: chars_width(TEXT),
         }
     }
-}
-
-fn height() -> u16 {
-    chars_height(TEXT)
-}
-
-fn width() -> u16 {
-    chars_width(TEXT)
 }

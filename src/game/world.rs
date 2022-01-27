@@ -10,6 +10,8 @@ use crate::{
 };
 use anyhow::{anyhow, Result};
 
+const BROADCAST_CYCLES: u8 = 2;
+
 pub struct World {
     pub actors: Vec<Box<dyn GameItem>>,
     pub ui: Vec<Box<dyn GameItem>>,
@@ -30,18 +32,17 @@ impl Default for World {
 
 impl TickHandler for World {
     fn handle_tick(&mut self, ticker: &Ticker) {
+        // `tick.number` 1 is the fist time `handle_tick()` is invoked, because it is invoked after the first tick (0).
         if ticker.number() == 1 {
-            // Initialize on tick 1, because the viewport is set on tick 0 when the world is first rendered.
-            self.actors.clear(); // Actors are spawned on tick 2.
             self.spawner.restart();
             self.ui = self.spawner.ui();
-            return;
         }
 
         self.game_items_iter_mut()
             .for_each(|handler| handler.handle_tick(ticker));
         self.actors.retain(|actor| !actor.deleted());
 
+        // `self.actors_viewport` is set when `tick.number` is 0, which occurs before this method is first invoked.
         let viewport = &self.actors_viewport.unwrap();
         self.actors.extend(self.spawner.actors(ticker, viewport));
     }
@@ -89,9 +90,8 @@ impl World {
     }
 
     fn broadcast_command(&mut self, command: Command) -> Vec<Command> {
-        // Broadcast 3 command->command loops
         let mut commands = self.notify_handlers(command);
-        for _ in 0..2 {
+        for _ in 0..BROADCAST_CYCLES {
             commands = commands
                 .into_iter()
                 .flat_map(|command| self.notify_handlers(command))

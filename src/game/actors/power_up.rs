@@ -44,8 +44,12 @@ impl PowerUpKind {
 
 pub struct PowerUp {
     coordinates: Coordinates,
+    color: ColorTheme,
     deleted: bool,
+    height: u16,
     kind: PowerUpKind,
+    text: &'static str,
+    width: u16,
 }
 
 impl CommandHandler for PowerUp {
@@ -71,16 +75,11 @@ impl GameItem for PowerUp {
 
 impl Renderable for PowerUp {
     fn render(&mut self, context: &mut Context, _: &Viewport) {
-        render_text(
-            context,
-            self.coordinates,
-            self.kind.text(),
-            self.kind.color(),
-        );
+        render_text(context, self.coordinates, self.text, self.color);
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width(), self.height(), self.coordinates)
+        Viewport::new_from_coordinates(self.width, self.height, self.coordinates)
     }
 }
 
@@ -107,18 +106,15 @@ impl PowerUp {
     }
 
     fn new(coordinates: Coordinates, kind: PowerUpKind) -> Self {
+        let text = kind.text();
         Self {
             coordinates,
+            color: kind.color(),
+            height: chars_height(text),
             deleted: false,
             kind,
+            text,
+            width: chars_width(text),
         }
-    }
-
-    fn height(&self) -> u16 {
-        chars_height(self.kind.text())
-    }
-
-    fn width(&self) -> u16 {
-        chars_width(self.kind.text())
     }
 }

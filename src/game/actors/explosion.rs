@@ -96,7 +96,7 @@ impl Renderable for Explosion {
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(width(), height(), self.coordinates)
+        Viewport::new_from_coordinates(self.width(), self.height(), self.coordinates)
     }
 }
 
@@ -127,12 +127,12 @@ impl Explosion {
         obj.coordinates = obj.viewport().centered_around_bottom_left();
         obj
     }
-}
 
-fn height() -> u16 {
-    chars_height(TEXT_START)
-}
+    fn height(&self) -> u16 {
+        chars_height(self.lifecycle.text())
+    }
 
-fn width() -> u16 {
-    chars_width(TEXT_START)
+    fn width(&self) -> u16 {
+        chars_width(self.lifecycle.text())
+    }
 }
