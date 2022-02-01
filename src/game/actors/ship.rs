@@ -121,7 +121,7 @@ impl GameItem for Ship {
 impl Renderable for Ship {
     fn render(&mut self, context: &mut Context, viewport: &Viewport) {
         // Prevent the ship from going out of bounds when the viewport is resized.
-        self.coordinates = viewport.contain(&self.viewport());
+        self.coordinates = viewport.contain(self.viewport());
         render_text(context, self.coordinates, self.text(), self.color());
     }
 

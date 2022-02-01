@@ -52,7 +52,7 @@ impl Renderable for ButtonPanel {
     fn render(&mut self, context: &mut Context, viewport: &Viewport) {
         self.center(viewport);
 
-        self.size = if viewport.rect.width < MIN_FULL_WIDTH {
+        self.size = if viewport.width < MIN_FULL_WIDTH {
             ButtonSize::Condensed
         } else {
             ButtonSize::Full

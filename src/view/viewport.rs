@@ -1,11 +1,19 @@
+use std::ops::Deref;
+
 use tui::layout::Rect;
 
 pub type Coordinates = (u16, u16);
 pub type Movement = (i16, i16);
 
 #[derive(Copy, Clone)]
-pub struct Viewport {
-    pub rect: Rect,
+pub struct Viewport(Rect);
+
+impl Deref for Viewport {
+    type Target = Rect;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 impl Viewport {
@@ -15,17 +23,16 @@ impl Viewport {
 
     pub fn new_from_coordinates(width: u16, height: u16, bottom_left: Coordinates) -> Self {
         let (x, y) = bottom_left;
-        let rect = Rect {
+        Self(Rect {
             x,
             y,
             height,
             width,
-        };
-        Self { rect }
+        })
     }
 
     pub fn bottom_left(&self) -> Coordinates {
-        (self.rect.x, self.rect.y)
+        (self.x, self.y)
     }
 
     pub fn center(&self) -> Coordinates {
@@ -37,12 +44,12 @@ impl Viewport {
     pub fn centered_around_bottom_left(&self) -> Coordinates {
         let (x1, y1) = self.bottom_left();
         (
-            x1.saturating_sub(self.rect.width / 2),
-            y1.saturating_sub(self.rect.height / 2),
+            x1.saturating_sub(self.width / 2),
+            y1.saturating_sub(self.height / 2),
         )
     }
 
-    pub fn contain(&self, other: &Self) -> Coordinates {
+    pub fn contain(&self, other: Self) -> Coordinates {
         let (x_bl, y_bl) = other.bottom_left();
         let mut x_bl = x_bl;
         let mut y_bl = y_bl;
@@ -59,32 +66,25 @@ impl Viewport {
 
     pub fn grow(&self, wider_width: u16, taller_height: u16) -> Coordinates {
         let (x, y) = self.bottom_left();
-        let x_offset = wider_width.saturating_sub(self.rect.width) / 2;
-        let y_offset = taller_height.saturating_sub(self.rect.height) / 2;
+        let x_offset = wider_width.saturating_sub(self.width) / 2;
+        let y_offset = taller_height.saturating_sub(self.height) / 2;
         (x.saturating_sub(x_offset), y.saturating_sub(y_offset))
+    }
+
+    pub fn out_of_bounds(&self, other: Self) -> bool {
+        !self.intersects(*other)
     }
 
     pub fn shrink(&self, narrower_width: u16, shorter_height: u16) -> Coordinates {
         let (x, y) = self.bottom_left();
-        let x_offset = self.rect.width.saturating_sub(narrower_width) / 2;
-        let y_offset = self.rect.height.saturating_sub(shorter_height) / 2;
+        let x_offset = self.width.saturating_sub(narrower_width) / 2;
+        let y_offset = self.height.saturating_sub(shorter_height) / 2;
         (x + x_offset, y + y_offset)
     }
 
-    pub fn out_of_bounds_completely(&self, other: &Self) -> bool {
-        let (x, y) = other.bottom_left();
-        let (max_x, max_y) = self.top_right();
-        return x > max_x || y > max_y;
-    }
-
-    pub fn intersects(&self, other: &Self) -> bool {
-        self.rect.intersects(other.rect)
-    }
-
     pub fn top_right(&self) -> Coordinates {
-        let rect = self.rect;
-        let x = rect.x + rect.width.saturating_sub(1);
-        let y = rect.y + rect.height.saturating_sub(1);
+        let x = self.x + self.width.saturating_sub(1);
+        let y = self.y + self.height.saturating_sub(1);
         (x, y)
     }
 }
@@ -98,7 +98,7 @@ mod tests {
         let bl = Viewport::new(2, 2);
         let tr = Viewport::new_from_coordinates(2, 2, (2, 2));
 
-        let (x, y) = bl.contain(&tr);
+        let (x, y) = bl.contain(tr);
 
         assert_eq!(x, 0);
         assert_eq!(y, 0);
@@ -109,7 +109,7 @@ mod tests {
         let bl = Viewport::new(2, 2);
         let tr = Viewport::new_from_coordinates(2, 2, (1, 1));
 
-        let (x, y) = bl.contain(&tr);
+        let (x, y) = bl.contain(tr);
 
         assert_eq!(x, 0);
         assert_eq!(y, 0);
@@ -120,7 +120,7 @@ mod tests {
         let bl = Viewport::new(2, 2);
         let tr = Viewport::new_from_coordinates(1, 1, (2, 2));
 
-        let (x, y) = bl.contain(&tr);
+        let (x, y) = bl.contain(tr);
 
         assert_eq!(x, 1);
         assert_eq!(y, 1);
@@ -131,30 +131,33 @@ mod tests {
         let bl = Viewport::new(2, 2);
         let tr = Viewport::new_from_coordinates(3, 3, (2, 2));
 
-        let (x, y) = bl.contain(&tr);
+        let (x, y) = bl.contain(tr);
 
         assert_eq!(x, 0);
         assert_eq!(y, 0);
     }
 
     #[test]
-    fn out_of_bounds_completely_returns_false_when_overlapping() {
+    fn out_of_bounds_returns_false_when_overlapping() {
         let bl = Viewport::new_from_coordinates(2, 2, (0, 0));
         let tr = Viewport::new_from_coordinates(2, 2, (1, 1));
-        assert!(!bl.out_of_bounds_completely(&tr));
+
+        assert!(!bl.out_of_bounds(tr));
     }
 
     #[test]
-    fn out_of_bounds_completely_returns_true_when_right_adjacent() {
-        let bl = Viewport::new_from_coordinates(2, 2, (0, 0));
-        let tr = Viewport::new_from_coordinates(2, 2, (2, 0));
-        assert!(!bl.out_of_bounds_completely(&tr));
-    }
-
-    #[test]
-    fn out_of_bounds_completely_returns_true_when_bottom_adjacent() {
+    fn out_of_bounds_returns_true_when_bottom_adjacent() {
         let bl = Viewport::new_from_coordinates(2, 2, (2, 2));
         let tr = Viewport::new_from_coordinates(2, 2, (2, 0));
-        assert!(!bl.out_of_bounds_completely(&tr));
+
+        assert!(bl.out_of_bounds(tr));
+    }
+
+    #[test]
+    fn out_of_bounds_returns_true_when_right_adjacent() {
+        let bl = Viewport::new_from_coordinates(2, 2, (0, 0));
+        let tr = Viewport::new_from_coordinates(2, 2, (2, 0));
+
+        assert!(bl.out_of_bounds(tr));
     }
 }

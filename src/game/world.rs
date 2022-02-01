@@ -75,7 +75,7 @@ impl World {
             let (left_actors, right_actors) = self.actors.split_at_mut(index + 1);
             let left_actor = &mut left_actors[index];
             for right_actor in right_actors {
-                if left_actor.viewport().intersects(&right_actor.viewport()) {
+                if left_actor.viewport().intersects(*right_actor.viewport()) {
                     commands
                         .extend(left_actor.handle_command(Command::Collide(right_actor.kind())));
                     commands

@@ -47,7 +47,7 @@ impl GameItem for Missile {
 
 impl Renderable for Missile {
     fn render<'a>(&mut self, context: &mut Context, viewport: &Viewport) {
-        if viewport.out_of_bounds_completely(&self.viewport()) {
+        if viewport.out_of_bounds(self.viewport()) {
             self.deleted = true;
             return;
         }

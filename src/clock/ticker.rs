@@ -140,14 +140,14 @@ mod tests {
     }
 
     #[test]
-    fn restarts_at_1_after_2048() {
+    fn restarts_at_0_after_2048() {
         let mut ticker = Ticker::new(Duration::from_secs(1));
         ticker.number = 2047;
 
         ticker.tick();
         assert_eq!(ticker.number, 2048);
         ticker.tick();
-        assert_eq!(ticker.number, 1);
+        assert_eq!(ticker.number, 0);
     }
 
     #[test]
