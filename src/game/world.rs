@@ -35,6 +35,7 @@ impl TickHandler for World {
         // `tick.number` 1 is the fist time `handle_tick()` is invoked, because it is invoked after the first tick (0).
         if ticker.number() == 1 {
             self.spawner.restart();
+            self.actors.clear();
             self.ui = self.spawner.ui();
         }
 

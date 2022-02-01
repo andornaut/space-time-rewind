@@ -14,7 +14,7 @@ use crate::{
     },
 };
 use anyhow::Result;
-use std::{cell::RefCell, rc::Rc};
+use std::cell::RefCell;
 use tui::{
     backend::Backend,
     layout::Rect,
@@ -99,7 +99,7 @@ fn render_canvas<B: Backend>(
         return;
     }
     let mut canvas = create_canvas(block, viewport);
-    let renderables = Rc::new(RefCell::new(renderables));
+    let renderables = RefCell::new(renderables);
     canvas = canvas.paint(|ctx: &mut Context| {
         for renderable in renderables.borrow_mut().iter_mut() {
             renderable.render(ctx, &viewport.clone());

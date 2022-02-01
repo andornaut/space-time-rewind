@@ -22,13 +22,13 @@ static TEXT_HEADER: &'static str = "Missiles ";
 static TEXT_CURRENT: &'static str = "▮";
 static TEXT_USED: &'static str = "▯";
 
-pub struct MissilesAmount {
+pub struct MissilesBar {
     coordinates: Coordinates,
     current: u8,
     max: u8,
 }
 
-impl CommandHandler for MissilesAmount {
+impl CommandHandler for MissilesBar {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         if let Command::UpdateMissiles(current, max) = command {
             self.current = current;
@@ -37,15 +37,15 @@ impl CommandHandler for MissilesAmount {
         NO_COMMANDS
     }
 }
-impl Default for MissilesAmount {
+impl Default for MissilesBar {
     fn default() -> Self {
         Self::new((1, 1), INITIAL_MAX_MISSILES, INITIAL_MAX_MISSILES)
     }
 }
 
-impl GameItem for MissilesAmount {}
+impl GameItem for MissilesBar {}
 
-impl Renderable for MissilesAmount {
+impl Renderable for MissilesBar {
     fn render(&mut self, context: &mut Context, _: &Viewport) {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::MissilesHeader);
         let current = span(self.text_current(), ColorTheme::MissilesCurrent);
@@ -63,9 +63,9 @@ impl Renderable for MissilesAmount {
     }
 }
 
-impl TickHandler for MissilesAmount {}
+impl TickHandler for MissilesBar {}
 
-impl MissilesAmount {
+impl MissilesBar {
     fn new(coordinates: Coordinates, current: u8, max: u8) -> Self {
         Self {
             coordinates,

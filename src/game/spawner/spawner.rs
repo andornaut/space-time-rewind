@@ -3,7 +3,10 @@ use crate::{
     clock::ticker::Ticker,
     game::{
         game_item::GameItem,
-        ui::{health::Health, missiles_amount::MissilesAmount, panel::ButtonPanel, score::Score},
+        ui::{
+            buttons::panel::ButtonPanel, health_bar::HealthBar, missiles_bar::MissilesBar,
+            score::Score,
+        },
     },
     view::viewport::Viewport,
 };
@@ -52,8 +55,8 @@ impl Spawner {
         vec![
             // Render the health, missiles, and score UIs before the button panel, so that they'll
             // be rendered below the panel when the viewport is very narrow.
-            Box::new(Health::default()),
-            Box::new(MissilesAmount::default()),
+            Box::new(HealthBar::default()),
+            Box::new(MissilesBar::default()),
             Box::new(Score::default()),
             Box::new(ButtonPanel::default()),
         ]

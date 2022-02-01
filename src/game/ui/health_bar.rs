@@ -22,13 +22,13 @@ static TEXT_HEADER: &'static str = "Health ";
 static TEXT_CURRENT: &'static str = "▮";
 static TEXT_LOST: &'static str = "▯";
 
-pub struct Health {
+pub struct HealthBar {
     coordinates: Coordinates,
     current: u8,
     max: u8,
 }
 
-impl CommandHandler for Health {
+impl CommandHandler for HealthBar {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         if let Command::UpdateHealth(current, max) = command {
             self.current = current;
@@ -37,15 +37,15 @@ impl CommandHandler for Health {
         NO_COMMANDS
     }
 }
-impl Default for Health {
+impl Default for HealthBar {
     fn default() -> Self {
         Self::new((3, 2), INITIAL_MAX_HEALTH, INITIAL_MAX_HEALTH)
     }
 }
 
-impl GameItem for Health {}
+impl GameItem for HealthBar {}
 
-impl Renderable for Health {
+impl Renderable for HealthBar {
     fn render(&mut self, context: &mut Context, _: &Viewport) {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::HealthHeader);
         let current = span(self.text_current(), ColorTheme::HealthCurrent);
@@ -63,9 +63,9 @@ impl Renderable for Health {
     }
 }
 
-impl TickHandler for Health {}
+impl TickHandler for HealthBar {}
 
-impl Health {
+impl HealthBar {
     fn new(coordinates: Coordinates, current: u8, max: u8) -> Self {
         Self {
             coordinates,

@@ -1,4 +1,8 @@
-use super::button::Button;
+use super::{
+    button::ButtonSize,
+    container::ButtonContainer,
+    factory::{new_game_over, new_missiles, new_rewind, new_shields},
+};
 use crate::{
     app::command::{Command, CommandHandler, NO_COMMANDS},
     clock::ticker::{TickHandler, Ticker},
@@ -11,22 +15,23 @@ use crate::{
 use tui::widgets::canvas::Context;
 
 const GUTTER_WIDTH: u16 = 1;
+const MIN_FULL_WIDTH: u16 = 71;
 
 pub struct ButtonPanel {
-    buttons: Vec<Button>,
+    buttons: Vec<ButtonContainer>,
     coordinates: Coordinates,
+    size: ButtonSize,
 }
 
 impl CommandHandler for ButtonPanel {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         if let Command::GameOver = command {
-            self.buttons.clear();
-            self.buttons.push(Button::new_game_over());
+            self.buttons = vec![new_game_over()];
             return NO_COMMANDS;
         }
         self.buttons
             .iter_mut()
-            .flat_map(|button| button.handle_command(command))
+            .filter_map(|button| button.handle_command(command))
             .collect()
     }
 }
@@ -34,12 +39,9 @@ impl CommandHandler for ButtonPanel {
 impl Default for ButtonPanel {
     fn default() -> Self {
         Self {
-            buttons: vec![
-                Button::new_missile(),
-                Button::new_shields(),
-                Button::new_rewind(),
-            ],
+            buttons: vec![new_missiles(), new_shields(), new_rewind()],
             coordinates: (0, 0), // Will be re-aligned during `render()`
+            size: ButtonSize::Full,
         }
     }
 }
@@ -49,10 +51,20 @@ impl GameItem for ButtonPanel {}
 impl Renderable for ButtonPanel {
     fn render(&mut self, context: &mut Context, viewport: &Viewport) {
         self.center(viewport);
-        self.align_buttons();
 
-        for button in self.buttons.iter_mut() {
-            button.render(context, viewport);
+        self.size = if viewport.rect.width < MIN_FULL_WIDTH {
+            ButtonSize::Condensed
+        } else {
+            ButtonSize::Full
+        };
+        let (x, y) = self.coordinates;
+        let x_panel_offset = self.width() / 2;
+        let x = x.saturating_sub(x_panel_offset);
+
+        for (i, button) in self.buttons.iter_mut().enumerate() {
+            let x_buttons_offset = i as u16 * (button.width(self.size) + GUTTER_WIDTH);
+            let coordinates = (x + x_buttons_offset, y);
+            button.render(context, coordinates, self.size);
         }
     }
 
@@ -70,17 +82,6 @@ impl TickHandler for ButtonPanel {
 }
 
 impl ButtonPanel {
-    fn align_buttons(&mut self) {
-        let (x, y) = self.coordinates;
-        let x_panel_offset = self.width() / 2;
-        let x = x.saturating_sub(x_panel_offset);
-
-        for (i, button) in self.buttons.iter_mut().enumerate() {
-            let x_buttons_offset = i as u16 * (button.width() + GUTTER_WIDTH);
-            button.set_coordinates((x + x_buttons_offset, y));
-        }
-    }
-
     fn center(&mut self, viewport: &Viewport) {
         let (_, y) = self.coordinates;
         let (x, _) = viewport.center();
@@ -88,11 +89,15 @@ impl ButtonPanel {
     }
 
     fn height(&self) -> u16 {
-        self.buttons[0].height() // All buttons are the same height.
+        self.buttons[0].height(self.size) // All buttons are the same height.
     }
 
     fn width(&self) -> u16 {
-        let buttons_width: u16 = self.buttons.iter().map(|button| button.width()).sum();
+        let buttons_width: u16 = self
+            .buttons
+            .iter()
+            .map(|button| button.width(self.size))
+            .sum();
         let number_of_gutters = self.buttons.len() as u16 - 1;
         buttons_width + (number_of_gutters * GUTTER_WIDTH)
     }

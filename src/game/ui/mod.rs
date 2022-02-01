@@ -1,6 +1,4 @@
-mod button;
-mod button_kind;
-pub mod health;
-pub mod missiles_amount;
-pub mod panel;
+pub mod buttons;
+pub mod health_bar;
+pub mod missiles_bar;
 pub mod score;
