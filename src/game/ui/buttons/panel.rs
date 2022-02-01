@@ -50,20 +50,13 @@ impl GameItem for ButtonPanel {}
 
 impl Renderable for ButtonPanel {
     fn render(&mut self, context: &mut Context, viewport: &Viewport) {
-        self.center(viewport);
+        self.align(viewport);
+        self.resize(viewport);
 
-        self.size = if viewport.width < MIN_FULL_WIDTH {
-            ButtonSize::Condensed
-        } else {
-            ButtonSize::Full
-        };
         let (x, y) = self.coordinates;
-        let x_panel_offset = self.width() / 2;
-        let x = x.saturating_sub(x_panel_offset);
-
         for (i, button) in self.buttons.iter_mut().enumerate() {
-            let x_buttons_offset = i as u16 * (button.width(self.size) + GUTTER_WIDTH);
-            let coordinates = (x + x_buttons_offset, y);
+            let x_offset = i as u16 * (button.width(self.size) + GUTTER_WIDTH);
+            let coordinates = (x + x_offset, y);
             button.render(context, coordinates, self.size);
         }
     }
@@ -82,10 +75,20 @@ impl TickHandler for ButtonPanel {
 }
 
 impl ButtonPanel {
-    fn center(&mut self, viewport: &Viewport) {
+    fn align(&mut self, viewport: &Viewport) {
         let (_, y) = self.coordinates;
         let (x, _) = viewport.center();
-        self.coordinates = (x, y)
+        let x_panel_offset = self.width() / 2;
+        let x = x.saturating_sub(x_panel_offset);
+        self.coordinates = (x, y);
+    }
+
+    fn resize(&mut self, viewport: &Viewport) {
+        self.size = if viewport.width < MIN_FULL_WIDTH {
+            ButtonSize::Condensed
+        } else {
+            ButtonSize::Full
+        };
     }
 
     fn height(&self) -> u16 {
