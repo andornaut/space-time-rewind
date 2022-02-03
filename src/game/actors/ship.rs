@@ -27,7 +27,7 @@ static TEXT_SHIELDS: &str = "\
 ░◄◆►░
 ░░░░░";
 
-const DISABLED_GUNS_COUNT: u16 = TICKS_PER_SECOND / 10; // 100 ms
+const DISABLED_GUNS_COUNT: u16 = TICKS_PER_SECOND / 5; // 200 ms
 const ENABLED_SHIELDS_COUNT: u16 = TICKS_PER_SECOND * 5; // 5 seconds
 
 pub struct Ship {
