@@ -1,12 +1,15 @@
-use super::command::Command;
+use super::{
+    command::Command,
+    input::{receive_input_commands, send_input_commands},
+};
 use crate::{
     clock::ticker::{TickHandler, Ticker},
     game::world::World,
     view::{render::render, session::Session},
 };
 use anyhow::Result;
-use crossterm::event::{poll, read, Event};
-use std::time::Duration;
+
+use std::{sync::mpsc, thread, time::Duration};
 
 const TICK_RATE_MS: u64 = 20;
 pub const TICKS_PER_SECOND: u16 = 1000 / TICK_RATE_MS as u16;
@@ -26,34 +29,26 @@ impl Default for App {
 }
 impl App {
     pub fn run(&mut self, session: &mut Session) -> Result<()> {
+        let (tx, rx) = mpsc::channel();
+        send_input_commands(tx);
+
         loop {
             if self.ticker.maybe_tick() {
                 self.world.handle_tick(&self.ticker);
             }
             render(session, &mut self.world)?;
 
-            let mut commands = self.world.detect_collisions();
-
-            match self.wait_for_input_command()? {
-                Some(command) => match command {
+            let mut commands = receive_input_commands(&rx);
+            for command in commands.iter() {
+                match command {
                     Command::Quit => return Ok(()),
                     Command::Restart => self.ticker.restart(),
-                    _ => commands.push(command),
-                },
-                None => (),
+                    _ => (),
+                }
             }
+            commands.extend(self.world.detect_collisions());
             self.world.broadcast_commands(commands)?;
+            thread::sleep(self.ticker.remaining_timeout());
         }
-    }
-
-    fn wait_for_input_command(&mut self) -> Result<Option<Command>> {
-        if poll(self.ticker.remaining_timeout())? {
-            // `poll()` returned true, so an event is available,
-            // so the following call to `read()` will not block.
-            if let Event::Key(key) = read()? {
-                return Ok(Some(Command::from(key)));
-            }
-        }
-        Ok(None)
     }
 }
