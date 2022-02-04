@@ -15,56 +15,56 @@ use tui::widgets::canvas::Context;
 
 const LIFECYCLE_TRANSITION_COUNT: u16 = TICKS_PER_SECOND / 16; // 62.5ms
 
-static TEXT_START: &str = "\
+static TEXT_A: &str = "\
 \x20\x20\x20\x20\x20\x20
 \x20\x20▒▒\x20\x20
 \x20\x20\x20\x20\x20\x20";
 
-static TEXT_MIDDLE: &str = "\
+static TEXT_B: &str = "\
 \x20\x20░░\x20\x20
 \x20░▒▒░\x20
 \x20\x20░░\x20\x20";
 
-static TEXT_END: &str = "\
+static TEXT_C_AND_D: &str = "\
 ░▒▒▒░
 ▒░░░▒
 ░▒▒▒░";
 
-enum Lifecycle {
-    Start,
-    Middle,
-    End,
-    End2,
+enum Animation {
+    A,
+    B,
+    C,
+    D,
     Deleted,
 }
 
-impl Lifecycle {
+impl Animation {
     fn color(&self) -> ColorTheme {
         match self {
-            Self::Start => ColorTheme::ExplosionStart,
-            Self::Middle => ColorTheme::ExplosionMiddle1,
-            Self::End => ColorTheme::ExplosionMiddle2,
-            Self::End2 => ColorTheme::ExplosionMiddle2,
+            Self::A => ColorTheme::ExplosionA,
+            Self::B => ColorTheme::ExplosionB,
+            Self::C => ColorTheme::ExplosionC,
+            Self::D => ColorTheme::ExplosionD,
             Self::Deleted => panic!("Cannot invoke methods on Lifecycle::Deleted"),
         }
     }
 
     fn next(&self) -> Self {
         match self {
-            Self::Start => Self::Middle,
-            Self::Middle => Self::End,
-            Self::End => Self::End2,
-            Self::End2 => Self::Deleted,
+            Self::A => Self::B,
+            Self::B => Self::C,
+            Self::C => Self::D,
+            Self::D => Self::Deleted,
             Self::Deleted => panic!("Cannot advance past Lifecycle::Deleted"),
         }
     }
 
     fn text(&self) -> &'static str {
         match self {
-            Self::Start => TEXT_START,
-            Self::Middle => TEXT_MIDDLE,
-            Self::End => TEXT_END,
-            Self::End2 => TEXT_END,
+            Self::A => TEXT_A,
+            Self::B => TEXT_B,
+            Self::C => TEXT_C_AND_D,
+            Self::D => TEXT_C_AND_D,
             Self::Deleted => panic!("Cannot invoke methods on Lifecycle::Deleted"),
         }
     }
@@ -73,8 +73,8 @@ impl Lifecycle {
 pub struct Explosion {
     coordinates: Coordinates,
     deleted: bool,
-    lifecycle: Lifecycle,
-    lifecycle_next: Countdown,
+    animation: Animation,
+    animation_next: Countdown,
 }
 
 impl CommandHandler for Explosion {}
@@ -90,8 +90,8 @@ impl Renderable for Explosion {
         render_text(
             context,
             self.coordinates,
-            self.lifecycle.text(),
-            self.lifecycle.color(),
+            self.animation.text(),
+            self.animation.color(),
         );
     }
 
@@ -102,15 +102,15 @@ impl Renderable for Explosion {
 
 impl TickHandler for Explosion {
     fn handle_tick(&mut self, _: &Ticker) {
-        if self.lifecycle_next.off() {
-            self.lifecycle_next.restart();
-            self.lifecycle = self.lifecycle.next();
-            if let Lifecycle::Deleted = self.lifecycle {
+        if self.animation_next.off() {
+            self.animation_next.restart();
+            self.animation = self.animation.next();
+            if let Animation::Deleted = self.animation {
                 self.deleted = true;
             }
         }
 
-        self.lifecycle_next.down();
+        self.animation_next.down();
     }
 }
 
@@ -121,18 +121,18 @@ impl Explosion {
         let mut obj = Self {
             coordinates,
             deleted: false,
-            lifecycle: Lifecycle::Start,
-            lifecycle_next,
+            animation: Animation::A,
+            animation_next: lifecycle_next,
         };
         obj.coordinates = obj.viewport().centered_around_bottom_left();
         obj
     }
 
     fn height(&self) -> u16 {
-        chars_height(self.lifecycle.text())
+        chars_height(self.animation.text())
     }
 
     fn width(&self) -> u16 {
-        chars_width(self.lifecycle.text())
+        chars_width(self.animation.text())
     }
 }

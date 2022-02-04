@@ -21,6 +21,7 @@ static TEXT_MISSILE: &str = "\
 ┏━━━┓
 ┃ m ┃
 ┗━━━┛";
+
 enum PowerUpKind {
     Health,
     Missile,
@@ -85,7 +86,7 @@ impl Renderable for PowerUp {
 
 impl TickHandler for PowerUp {
     fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.at(Frequency::Five) {
+        if ticker.at(Frequency::Four) {
             let (x, y) = self.coordinates;
             if y == 0 {
                 self.deleted = true;

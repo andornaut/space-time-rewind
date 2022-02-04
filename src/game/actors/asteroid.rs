@@ -14,31 +14,30 @@ use crate::{
 use tui::widgets::canvas::Context;
 
 static TEXT_LARGE: &str = "\
-\x20▟▒▒▒▓▓▓▒▒▒▓▓▓▓▓▒▓▩\x20\x20\x20\x20\x20
-▜▓▓▒▒▒▓▓▓▒▒▓▒▒▓▟▓▓▓▓▓▞\x20\x20
-▜▓▓▓▒▒▓▟▓▛▓▓▓▛▛▓▛▛▛▓▓▓▓▞
-▜▓▓▓▒▒▓▟▓▓▓▓▓▞▓▓▓▓▓▛\x20\x20\x20\x20
-\x20▟▒▒▒▟▒▒▓▓▓▓▓▓▒▓▩\x20\x20\x20\x20\x20\x20\x20
-▜▓▓▓▓▓▓▒▛▒▒▓▓▓▒▒▒▒▓▞\x20\x20\x20\x20
-\x20\x20\x20▩▒▓▓▓▓▓▓▓▓▒▒▓▛\x20\x20\x20\x20\x20\x20\x20";
+\x20\x20▟▒▒▒▓▓▓▒▒▒▓▓▓▓▓▒▓▩
+▜▓▓▛▞▒▒▒▓▓▒▓▒▒▓▟▓▓▓▞
+▜▓▓▒▒▓▟▛▓▛▛▓▓▛▓▛▛▓▓▞
+▜▓▓▓▒▒▓▟▓▓▓▓▞▓▓▓▓▛
+\x20\x20▟▒▒▒▛▟▛▒▛▒▓▓▓▓▓▓▒▓▩\x20
+\x20▜▓▓▓▓▓▒▛▒▒▓▓▓▒▒▒▒▓▞
+▩▒▓▓▓▟▟▓▓▟▟▓▓▓▟▓▓▒▒▓▛";
 static TEXT_MEDIUM: &str = "\
 \x20▟▒▒▓▩\x20\x20\x20
-▜▓▓▓▓▟▓▞
-▜▓▓▟▓▓▓▓▞\x20
+▜▓▓▓▓▞▟▓▞
+▜▓▓▞▟▓▓▓▓▞
 \x20▩▒▓▒▒▓▛\x20\x20";
-
 static TEXT_SMALL: &str = "\
 ▟▒▓▩
 ▜▓▓▞
 ▩▒▓▛";
 
-enum AsteroidKind {
+enum AsteroidSize {
     Large,
     Medium,
     Small,
 }
 
-impl AsteroidKind {
+impl AsteroidSize {
     fn color(&self, hp: u8) -> ColorTheme {
         if hp <= self.initial_hp() / 3 {
             return ColorTheme::AsteroidLowHp;
@@ -55,9 +54,9 @@ impl AsteroidKind {
 
     fn frequency(&self) -> Frequency {
         match self {
-            Self::Large => Frequency::Six,
-            Self::Medium => Frequency::Five,
-            Self::Small => Frequency::Four,
+            Self::Large => Frequency::Five,
+            Self::Medium => Frequency::Four,
+            Self::Small => Frequency::Three,
         }
     }
 
@@ -86,7 +85,7 @@ pub struct Asteroid {
     coordinates: Coordinates,
     deleted: bool,
     hp: u8,
-    kind: AsteroidKind,
+    kind: AsteroidSize,
 }
 
 impl CommandHandler for Asteroid {
@@ -149,18 +148,18 @@ impl TickHandler for Asteroid {
 
 impl Asteroid {
     pub fn new_large(coordinates: Coordinates) -> Self {
-        Self::new(coordinates, AsteroidKind::Large)
+        Self::new(coordinates, AsteroidSize::Large)
     }
 
     pub fn new_medium(coordinates: Coordinates) -> Self {
-        Self::new(coordinates, AsteroidKind::Medium)
+        Self::new(coordinates, AsteroidSize::Medium)
     }
 
     pub fn new_small(coordinates: Coordinates) -> Self {
-        Self::new(coordinates, AsteroidKind::Small)
+        Self::new(coordinates, AsteroidSize::Small)
     }
 
-    fn new(coordinates: Coordinates, kind: AsteroidKind) -> Self {
+    fn new(coordinates: Coordinates, kind: AsteroidSize) -> Self {
         Self {
             coordinates,
             deleted: false,
