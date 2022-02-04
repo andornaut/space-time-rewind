@@ -102,7 +102,7 @@ fn render_canvas<B: Backend>(
     let renderables = RefCell::new(renderables);
     canvas = canvas.paint(|ctx: &mut Context| {
         for renderable in renderables.borrow_mut().iter_mut() {
-            renderable.render(ctx, &viewport.clone());
+            renderable.render(ctx, &viewport);
         }
     });
     frame.render_widget(canvas, rect);
