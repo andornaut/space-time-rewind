@@ -11,7 +11,7 @@ use anyhow::Result;
 
 use std::{sync::mpsc, thread, time::Duration};
 
-const TICK_RATE_MS: u64 = 20;
+const TICK_RATE_MS: u64 = 40;
 pub const TICKS_PER_SECOND: u16 = 1000 / TICK_RATE_MS as u16;
 
 pub struct App {
@@ -27,6 +27,7 @@ impl Default for App {
         }
     }
 }
+
 impl App {
     pub fn run(&mut self, session: &mut Session) -> Result<()> {
         let (tx, rx) = mpsc::channel();
