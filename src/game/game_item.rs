@@ -15,17 +15,14 @@ pub enum GameItemKind {
     Asteroid,
     Bullet,
     Missile,
-    Shields,
     Ship,
+    ShipWithShields,
 
     Unspecified,
 }
 
 impl GameItemKind {
     pub fn is_shootable(self) -> bool {
-        match self {
-            GameItemKind::Asteroid => true,
-            _ => false,
-        }
+        matches!(self, GameItemKind::Asteroid)
     }
 }

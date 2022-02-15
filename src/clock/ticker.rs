@@ -1,7 +1,9 @@
 use std::time::{Duration, Instant};
 
+use crate::view::viewport::Viewport;
+
 pub trait TickHandler {
-    fn handle_tick(&mut self, _: &Ticker) {}
+    fn handle_tick(&mut self, _ticker: &Ticker, _world_viewport: &Viewport) {}
 }
 
 #[derive(Copy, Clone)]
@@ -73,18 +75,11 @@ impl Ticker {
             self.reset_last_tick();
             self.tick();
         }
-        return should_tick;
+        should_tick
     }
 
     pub fn number(&self) -> u64 {
         u64::from(self.cycles) * u64::from(MAX_NUMBER) + u64::from(self.number)
-    }
-
-    pub fn remaining_timeout(&self) -> Duration {
-        let elapsed = self.last_tick.unwrap_or_else(|| Instant::now()).elapsed();
-        self.tick_rate
-            .checked_sub(elapsed)
-            .unwrap_or_else(|| Duration::from_secs(0))
     }
 
     pub fn restart(&mut self) {

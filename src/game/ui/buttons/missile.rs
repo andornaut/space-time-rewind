@@ -10,14 +10,9 @@ static TEXT_FULL: &str = "\
 │Missile [j]│
 ╰───────────╯";
 
+#[derive(Default)]
 pub struct MissileButton {
     disabled: bool,
-}
-
-impl Default for MissileButton {
-    fn default() -> Self {
-        Self { disabled: false }
-    }
 }
 
 impl Button for MissileButton {

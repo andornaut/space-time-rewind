@@ -7,15 +7,11 @@ use crate::{
     app::command::{Command, CommandHandler, NO_COMMANDS},
     clock::ticker::{TickHandler, Ticker},
     game::game_item::GameItem,
-    view::{
-        render::Renderable,
-        viewport::{Coordinates, Viewport},
-    },
+    view::{coordinates::Coordinates, render::Renderable, renderer::Renderer, viewport::Viewport},
 };
-use tui::widgets::canvas::Context;
 
-const GUTTER_WIDTH: u16 = 1;
-const MIN_FULL_WIDTH: u16 = 71;
+const GUTTER_WIDTH: u8 = 1;
+const MIN_FULL_WIDTH: u8 = 71;
 
 pub struct ButtonPanel {
     buttons: Vec<ButtonContainer>,
@@ -40,7 +36,7 @@ impl Default for ButtonPanel {
     fn default() -> Self {
         Self {
             buttons: vec![new_missiles(), new_shields(), new_rewind()],
-            coordinates: (0, 0), // Will be re-aligned during `render()`
+            coordinates: Coordinates::default(), // Will be re-aligned during `render()`
             size: ButtonSize::Full,
         }
     }
@@ -49,25 +45,28 @@ impl Default for ButtonPanel {
 impl GameItem for ButtonPanel {}
 
 impl Renderable for ButtonPanel {
-    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
-        self.align(viewport);
-        self.resize(viewport);
+    // The lint warning is a false positive: https://github.com/rust-lang/rust-clippy/issues/7414
+    #[allow(clippy::clone_on_copy)]
+    fn render(&mut self, renderer: &mut Renderer, visible_viewport: &Viewport) {
+        self.align(visible_viewport);
+        self.resize(visible_viewport);
 
-        let (x, y) = self.coordinates;
         for (i, button) in self.buttons.iter_mut().enumerate() {
-            let x_offset = i as u16 * (button.width(self.size) + GUTTER_WIDTH);
-            let coordinates = (x + x_offset, y);
-            button.render(context, coordinates, self.size);
+            let x = u8::try_from(i).unwrap() * (button.width(self.size) + GUTTER_WIDTH);
+
+            let mut coordinates = self.coordinates.clone();
+            coordinates.x_offset(i16::from(x));
+            button.render(renderer, coordinates, self.size);
         }
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width(), self.height(), self.coordinates)
+        Viewport::new_with_coordinates(self.width(), self.height(), self.coordinates)
     }
 }
 
 impl TickHandler for ButtonPanel {
-    fn handle_tick(&mut self, ticker: &Ticker) {
+    fn handle_tick(&mut self, ticker: &Ticker, _: &Viewport) {
         for button in self.buttons.iter_mut() {
             button.handle_tick(ticker)
         }
@@ -76,32 +75,30 @@ impl TickHandler for ButtonPanel {
 
 impl ButtonPanel {
     fn align(&mut self, viewport: &Viewport) {
-        let (_, y) = self.coordinates;
-        let (x, _) = viewport.center();
-        let x_panel_offset = self.width() / 2;
-        let x = x.saturating_sub(x_panel_offset);
-        self.coordinates = (x, y);
+        let (x_centered, _) = viewport.centered().as_tuple();
+        let x_offset = self.width() / 2;
+        self.coordinates = Coordinates::new(x_centered - x_offset, 0);
     }
 
     fn resize(&mut self, viewport: &Viewport) {
-        self.size = if viewport.width < MIN_FULL_WIDTH {
+        self.size = if viewport.width() < MIN_FULL_WIDTH {
             ButtonSize::Condensed
         } else {
             ButtonSize::Full
         };
     }
 
-    fn height(&self) -> u16 {
+    fn height(&self) -> u8 {
         self.buttons[0].height(self.size) // All buttons are the same height.
     }
 
-    fn width(&self) -> u16 {
-        let buttons_width: u16 = self
+    fn width(&self) -> u8 {
+        let buttons_width: u8 = self
             .buttons
             .iter()
             .map(|button| button.width(self.size))
             .sum();
-        let number_of_gutters = self.buttons.len() as u16 - 1;
+        let number_of_gutters = u8::try_from(self.buttons.len()).unwrap() - 1;
         buttons_width + (number_of_gutters * GUTTER_WIDTH)
     }
 }

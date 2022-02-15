@@ -10,13 +10,8 @@ static TEXT_FULL: &str = "\
 │Rewind! [l]│
 ╰───────────╯";
 
+#[derive(Default)]
 pub struct RewindButton {}
-
-impl Default for RewindButton {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 impl Button for RewindButton {
     fn color(&self, active: bool, disabled: bool) -> ColorTheme {

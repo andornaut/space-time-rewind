@@ -11,15 +11,18 @@ use tui::{
     },
 };
 
-const ACTORS_MIN_HEIGHT: u16 = 10;
-const UI_HEIGHT: u16 = 3;
-pub const WINDOW_MIN_HEIGHT: u16 = ACTORS_MIN_HEIGHT + UI_HEIGHT;
-pub const WINDOW_MIN_WIDTH: u16 = 47;
+const ACTORS_MIN_HEIGHT: u8 = 10;
+const UI_HEIGHT: u8 = 3;
 
-const MAX_HEIGHT: u16 = 40;
-const MAX_WIDTH: u16 = 79;
+const MAX_HEIGHT: u8 = 40;
+const MAX_WIDTH: u8 = 100;
+pub const WINDOW_MIN_HEIGHT: u8 = ACTORS_MIN_HEIGHT + UI_HEIGHT;
+pub const WINDOW_MIN_WIDTH: u8 = 47;
+pub const WORLD_HEIGHT: u8 = MAX_HEIGHT - UI_HEIGHT - 2; // Account for the actors viewport's borders
+pub const WORLD_WIDTH: u8 = 200;
+
 static TITLE: &str = "Space-Time-Rewind!";
-static ERROR_MESSAGE_RESIZE: &str = "Please increase the size of the terminal window";
+static RESIZE_WARNING_MESSAGE: &str = "Please increase the size of the terminal window";
 
 pub fn create_actors_block<'a>() -> Block<'a> {
     Block::default()
@@ -33,7 +36,11 @@ pub fn create_actors_block<'a>() -> Block<'a> {
         ))
 }
 
-pub fn create_error_message<'a>() -> Paragraph<'a> {
+pub fn create_background_block<'a>() -> Block<'a> {
+    Block::default().style(Style::default().bg(Color::from(ColorTheme::Bg)))
+}
+
+pub fn create_resize_warning_paragraph<'a>() -> Paragraph<'a> {
     let block = Block::default()
         .border_style(Style::default().fg(Color::from(ColorTheme::ErrorBg)))
         .border_type(BorderType::Rounded)
@@ -43,7 +50,7 @@ pub fn create_error_message<'a>() -> Paragraph<'a> {
             TITLE,
             Style::default().fg(Color::from(ColorTheme::ErrorBg)),
         ));
-    Paragraph::new(ERROR_MESSAGE_RESIZE)
+    Paragraph::new(RESIZE_WARNING_MESSAGE)
         .style(
             Style::default()
                 .bg(Color::from(ColorTheme::ErrorBg))
@@ -58,18 +65,17 @@ pub fn create_ui_block<'a>() -> Block<'a> {
     Block::default().style(Style::default().bg(Color::from(ColorTheme::Bg)))
 }
 
-pub fn create_background_block<'a>() -> Block<'a> {
-    Block::default().style(Style::default().bg(Color::from(ColorTheme::Bg)))
-}
-
 pub fn create_actors_viewport(rect: Rect) -> Viewport {
     let Rect { width, height, .. } = rect;
     // Account for the 1px border
-    Viewport::new(width.saturating_sub(2), height.saturating_sub(2))
+    let width = u8::try_from(width.saturating_sub(2)).unwrap();
+    let height = u8::try_from(height.saturating_sub(2)).unwrap();
+    Viewport::new(width, height)
 }
 
 pub fn create_ui_viewport(rect: Rect) -> Viewport {
     let Rect { width, .. } = rect;
+    let width = u8::try_from(width).unwrap();
     Viewport::new(width, UI_HEIGHT)
 }
 
@@ -90,8 +96,8 @@ where
 pub fn split_into_actors_and_ui(rect: Rect) -> (Rect, Rect) {
     let rect = normalize(rect);
     let constraints = [
-        Constraint::Min(ACTORS_MIN_HEIGHT),
-        Constraint::Length(UI_HEIGHT),
+        Constraint::Min(u16::from(ACTORS_MIN_HEIGHT)),
+        Constraint::Length(u16::from(UI_HEIGHT)),
     ];
     let rects = Layout::default()
         .direction(Direction::Vertical)
@@ -101,12 +107,15 @@ pub fn split_into_actors_and_ui(rect: Rect) -> (Rect, Rect) {
 }
 
 fn normalize(rect: Rect) -> Rect {
+    let max_height = u16::from(MAX_HEIGHT);
+    let max_width = u16::from(MAX_WIDTH);
     let mut normalized_rect = Rect {
-        height: MAX_HEIGHT,
-        width: MAX_WIDTH,
+        height: max_height,
+        width: max_width,
         ..rect
     }
     .intersection(rect);
-    normalized_rect.y += rect.height.saturating_sub(MAX_HEIGHT);
+    // Add top-padding
+    normalized_rect.y += rect.height.saturating_sub(max_height);
     normalized_rect
 }

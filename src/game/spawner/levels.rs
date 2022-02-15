@@ -4,30 +4,42 @@ use crate::{
         actors::{asteroid::Asteroid, power_up::PowerUp, ship::Ship},
         game_item::GameItem,
     },
-    view::viewport::Viewport,
+    view::{coordinates::Coordinates, viewport::Viewport},
 };
 
-pub fn initial(viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
-    let (x, y) = viewport.top_right();
-    vec![
-        Box::new(Ship::new(viewport.center())),
-        Box::new(Asteroid::new_medium((0, y))),
-        Box::new(Asteroid::new_medium((x / 5, y + 3))),
-        Box::new(Asteroid::new_small((x / 3, y))),
-        Box::new(Asteroid::new_large((x.saturating_sub(20), y))),
-    ]
+pub fn initial(world_viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
+    let (_, y) = world_viewport.top_right();
+
+    let mut actors: Vec<Box<dyn GameItem>> = vec![
+        Box::new(Ship::new(Coordinates::default())), // The ship will center itself when first rendered.
+        Box::new(Asteroid::new_small(Coordinates::new(1, y - 6))),
+        Box::new(Asteroid::new_large(Coordinates::new(15, y))),
+    ];
+    for x in (0..world_viewport.width()).step_by(25) {
+        actors.push(Box::new(Asteroid::new_medium(Coordinates::new(x, y))));
+    }
+    actors
 }
 
-pub fn level1(ticker: &Ticker, viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
+pub fn level1(ticker: &Ticker, world_viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
     let mut actors: Vec<Box<dyn GameItem>> = Vec::new();
-    let (x, y) = viewport.top_right();
-    if ticker.at(Frequency::Ten) {
-        actors.push(Box::new(Asteroid::new_small((0, y))));
-        actors.push(Box::new(Asteroid::new_large((0, y + 4))));
-        actors.push(Box::new(PowerUp::new_health(((x / 2) - 3, y + 5))));
-        actors.push(Box::new(PowerUp::new_missile(((x / 2) - 3, y - 5))));
-        actors.push(Box::new(Asteroid::new_medium(((x / 2) + 3, y + 6))));
-        actors.push(Box::new(Asteroid::new_medium((x.saturating_sub(10), y))));
+
+    if ticker.at(Frequency::Eight) {
+        let (_, y) = world_viewport.top_right();
+
+        actors.push(Box::new(Asteroid::new_small(Coordinates::new(0, y))));
+        actors.push(Box::new(Asteroid::new_large(Coordinates::new(0, y - 4))));
+        actors.push(Box::new(PowerUp::new_health(Coordinates::new(
+            (38) - 3,
+            y - 1,
+        ))));
+        actors.push(Box::new(PowerUp::new_missile(Coordinates::new(
+            (37) - 3,
+            y - 5,
+        ))));
+        for x in (0..world_viewport.width()).step_by(25) {
+            actors.push(Box::new(Asteroid::new_medium(Coordinates::new(x, y))));
+        }
     }
     actors
 }

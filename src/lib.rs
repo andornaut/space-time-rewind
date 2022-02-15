@@ -1,6 +1,7 @@
 // Requires Rust from the nightly channel as of rustc 1.59.0-nightly (e012a191d 2022-01-06)
 #![feature(mixed_integer_ops)]
-
+// Allow modules to have the same name as their parent module
+#![allow(clippy::module_inception)]
 use anyhow::Result;
 use app::app::App;
 use view::session::Session;

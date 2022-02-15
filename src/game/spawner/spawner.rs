@@ -17,17 +17,19 @@ pub enum Level {
 }
 
 impl Level {
-    fn next(&self, _: &Ticker) -> Self {
-        match self {
+    // TODO Remove the following #[allow] once the TODO in the method body is addressed.
+    #[allow(clippy::match_single_binding)]
+    fn next(&mut self, _: &Ticker) {
+        *self = match self {
             // TODO Advance levels. Consider using `Countdown` or `Ticker` to time the advancement.
             _ => Self::Level1,
         }
     }
 
-    fn spawn(&self, ticker: &Ticker, viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
+    fn spawn(&self, ticker: &Ticker, world_viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
         match self {
-            Self::Initial => initial(viewport),
-            Self::Level1 => level1(ticker, viewport),
+            Self::Initial => initial(world_viewport),
+            Self::Level1 => level1(ticker, world_viewport),
         }
     }
 }
@@ -45,19 +47,19 @@ impl Default for Spawner {
 }
 
 impl Spawner {
-    pub fn actors(&mut self, ticker: &Ticker, viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
-        let actors = self.level.spawn(ticker, viewport);
-        self.level = self.level.next(ticker);
+    pub fn actors(&mut self, ticker: &Ticker, world_viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
+        let actors = self.level.spawn(ticker, world_viewport);
+        self.level.next(ticker);
         actors
     }
 
     pub fn ui(&self) -> Vec<Box<dyn GameItem>> {
         vec![
-            // Render the health, missiles, and score UIs before the button panel, so that they'll
-            // be rendered below the panel when the viewport is very narrow.
             Box::new(HealthBar::default()),
             Box::new(MissilesBar::default()),
             Box::new(Score::default()),
+            // Render the health, missiles, and score UIs before the button panel, so that they'll
+            // be rendered below the panel when the viewport is very narrow.
             Box::new(ButtonPanel::default()),
         ]
     }

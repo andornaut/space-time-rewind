@@ -6,20 +6,21 @@ use crate::{
     clock::ticker::{Frequency, TickHandler, Ticker},
     game::game_item::{GameItem, GameItemKind},
     view::{
-        render::{render_text, Renderable},
+        coordinates::Coordinates,
+        render::Renderable,
+        renderer::Renderer,
         util::{chars_height, chars_width},
-        viewport::{Coordinates, Viewport},
+        viewport::Viewport,
     },
 };
-use tui::widgets::canvas::Context;
 
 static TEXT: &str = "•";
 
 pub struct Bullet {
     coordinates: Coordinates,
     deleted: bool,
-    height: u16,
-    width: u16,
+    height: u8,
+    width: u8,
 }
 
 impl CommandHandler for Bullet {
@@ -44,24 +45,23 @@ impl GameItem for Bullet {
 }
 
 impl Renderable for Bullet {
-    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
-        if viewport.out_of_bounds(self.viewport()) {
-            self.deleted = true;
-            return;
-        }
-        render_text(context, self.coordinates, TEXT, ColorTheme::Bullet);
+    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+        renderer.render_with_offset(self.coordinates, TEXT, ColorTheme::Bullet);
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width, self.height, self.coordinates)
+        Viewport::new_with_coordinates(self.width, self.height, self.coordinates)
     }
 }
 
 impl TickHandler for Bullet {
-    fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.at(Frequency::Three) {
-            let (x, y) = self.coordinates;
-            self.coordinates = (x, y + 1);
+    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: &Viewport) {
+        if ticker.at(Frequency::One) {
+            self.coordinates.y_offset(1);
+
+            if !world_viewport.intersects_vertically(self.viewport()) {
+                self.deleted = true;
+            }
         }
     }
 }

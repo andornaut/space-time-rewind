@@ -6,12 +6,13 @@ use crate::{
     clock::ticker::{Frequency, TickHandler, Ticker},
     game::game_item::{GameItem, GameItemKind},
     view::{
-        render::{render_text, Renderable},
+        coordinates::Coordinates,
+        render::Renderable,
+        renderer::Renderer,
         util::{chars_height, chars_width},
-        viewport::{Coordinates, Viewport},
+        viewport::Viewport,
     },
 };
-use tui::widgets::canvas::Context;
 
 static TEXT_HEALTH: &str = "\
 ┏━━━┓
@@ -44,19 +45,19 @@ impl PowerUpKind {
 }
 
 pub struct PowerUp {
-    coordinates: Coordinates,
     color: ColorTheme,
+    coordinates: Coordinates,
     deleted: bool,
-    height: u16,
+    height: u8,
     kind: PowerUpKind,
     text: &'static str,
-    width: u16,
+    width: u8,
 }
 
 impl CommandHandler for PowerUp {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         if let Command::Collide(kind) = command {
-            if let GameItemKind::Ship | GameItemKind::Shields = kind {
+            if let GameItemKind::Ship | GameItemKind::ShipWithShields = kind {
                 self.deleted = true;
                 return match self.kind {
                     PowerUpKind::Health => vec![Command::IncreaseHealth(1)],
@@ -75,24 +76,23 @@ impl GameItem for PowerUp {
 }
 
 impl Renderable for PowerUp {
-    fn render(&mut self, context: &mut Context, _: &Viewport) {
-        render_text(context, self.coordinates, self.text, self.color);
+    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+        renderer.render_with_offset(self.coordinates, self.text, self.color);
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width, self.height, self.coordinates)
+        Viewport::new_with_coordinates(self.width, self.height, self.coordinates)
     }
 }
 
 impl TickHandler for PowerUp {
-    fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.at(Frequency::Four) {
-            let (x, y) = self.coordinates;
-            if y == 0 {
+    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: &Viewport) {
+        if ticker.at(Frequency::Three) {
+            self.coordinates.y_offset(-1);
+
+            if !world_viewport.intersects_vertically(self.viewport()) {
                 self.deleted = true;
-                return;
             }
-            self.coordinates = (x, y - 1);
         }
     }
 }
@@ -109,10 +109,10 @@ impl PowerUp {
     fn new(coordinates: Coordinates, kind: PowerUpKind) -> Self {
         let text = kind.text();
         Self {
-            coordinates,
             color: kind.color(),
-            height: chars_height(text),
+            coordinates,
             deleted: false,
+            height: chars_height(text),
             kind,
             text,
             width: chars_width(text),

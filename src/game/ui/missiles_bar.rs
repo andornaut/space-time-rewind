@@ -6,21 +6,19 @@ use crate::{
     clock::ticker::TickHandler,
     game::{game_item::GameItem, INITIAL_MAX_MISSILES},
     view::{
-        render::Renderable,
-        util::chars_width,
-        viewport::{Coordinates, Viewport},
+        coordinates::Coordinates, render::Renderable, renderer::Renderer, util::chars_width,
+        viewport::Viewport,
     },
 };
 use tui::{
     style::{Color, Style},
-    text::{Span, Spans},
-    widgets::canvas::Context,
+    text::Span,
 };
 
-const HEIGHT: u16 = 1;
-static TEXT_HEADER: &'static str = "Missiles ";
-static TEXT_CURRENT: &'static str = "▮";
-static TEXT_USED: &'static str = "▯";
+const HEIGHT: u8 = 1;
+static TEXT_HEADER: &str = "Missiles ";
+static TEXT_CURRENT: &str = "▮";
+static TEXT_USED: &str = "▯";
 
 pub struct MissilesBar {
     coordinates: Coordinates,
@@ -39,27 +37,23 @@ impl CommandHandler for MissilesBar {
 }
 impl Default for MissilesBar {
     fn default() -> Self {
-        Self::new((1, 1), INITIAL_MAX_MISSILES, INITIAL_MAX_MISSILES)
+        let coordinates = Coordinates::new(1, 1);
+        Self::new(coordinates, INITIAL_MAX_MISSILES, INITIAL_MAX_MISSILES)
     }
 }
 
 impl GameItem for MissilesBar {}
 
 impl Renderable for MissilesBar {
-    fn render(&mut self, context: &mut Context, _: &Viewport) {
+    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::MissilesHeader);
         let current = span(self.text_current(), ColorTheme::MissilesCurrent);
         let used = span(self.text_used(), ColorTheme::MissilesLost);
-        let (x, y) = self.coordinates;
-        context.print(
-            f64::from(x),
-            f64::from(y),
-            Spans::from(vec![header, current, used]),
-        );
+        renderer.render_spans(self.coordinates, vec![header, current, used]);
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width(), HEIGHT, self.coordinates)
+        Viewport::new_with_coordinates(self.width(), HEIGHT, self.coordinates)
     }
 }
 
@@ -82,8 +76,8 @@ impl MissilesBar {
         TEXT_USED.repeat((self.max - self.current) as usize)
     }
 
-    fn width(&self) -> u16 {
-        chars_width(TEXT_HEADER) + u16::from(self.max)
+    fn width(&self) -> u8 {
+        chars_width(TEXT_HEADER) + self.max
     }
 }
 

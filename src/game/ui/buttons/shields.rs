@@ -10,13 +10,8 @@ static TEXT_FULL: &str = "\
 │Shields [k]│
 ╰───────────╯";
 
+#[derive(Default)]
 pub struct ShieldsButton {}
-
-impl Default for ShieldsButton {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 impl Button for ShieldsButton {
     fn color(&self, active: bool, disabled: bool) -> ColorTheme {

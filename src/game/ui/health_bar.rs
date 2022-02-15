@@ -6,21 +6,19 @@ use crate::{
     clock::ticker::TickHandler,
     game::{game_item::GameItem, INITIAL_MAX_HEALTH},
     view::{
-        render::Renderable,
-        util::chars_width,
-        viewport::{Coordinates, Viewport},
+        coordinates::Coordinates, render::Renderable, renderer::Renderer, util::chars_width,
+        viewport::Viewport,
     },
 };
 use tui::{
     style::{Color, Style},
-    text::{Span, Spans},
-    widgets::canvas::Context,
+    text::Span,
 };
 
-const HEIGHT: u16 = 1;
-static TEXT_HEADER: &'static str = "Health ";
-static TEXT_CURRENT: &'static str = "▮";
-static TEXT_LOST: &'static str = "▯";
+const HEIGHT: u8 = 1;
+static TEXT_HEADER: &str = "Health ";
+static TEXT_CURRENT: &str = "▮";
+static TEXT_LOST: &str = "▯";
 
 pub struct HealthBar {
     coordinates: Coordinates,
@@ -37,29 +35,26 @@ impl CommandHandler for HealthBar {
         NO_COMMANDS
     }
 }
+
 impl Default for HealthBar {
     fn default() -> Self {
-        Self::new((3, 2), INITIAL_MAX_HEALTH, INITIAL_MAX_HEALTH)
+        let coordinates = Coordinates::new(3, 2);
+        Self::new(coordinates, INITIAL_MAX_HEALTH, INITIAL_MAX_HEALTH)
     }
 }
 
 impl GameItem for HealthBar {}
 
 impl Renderable for HealthBar {
-    fn render(&mut self, context: &mut Context, _: &Viewport) {
+    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::HealthHeader);
         let current = span(self.text_current(), ColorTheme::HealthCurrent);
         let lost = span(self.text_lost(), ColorTheme::HealthLost);
-        let (x, y) = self.coordinates;
-        context.print(
-            f64::from(x),
-            f64::from(y),
-            Spans::from(vec![header, current, lost]),
-        );
+        renderer.render_spans(self.coordinates, vec![header, current, lost]);
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width(), HEIGHT, self.coordinates)
+        Viewport::new_with_coordinates(self.width(), HEIGHT, self.coordinates)
     }
 }
 
@@ -82,8 +77,8 @@ impl HealthBar {
         TEXT_LOST.repeat((self.max - self.current) as usize)
     }
 
-    fn width(&self) -> u16 {
-        chars_width(TEXT_HEADER) + u16::from(self.max)
+    fn width(&self) -> u8 {
+        chars_width(TEXT_HEADER) + self.max
     }
 }
 

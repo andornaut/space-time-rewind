@@ -31,6 +31,7 @@ n.b. Requires Rust from the *nightly* channel as of 1.59.0-nightly to support
 
 ```
 cargo test
+cargo clippy
 cargo run
 cargo build --release
 ./target/debug/space_time_rewind

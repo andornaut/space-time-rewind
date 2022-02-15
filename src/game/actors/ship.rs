@@ -13,12 +13,13 @@ use crate::{
         INITIAL_MAX_HEALTH, INITIAL_MAX_MISSILES,
     },
     view::{
-        render::{render_text, Renderable},
+        coordinates::Coordinates,
+        render::Renderable,
+        renderer::Renderer,
         util::{chars_height, chars_width},
-        viewport::{Coordinates, Viewport},
+        viewport::Viewport,
     },
 };
-use tui::widgets::canvas::Context;
 
 static TEXT: &str = "◄◆►";
 
@@ -36,6 +37,7 @@ pub struct Ship {
     disabled_guns: Countdown,
     enabled_shields: Countdown,
     health: u8,
+    initialized: bool,
     missiles: u8,
 }
 
@@ -51,7 +53,7 @@ impl CommandHandler for Ship {
                     let mut commands = vec![Command::UpdateHealth(self.health, INITIAL_MAX_HEALTH)];
                     if self.health == 0 {
                         self.deleted = true;
-                        commands.push(Command::AddExplosion(self.viewport().center()));
+                        commands.push(Command::AddExplosion(self.viewport().centered()));
                         commands.push(Command::GameOver);
                     }
                     return commands;
@@ -60,22 +62,24 @@ impl CommandHandler for Ship {
             Command::FireGuns => {
                 if self.disabled_guns.off() {
                     self.disabled_guns.restart();
-                    let (cx, cy) = self.viewport().center();
-                    return vec![Command::AddBullet((cx, cy + 1))];
+                    let mut coordinates = self.viewport().centered();
+                    coordinates.y_offset(1);
+                    return vec![Command::AddBullet(coordinates)];
                 }
             }
             Command::FireMissile => {
-                let (cx, cy) = self.viewport().center();
                 self.missiles = self.missiles.saturating_sub(1);
+                let mut coordinates = self.viewport().centered();
+                coordinates.y_offset(1);
                 return vec![
+                    Command::AddMissile(coordinates),
                     Command::UpdateMissiles(self.missiles, INITIAL_MAX_MISSILES),
-                    Command::AddMissile((cx, cy + 1)),
                 ];
             }
             Command::FireShields => {
                 let wider_width = chars_width(TEXT_SHIELDS);
                 let taller_height = chars_height(TEXT_SHIELDS);
-                self.coordinates = self.viewport().grow(wider_width, taller_height);
+                self.coordinates = self.viewport().expanded(wider_width, taller_height);
                 self.enabled_shields.restart();
             }
             Command::IncreaseHealth(number) => {
@@ -90,13 +94,8 @@ impl CommandHandler for Ship {
                     return vec![Command::UpdateMissiles(self.missiles, INITIAL_MAX_MISSILES)];
                 }
             }
-            Command::MoveShip((dx, dy)) => {
-                let (x, y) = self.coordinates;
-                let width = i16::try_from(self.width()).unwrap();
-                self.coordinates = (
-                    u16::from(x.saturating_add_signed(dx * width)),
-                    u16::from(y.saturating_add_signed(dy)),
-                );
+            Command::MoveShip(movement) => {
+                self.coordinates.movement(movement);
             }
             _ => (),
         }
@@ -111,7 +110,7 @@ impl GameItem for Ship {
 
     fn kind(&self) -> GameItemKind {
         if self.enabled_shields.on() {
-            GameItemKind::Shields
+            GameItemKind::ShipWithShields
         } else {
             GameItemKind::Ship
         }
@@ -119,19 +118,26 @@ impl GameItem for Ship {
 }
 
 impl Renderable for Ship {
-    fn render(&mut self, context: &mut Context, viewport: &Viewport) {
-        // Prevent the ship from going out of bounds when the viewport is resized.
-        self.coordinates = viewport.contain(self.viewport());
-        render_text(context, self.coordinates, self.text(), self.color());
+    fn render(&mut self, renderer: &mut Renderer, visible_viewport: &Viewport) {
+        if self.initialized {
+            self.coordinates = visible_viewport.contained_vertically(self.viewport());
+        } else {
+            self.initialized = true;
+            self.coordinates = self
+                .viewport()
+                .with_coordinates(visible_viewport.centered())
+                .centered_around_bottom_left();
+        }
+        renderer.render_with_offset(self.coordinates, self.text(), self.color());
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width(), self.height(), self.coordinates)
+        Viewport::new_with_coordinates(self.width(), self.height(), self.coordinates)
     }
 }
 
 impl TickHandler for Ship {
-    fn handle_tick(&mut self, _: &Ticker) {
+    fn handle_tick(&mut self, _: &Ticker, _: &Viewport) {
         self.disabled_guns.down();
 
         if self.enabled_shields.current() == 1 {
@@ -139,7 +145,7 @@ impl TickHandler for Ship {
             let shorter_height = chars_height(TEXT);
             // Shrink before turning off the shields, because turning off the shields will reduce
             // the ship's width, which will cause the `shrink()` calculation to be incorrect.
-            self.coordinates = self.viewport().shrink(narrower_width, shorter_height);
+            self.coordinates = self.viewport().shrunk(narrower_width, shorter_height);
         }
         self.enabled_shields.down();
     }
@@ -153,6 +159,7 @@ impl Ship {
             disabled_guns: Countdown::new(DISABLED_GUNS_COUNT),
             enabled_shields: Countdown::new(ENABLED_SHIELDS_COUNT),
             health: INITIAL_MAX_HEALTH,
+            initialized: false,
             missiles: INITIAL_MAX_MISSILES,
         }
     }
@@ -173,11 +180,11 @@ impl Ship {
         }
     }
 
-    fn height(&self) -> u16 {
+    fn height(&self) -> u8 {
         chars_height(self.text())
     }
 
-    fn width(&self) -> u16 {
+    fn width(&self) -> u8 {
         chars_width(self.text())
     }
 }

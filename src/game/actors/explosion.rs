@@ -6,14 +6,15 @@ use crate::{
     },
     game::game_item::GameItem,
     view::{
-        render::{render_text, Renderable},
+        coordinates::Coordinates,
+        render::Renderable,
+        renderer::Renderer,
         util::{chars_height, chars_width},
-        viewport::{Coordinates, Viewport},
+        viewport::Viewport,
     },
 };
-use tui::widgets::canvas::Context;
 
-const LIFECYCLE_TRANSITION_COUNT: u16 = TICKS_PER_SECOND / 16; // 62.5ms
+const ANIMATION_COUNT: u16 = TICKS_PER_SECOND / 10; // 100ms
 
 static TEXT_A: &str = "\
 \x20\x20\x20\x20\x20\x20
@@ -86,22 +87,19 @@ impl GameItem for Explosion {
 }
 
 impl Renderable for Explosion {
-    fn render(&mut self, context: &mut Context, _: &Viewport) {
-        render_text(
-            context,
-            self.coordinates,
-            self.animation.text(),
-            self.animation.color(),
-        );
+    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+        let text = self.animation.text();
+        let color = self.animation.color();
+        renderer.render_with_offset(self.coordinates, text, color);
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width(), self.height(), self.coordinates)
+        Viewport::new_with_coordinates(self.width(), self.height(), self.coordinates)
     }
 }
 
 impl TickHandler for Explosion {
-    fn handle_tick(&mut self, _: &Ticker) {
+    fn handle_tick(&mut self, _: &Ticker, _: &Viewport) {
         if self.animation_next.off() {
             self.animation_next.restart();
             self.animation = self.animation.next();
@@ -116,23 +114,23 @@ impl TickHandler for Explosion {
 
 impl Explosion {
     pub fn new(coordinates: Coordinates) -> Self {
-        let mut lifecycle_next = Countdown::new(LIFECYCLE_TRANSITION_COUNT);
-        lifecycle_next.restart();
-        let mut obj = Self {
+        let mut animation_next = Countdown::new(ANIMATION_COUNT);
+        animation_next.restart();
+        let mut explosion = Self {
             coordinates,
             deleted: false,
             animation: Animation::A,
-            animation_next: lifecycle_next,
+            animation_next,
         };
-        obj.coordinates = obj.viewport().centered_around_bottom_left();
-        obj
+        explosion.coordinates = explosion.viewport().centered_around_bottom_left();
+        explosion
     }
 
-    fn height(&self) -> u16 {
+    fn height(&self) -> u8 {
         chars_height(self.animation.text())
     }
 
-    fn width(&self) -> u16 {
+    fn width(&self) -> u8 {
         chars_width(self.animation.text())
     }
 }

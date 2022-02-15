@@ -6,12 +6,13 @@ use crate::{
     clock::ticker::{Frequency, TickHandler, Ticker},
     game::game_item::{GameItem, GameItemKind},
     view::{
-        render::{render_text, Renderable},
+        coordinates::Coordinates,
+        render::Renderable,
+        renderer::Renderer,
         util::{chars_height, chars_width},
-        viewport::{Coordinates, Viewport},
+        viewport::Viewport,
     },
 };
-use tui::widgets::canvas::Context;
 
 static TEXT: &str = "  ▄\x20\x20
 ▟███▙
@@ -20,8 +21,8 @@ static TEXT: &str = "  ▄\x20\x20
 pub struct Missile {
     coordinates: Coordinates,
     deleted: bool,
-    height: u16,
-    width: u16,
+    height: u8,
+    width: u8,
 }
 
 impl CommandHandler for Missile {
@@ -46,38 +47,37 @@ impl GameItem for Missile {
 }
 
 impl Renderable for Missile {
-    fn render<'a>(&mut self, context: &mut Context, viewport: &Viewport) {
-        if viewport.out_of_bounds(self.viewport()) {
-            self.deleted = true;
-            return;
-        }
-        render_text(context, self.coordinates, TEXT, ColorTheme::Missile);
+    fn render<'a>(&mut self, renderer: &mut Renderer, _: &Viewport) {
+        renderer.render_with_offset(self.coordinates, TEXT, ColorTheme::Missile);
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_from_coordinates(self.width, self.height, self.coordinates)
+        Viewport::new_with_coordinates(self.width, self.height, self.coordinates)
     }
 }
 
 impl TickHandler for Missile {
-    fn handle_tick(&mut self, ticker: &Ticker) {
-        if ticker.at(Frequency::Four) {
-            let (x, y) = self.coordinates;
-            self.coordinates = (x, y + 1);
+    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: &Viewport) {
+        if ticker.at(Frequency::Two) {
+            self.coordinates.y_offset(1);
+
+            if !world_viewport.intersects_vertically(self.viewport()) {
+                self.deleted = true;
+            }
         }
     }
 }
 
 impl Missile {
-    pub fn new(coordinates: Coordinates) -> Self {
+    pub fn new(mut coordinates: Coordinates) -> Self {
         // The given coordinates are relative to the center of a ship, so left-align.
-        let (x, y) = coordinates;
+        let height = chars_height(TEXT);
         let width = chars_width(TEXT);
-        let x = x.saturating_sub(width.saturating_div(2));
+        coordinates.x_offset(i16::from(width) / -2);
         Self {
-            coordinates: (x, y),
+            coordinates,
             deleted: false,
-            height: chars_height(TEXT),
+            height,
             width,
         }
     }

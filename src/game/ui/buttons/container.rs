@@ -1,12 +1,10 @@
-use tui::widgets::canvas::Context;
-
 use crate::{
     app::{app::TICKS_PER_SECOND, command::Command},
     clock::{countdown::Countdown, ticker::Ticker},
     view::{
-        render::render_text,
+        coordinates::Coordinates,
+        renderer::Renderer,
         util::{chars_height, chars_width},
-        viewport::Coordinates,
     },
 };
 
@@ -49,17 +47,17 @@ impl ButtonContainer {
         self.disabled.down();
     }
 
-    pub fn render(&mut self, context: &mut Context, coordinates: Coordinates, size: ButtonSize) {
+    pub fn render(&mut self, renderer: &mut Renderer, coordinates: Coordinates, size: ButtonSize) {
         let color = self.button.color(self.active.on(), self.disabled.on());
         let text = self.button.text(size);
-        render_text(context, coordinates, text, color);
+        renderer.render(coordinates, text, color);
     }
 
-    pub fn height(&self, size: ButtonSize) -> u16 {
+    pub fn height(&self, size: ButtonSize) -> u8 {
         chars_height(self.button.text(size))
     }
 
-    pub fn width(&self, size: ButtonSize) -> u16 {
+    pub fn width(&self, size: ButtonSize) -> u8 {
         chars_width(self.button.text(size))
     }
 }

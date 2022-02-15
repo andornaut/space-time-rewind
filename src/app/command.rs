@@ -1,6 +1,6 @@
 use crate::{
     game::game_item::GameItemKind,
-    view::viewport::{Coordinates, Movement},
+    view::coordinates::{Coordinates, Movement},
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
@@ -12,7 +12,7 @@ pub trait CommandHandler {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Command {
     Continue,
     GameOver, // Display a prompt to quit or restart

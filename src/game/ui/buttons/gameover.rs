@@ -6,13 +6,8 @@ static TEXT: &str = "\
 Game over! Press [r] to restart or [q] to quit
 ==============================================";
 
+#[derive(Default)]
 pub struct GameOverButton {}
-
-impl Default for GameOverButton {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 impl Button for GameOverButton {
     fn color(&self, _: bool, _: bool) -> ColorTheme {

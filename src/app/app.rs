@@ -3,7 +3,7 @@ use super::{
     input::{receive_input_commands, send_input_commands},
 };
 use crate::{
-    clock::ticker::{TickHandler, Ticker},
+    clock::ticker::Ticker,
     game::world::World,
     view::{render::render, session::Session},
 };
@@ -11,8 +11,9 @@ use anyhow::Result;
 
 use std::{sync::mpsc, thread, time::Duration};
 
-const TICK_RATE_MS: u64 = 40;
-pub const TICKS_PER_SECOND: u16 = 1000 / TICK_RATE_MS as u16;
+const MAIN_LOOP_MIN_PERIOD_MS: u64 = 30;
+const TICK_PERIOD_MS: u64 = 100;
+pub const TICKS_PER_SECOND: u16 = 1000 / TICK_PERIOD_MS as u16;
 
 pub struct App {
     ticker: Ticker,
@@ -22,7 +23,7 @@ pub struct App {
 impl Default for App {
     fn default() -> Self {
         Self {
-            ticker: Ticker::new(Duration::from_millis(TICK_RATE_MS)),
+            ticker: Ticker::new(Duration::from_millis(TICK_PERIOD_MS)),
             world: World::default(),
         }
     }
@@ -30,16 +31,17 @@ impl Default for App {
 
 impl App {
     pub fn run(&mut self, session: &mut Session) -> Result<()> {
+        let min_period = Duration::from_millis(MAIN_LOOP_MIN_PERIOD_MS);
         let (tx, rx) = mpsc::channel();
         send_input_commands(tx);
 
         loop {
-            if self.ticker.maybe_tick() {
+            let ticked = self.ticker.maybe_tick();
+            if ticked {
                 self.world.handle_tick(&self.ticker);
             }
-            render(session, &mut self.world)?;
 
-            let mut commands = receive_input_commands(&rx);
+            let commands = receive_input_commands(&rx);
             for command in commands.iter() {
                 match command {
                     Command::Quit => return Ok(()),
@@ -47,9 +49,15 @@ impl App {
                     _ => (),
                 }
             }
-            commands.extend(self.world.detect_collisions());
-            self.world.broadcast_commands(commands)?;
-            thread::sleep(self.ticker.remaining_timeout());
+
+            if ticked || !commands.is_empty() {
+                self.world.broadcast_commands(commands)?;
+                render(session, &mut self.world)?;
+
+                // A tick, command, or render can cause a collision.
+                self.world.broadcast_collisions()?;
+            }
+            thread::sleep(min_period);
         }
     }
 }
