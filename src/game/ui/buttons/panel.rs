@@ -1,6 +1,5 @@
 use super::{
-    button::ButtonSize,
-    container::ButtonContainer,
+    button::{ButtonContainer, ButtonSize},
     factory::{new_game_over, new_missiles, new_rewind, new_shields},
 };
 use crate::{

@@ -85,8 +85,11 @@ impl AsteroidSize {
 pub struct Asteroid {
     coordinates: Coordinates,
     deleted: bool,
+    height: u8,
     hp: u8,
     kind: AsteroidSize,
+    text: &'static str,
+    width: u8,
 }
 
 impl CommandHandler for Asteroid {
@@ -121,11 +124,11 @@ impl GameItem for Asteroid {
 
 impl Renderable for Asteroid {
     fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
-        renderer.render_with_offset(self.coordinates, self.kind.text(), self.kind.color(self.hp));
+        renderer.render_with_offset(self.coordinates, self.text, self.kind.color(self.hp));
     }
 
     fn viewport(&self) -> Viewport {
-        Viewport::new_with_coordinates(self.width(), self.height(), self.coordinates)
+        Viewport::new_with_coordinates(self.width, self.height, self.coordinates)
     }
 }
 
@@ -155,19 +158,17 @@ impl Asteroid {
     }
 
     fn new(coordinates: Coordinates, kind: AsteroidSize) -> Self {
+        let text = kind.text();
+        let height = chars_height(text);
+        let width = chars_width(text);
         Self {
             coordinates,
             deleted: false,
+            height,
             hp: kind.initial_hp(),
             kind,
+            text,
+            width,
         }
-    }
-
-    fn height(&self) -> u8 {
-        chars_height(self.kind.text())
-    }
-
-    fn width(&self) -> u8 {
-        chars_width(self.kind.text())
     }
 }
