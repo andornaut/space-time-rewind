@@ -17,7 +17,7 @@ const UI_HEIGHT: u8 = 3;
 const MAX_HEIGHT: u8 = 40;
 const MAX_WIDTH: u8 = 100;
 pub const WINDOW_MIN_HEIGHT: u8 = ACTORS_MIN_HEIGHT + UI_HEIGHT;
-pub const WINDOW_MIN_WIDTH: u8 = 47;
+pub const WINDOW_MIN_WIDTH: u8 = 42;
 pub const WORLD_HEIGHT: u8 = MAX_HEIGHT - UI_HEIGHT - 2; // Account for the actors viewport's borders
 pub const WORLD_WIDTH: u8 = 200;
 
@@ -25,15 +25,8 @@ static TITLE: &str = "Space-Time-Rewind!";
 static RESIZE_WARNING_MESSAGE: &str = "Please increase the size of the terminal window";
 
 pub fn create_actors_block<'a>() -> Block<'a> {
-    Block::default()
-        .border_style(Style::default().fg(Color::from(ColorTheme::BoardBorderFg)))
-        .border_type(BorderType::Rounded)
-        .borders(Borders::ALL)
-        .style(Style::default().bg(Color::from(ColorTheme::Bg)))
-        .title(Span::styled(
-            TITLE,
-            Style::default().fg(Color::from(ColorTheme::BoardTitleFg)),
-        ))
+    let title = create_title(ColorTheme::BoardTitleFg);
+    with_default_borders(create_background_block()).title(title)
 }
 
 pub fn create_background_block<'a>() -> Block<'a> {
@@ -41,15 +34,8 @@ pub fn create_background_block<'a>() -> Block<'a> {
 }
 
 pub fn create_resize_warning_paragraph<'a>() -> Paragraph<'a> {
-    let block = Block::default()
-        .border_style(Style::default().fg(Color::from(ColorTheme::ErrorBg)))
-        .border_type(BorderType::Rounded)
-        .borders(Borders::ALL)
-        .style(Style::default().bg(Color::from(ColorTheme::Bg)))
-        .title(Span::styled(
-            TITLE,
-            Style::default().fg(Color::from(ColorTheme::ErrorBg)),
-        ));
+    let title = create_title(ColorTheme::ErrorFg);
+    let block = with_error_borders(create_background_block()).title(title);
     Paragraph::new(RESIZE_WARNING_MESSAGE)
         .style(
             Style::default()
@@ -106,6 +92,10 @@ pub fn split_into_actors_and_ui(rect: Rect) -> (Rect, Rect) {
     (rects[0], rects[1])
 }
 
+fn create_title<'a>(color: ColorTheme) -> Span<'a> {
+    Span::styled(TITLE, Style::default().fg(Color::from(color)))
+}
+
 fn normalize(rect: Rect) -> Rect {
     let max_height = u16::from(MAX_HEIGHT);
     let max_width = u16::from(MAX_WIDTH);
@@ -118,4 +108,18 @@ fn normalize(rect: Rect) -> Rect {
     // Add top-padding
     normalized_rect.y += rect.height.saturating_sub(max_height);
     normalized_rect
+}
+
+fn with_default_borders<'a>(block: Block<'a>) -> Block<'a> {
+    block
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::from(ColorTheme::BoardBorderFg)))
+        .border_type(BorderType::Rounded)
+}
+
+fn with_error_borders<'a>(block: Block<'a>) -> Block<'a> {
+    block
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::from(ColorTheme::ErrorBg)))
+        .border_type(BorderType::Rounded)
 }

@@ -36,17 +36,13 @@ pub enum ColorTheme {
     MissilesCurrent,
     MissilesHeader,
     MissilesLost,
-    RewindButton,
-    RewindButtonActive,
-    ScoreHeader,
-    ScorePoints,
     ShieldsButton,
     ShieldsButtonActive,
+    ScoreHeader,
+    ScorePoints,
 }
 
 const BLACK: Color = Color::Rgb(21, 21, 21);
-const BLUE: Color = Color::Rgb(51, 102, 175);
-const BLUE_LIGHT: Color = Color::Rgb(153, 204, 255);
 const GREEN: Color = Color::Rgb(102, 175, 51);
 const GREEN_LIGHT: Color = Color::Rgb(153, 255, 153);
 const GREY: Color = Color::Rgb(104, 104, 104);
@@ -81,7 +77,7 @@ impl From<ColorTheme> for Color {
             ColorTheme::PowerUpHealth => RED,
             ColorTheme::PowerUpMissile => PINK,
             ColorTheme::Ship => Color::Rgb(51, 153, 204),
-            ColorTheme::ShipShields => BLUE_LIGHT,
+            ColorTheme::ShipShields => GREEN_LIGHT,
 
             // UI
             ColorTheme::DisabledButton => GREY_DARK,
@@ -94,12 +90,10 @@ impl From<ColorTheme> for Color {
             ColorTheme::MissilesCurrent => PINK,
             ColorTheme::MissilesHeader => GREY,
             ColorTheme::MissilesLost => GREY,
-            ColorTheme::RewindButton => GREEN,
-            ColorTheme::RewindButtonActive => GREEN_LIGHT,
+            ColorTheme::ShieldsButton => GREEN,
+            ColorTheme::ShieldsButtonActive => GREEN_LIGHT,
             ColorTheme::ScoreHeader => GREY,
             ColorTheme::ScorePoints => GREY_LIGHT,
-            ColorTheme::ShieldsButton => BLUE,
-            ColorTheme::ShieldsButtonActive => BLUE_LIGHT,
         }
     }
 }

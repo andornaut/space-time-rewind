@@ -33,12 +33,10 @@ pub enum Command {
 
     // Button commands
     PressMissileButton,
-    PressRewindButton,
     PressShieldsButton,
     // Ship commands
     FireGuns,
     FireMissile,
-    FireRewind,
     FireShields,
 }
 
@@ -58,7 +56,6 @@ impl From<KeyEvent> for Command {
             KeyCode::Char(' ') => Self::FireGuns,
             KeyCode::Char('j') => Self::PressMissileButton,
             KeyCode::Char('k') => Self::PressShieldsButton,
-            KeyCode::Char('l') => Self::PressRewindButton,
 
             KeyCode::Char('q') => Self::Quit,
             KeyCode::Char('r') => Self::Restart,

@@ -159,16 +159,14 @@ impl Asteroid {
 
     fn new(coordinates: Coordinates, kind: AsteroidSize) -> Self {
         let text = kind.text();
-        let height = chars_height(text);
-        let width = chars_width(text);
         Self {
             coordinates,
             deleted: false,
-            height,
+            height: chars_height(text),
             hp: kind.initial_hp(),
             kind,
             text,
-            width,
+            width: chars_width(text),
         }
     }
 }

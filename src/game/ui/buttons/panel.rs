@@ -1,6 +1,6 @@
 use super::{
     button::{ButtonContainer, ButtonSize},
-    factory::{new_game_over, new_missiles, new_rewind, new_shields},
+    factory::{new_game_over, new_missiles, new_shields},
 };
 use crate::{
     app::command::{Command, CommandHandler, NO_COMMANDS},
@@ -10,7 +10,7 @@ use crate::{
 };
 
 const GUTTER_WIDTH: u8 = 1;
-const MIN_FULL_WIDTH: u8 = 71;
+const MIN_FULL_WIDTH: u8 = 58;
 
 pub struct ButtonPanel {
     buttons: Vec<ButtonContainer>,
@@ -34,7 +34,7 @@ impl CommandHandler for ButtonPanel {
 impl Default for ButtonPanel {
     fn default() -> Self {
         Self {
-            buttons: vec![new_missiles(), new_shields(), new_rewind()],
+            buttons: vec![new_missiles(), new_shields()],
             coordinates: Coordinates::default(), // Will be re-aligned during `render()`
             size: ButtonSize::Full,
         }
