@@ -1,7 +1,4 @@
-use super::{
-    button::{ButtonContainer, ButtonSize},
-    factory::{new_game_over, new_missiles, new_shields},
-};
+use super::button::{ButtonContainer, ButtonSize};
 use crate::{
     app::command::{Command, CommandHandler, NO_COMMANDS},
     clock::ticker::{TickHandler, Ticker},
@@ -21,7 +18,7 @@ pub struct ButtonPanel {
 impl CommandHandler for ButtonPanel {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         if let Command::GameOver = command {
-            self.buttons = vec![new_game_over()];
+            self.buttons = vec![ButtonContainer::new_game_over()];
             return NO_COMMANDS;
         }
         self.buttons
@@ -34,7 +31,10 @@ impl CommandHandler for ButtonPanel {
 impl Default for ButtonPanel {
     fn default() -> Self {
         Self {
-            buttons: vec![new_missiles(), new_shields()],
+            buttons: vec![
+                ButtonContainer::new_missiles(),
+                ButtonContainer::new_shields(),
+            ],
             coordinates: Coordinates::default(), // Will be re-aligned during `render()`
             size: ButtonSize::Full,
         }

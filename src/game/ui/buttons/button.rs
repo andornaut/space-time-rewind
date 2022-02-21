@@ -8,7 +8,10 @@ use crate::{
     },
 };
 
+use super::{game_over::GameOverButton, missile::MissileButton, shields::ShieldsButton};
+
 const ACTIVE_COUNT: u16 = TICKS_PER_SECOND / 10; // 100ms
+const DISABLED_SHIELDS_COUNT: u16 = TICKS_PER_SECOND * 30; // 30 seconds
 
 #[derive(Copy, Clone)]
 pub enum ButtonSize {
@@ -33,11 +36,23 @@ pub struct ButtonContainer {
 }
 
 impl ButtonContainer {
-    pub fn new(button: Box<dyn Button>) -> Self {
+    pub fn new_game_over() -> Self {
+        Self::new(Box::new(GameOverButton::default()))
+    }
+
+    pub fn new_missiles() -> Self {
+        Self::new(Box::new(MissileButton::default()))
+    }
+
+    pub fn new_shields() -> Self {
+        Self::new_disableable(Box::new(ShieldsButton::default()), DISABLED_SHIELDS_COUNT)
+    }
+
+    fn new(button: Box<dyn Button>) -> Self {
         Self::new_disableable(button, 0)
     }
 
-    pub fn new_disableable(button: Box<dyn Button>, disabled_count: u16) -> Self {
+    fn new_disableable(button: Box<dyn Button>, disabled_count: u16) -> Self {
         Self {
             active: Countdown::new(ACTIVE_COUNT),
             disabled: Countdown::new(disabled_count),
