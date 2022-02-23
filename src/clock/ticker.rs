@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 use crate::view::viewport::Viewport;
 
 pub trait TickHandler {
-    fn handle_tick(&mut self, _ticker: &Ticker, _world_viewport: &Viewport) {}
+    fn handle_tick(&mut self, _ticker: &Ticker, _world_viewport: Viewport) {}
 }
 
 #[derive(Copy, Clone)]

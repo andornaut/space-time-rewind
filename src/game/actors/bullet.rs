@@ -45,7 +45,7 @@ impl GameItem for Bullet {
 }
 
 impl Renderable for Bullet {
-    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+    fn render(&self, renderer: &mut Renderer) {
         renderer.render_with_offset(self.coordinates, TEXT, ColorTheme::Bullet);
     }
 
@@ -55,7 +55,7 @@ impl Renderable for Bullet {
 }
 
 impl TickHandler for Bullet {
-    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: &Viewport) {
+    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(Frequency::One) {
             self.coordinates.y_offset(1);
 

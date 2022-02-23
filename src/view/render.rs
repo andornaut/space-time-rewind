@@ -17,7 +17,6 @@ use crate::{
     },
 };
 use anyhow::Result;
-use std::cell::RefCell;
 use tui::{
     backend::Backend,
     layout::Rect,
@@ -28,7 +27,7 @@ use tui::{
 const MIN_CANVAS_LENGTH: u16 = 3;
 
 pub trait Renderable {
-    fn render(&mut self, renderer: &mut Renderer, visible_viewport: &Viewport);
+    fn render(&self, renderer: &mut Renderer);
 
     fn viewport(&self) -> Viewport;
 }
@@ -43,22 +42,31 @@ pub fn render(session: &mut Session, world: &mut World) -> Result<()> {
             return;
         }
 
+        let actors_viewport = create_actors_viewport(actors_rect);
+        let ui_viewport = create_ui_viewport(ui_rect);
+        world
+            .broadcast_actors_viewport(actors_viewport)
+            .expect("Broadcast Actors Viewport succeeds");
+        world
+            .broadcast_ui_viewport(ui_viewport)
+            .expect("Broadcast UI Viewport succeeds");
+
         render_background(frame);
         render_canvas(
             frame,
-            &mut world.actors,
+            &world.actors,
             create_actors_block(),
             world.offset,
             actors_rect,
-            create_actors_viewport(actors_rect),
+            actors_viewport,
         );
         render_canvas(
             frame,
-            &mut world.ui,
+            &world.ui,
             create_ui_block(),
             Coordinates::default(),
             ui_rect,
-            create_ui_viewport(ui_rect),
+            ui_viewport,
         );
     })?;
     Ok(())
@@ -71,7 +79,7 @@ fn render_background<B: Backend>(frame: &mut Frame<B>) {
 
 fn render_canvas<B: Backend>(
     frame: &mut Frame<B>,
-    renderables: &mut Vec<Box<dyn GameItem>>,
+    renderables: &[Box<dyn GameItem>],
     block: Block,
     offset: Coordinates,
     rect: Rect,
@@ -81,11 +89,10 @@ fn render_canvas<B: Backend>(
         return;
     }
     let mut canvas = create_canvas(block, viewport);
-    let renderables = RefCell::new(renderables);
     canvas = canvas.paint(|ctx: &mut Context| {
-        let mut renderer = Renderer::new(ctx, offset);
-        for renderable in renderables.borrow_mut().iter_mut() {
-            renderable.render(&mut renderer, &viewport);
+        let mut renderer = Renderer::new(ctx, offset, viewport);
+        for renderable in renderables.iter() {
+            renderable.render(&mut renderer);
         }
     });
     frame.render_widget(canvas, rect);

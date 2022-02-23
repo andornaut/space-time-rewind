@@ -4,7 +4,7 @@ use crate::{
         command::{Command, CommandHandler, NO_COMMANDS},
     },
     clock::ticker::TickHandler,
-    game::{game_item::GameItem, INITIAL_MAX_MISSILES},
+    game::game_item::GameItem,
     view::{
         coordinates::Coordinates, render::Renderable, renderer::Renderer, util::chars_width,
         viewport::Viewport,
@@ -16,6 +16,7 @@ use tui::{
 };
 
 const HEIGHT: u8 = 1;
+
 static TEXT_HEADER: &str = "Missiles ";
 static TEXT_CURRENT: &str = "▮";
 static TEXT_USED: &str = "▯";
@@ -38,14 +39,14 @@ impl CommandHandler for MissilesBar {
 impl Default for MissilesBar {
     fn default() -> Self {
         let coordinates = Coordinates::new(1, 1);
-        Self::new(coordinates, INITIAL_MAX_MISSILES, INITIAL_MAX_MISSILES)
+        Self::new(coordinates, 0, 0)
     }
 }
 
 impl GameItem for MissilesBar {}
 
 impl Renderable for MissilesBar {
-    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+    fn render(&self, renderer: &mut Renderer) {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::MissilesHeader);
         let current = span(self.text_current(), ColorTheme::MissilesCurrent);
         let used = span(self.text_used(), ColorTheme::MissilesLost);

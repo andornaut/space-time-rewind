@@ -76,7 +76,7 @@ impl ButtonContainer {
         self.disabled.down();
     }
 
-    pub fn render(&mut self, renderer: &mut Renderer, coordinates: Coordinates, size: ButtonSize) {
+    pub fn render(&self, renderer: &mut Renderer, coordinates: Coordinates, size: ButtonSize) {
         let color = self.button.color(self.active.on(), self.disabled.on());
         let text = self.button.text(size);
         renderer.render(coordinates, text, color);

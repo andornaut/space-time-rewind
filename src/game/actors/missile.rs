@@ -47,7 +47,7 @@ impl GameItem for Missile {
 }
 
 impl Renderable for Missile {
-    fn render<'a>(&mut self, renderer: &mut Renderer, _: &Viewport) {
+    fn render<'a>(&self, renderer: &mut Renderer) {
         renderer.render_with_offset(self.coordinates, TEXT, ColorTheme::Missile);
     }
 
@@ -57,7 +57,7 @@ impl Renderable for Missile {
 }
 
 impl TickHandler for Missile {
-    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: &Viewport) {
+    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(Frequency::Two) {
             self.coordinates.y_offset(1);
 

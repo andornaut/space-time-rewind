@@ -7,7 +7,7 @@ use crate::{
     view::{coordinates::Coordinates, viewport::Viewport},
 };
 
-pub fn initial(world_viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
+pub fn initial(world_viewport: Viewport) -> Vec<Box<dyn GameItem>> {
     let (_, y) = world_viewport.top_right();
 
     let mut actors: Vec<Box<dyn GameItem>> = vec![
@@ -21,7 +21,7 @@ pub fn initial(world_viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
     actors
 }
 
-pub fn level1(ticker: &Ticker, world_viewport: &Viewport) -> Vec<Box<dyn GameItem>> {
+pub fn level1(ticker: &Ticker, world_viewport: Viewport) -> Vec<Box<dyn GameItem>> {
     let mut actors: Vec<Box<dyn GameItem>> = Vec::new();
 
     if ticker.at(Frequency::Eight) {

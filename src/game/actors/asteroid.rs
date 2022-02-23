@@ -18,15 +18,15 @@ static TEXT_LARGE: &str = "\
 \x20\x20▟▒▒▒▓▓▓▒▒▒▓▓▓▓▓▒▓▩
 ▜▓▓▛▞▒▒▒▓▓▒▓▒▒▓▟▓▓▓▞
 ▜▓▓▒▒▓▟▛▓▛▛▓▓▛▓▛▛▓▓▞
-\x20▜▓▓▓▒▒▓▟▓▓▓▓▞▓▓▓▓▛\x20
-\x20\x20▟▒▒▒▛▟▛▒▛▒▓▓▓▓▓▓▒▓▩\x20
+\x20▜▓▓▓▒▒▓▟▓▓▓▓▞▓▓▓▓▛
+\x20\x20▟▒▒▒▛▟▛▒▛▒▓▓▓▓▓▓▒▓▩
 \x20▜▓▓▓▓▓▒▛▒▒▓▓▓▒▒▒▒▓▞
 ▩▒▓▓▓▟▟▓▓▟▟▓▓▓▟▓▓▒▒▓▛";
 static TEXT_MEDIUM: &str = "\
-\x20▟▒▒▓▩▩\x20\x20\x20
-▜▓▓▓▓▞▟▓▞\x20
+\x20▟▒▒▓▩▩
+▜▓▓▓▓▞▟▓▞
 ▜▓▓▞▟▓▓▓▓▞
-\x20▩▒▓▒▒▓▛\x20\x20";
+\x20▩▒▓▒▒▓▛";
 static TEXT_SMALL: &str = "\
 ▟▒▓▩
 ▜▓▓▞
@@ -69,8 +69,8 @@ impl AsteroidSize {
         }
     }
 
-    fn points(&self) -> u8 {
-        self.initial_hp()
+    fn points(&self) -> u32 {
+        u32::from(self.initial_hp())
     }
 
     fn text(&self) -> &'static str {
@@ -123,7 +123,7 @@ impl GameItem for Asteroid {
 }
 
 impl Renderable for Asteroid {
-    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+    fn render(&self, renderer: &mut Renderer) {
         renderer.render_with_offset(self.coordinates, self.text, self.kind.color(self.hp));
     }
 
@@ -133,7 +133,7 @@ impl Renderable for Asteroid {
 }
 
 impl TickHandler for Asteroid {
-    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: &Viewport) {
+    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(self.kind.frequency()) {
             self.coordinates.y_offset(-1);
 

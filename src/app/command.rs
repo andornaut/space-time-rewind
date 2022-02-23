@@ -1,6 +1,9 @@
 use crate::{
     game::game_item::GameItemKind,
-    view::coordinates::{Coordinates, Movement},
+    view::{
+        coordinates::{Coordinates, Movement},
+        viewport::Viewport,
+    },
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
@@ -16,12 +19,7 @@ pub trait CommandHandler {
 pub enum Command {
     Continue,
     GameOver, // Display a prompt to quit or restart
-    UpdateHealth(u8, u8),
-    UpdateMissiles(u8, u8),
-    IncreaseHealth(u8),
-    IncreaseMissiles(u8),
-    IncreaseScore(u8),
-    Quit, // Exit the application
+    Quit,     // Exit the application
     Restart,
 
     // Actors
@@ -29,15 +27,29 @@ pub enum Command {
     AddBullet(Coordinates),
     AddExplosion(Coordinates),
     AddMissile(Coordinates),
+    MoveOffset(Movement),
     MoveShip(Movement),
 
     // Button commands
     PressMissileButton,
     PressShieldsButton,
+
     // Ship commands
     FireGuns,
     FireMissile,
     FireShields,
+
+    // UI
+    IncreaseHealth(u8),
+    IncreaseMissiles(u8),
+    IncreaseScore(u32),
+    UpdateHealth(u8, u8),
+    UpdateMissiles(u8, u8),
+
+    // Viewports
+    ActorsViewportChanged(Viewport),
+    ActorsViewportInitialized(Viewport),
+    UiViewportInitializedOrChanged(Viewport),
 }
 
 impl From<KeyEvent> for Command {

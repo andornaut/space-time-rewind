@@ -11,7 +11,7 @@ use anyhow::Result;
 
 use std::{sync::mpsc, thread, time::Duration};
 
-const MAIN_LOOP_MIN_PERIOD_MS: u64 = 30;
+const MAIN_LOOP_MIN_PERIOD_MS: u64 = 20;
 const TICK_PERIOD_MS: u64 = 100;
 pub const TICKS_PER_SECOND: u16 = 1000 / TICK_PERIOD_MS as u16;
 

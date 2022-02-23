@@ -4,7 +4,7 @@ use crate::{
         command::{Command, CommandHandler, NO_COMMANDS},
     },
     clock::ticker::TickHandler,
-    game::{game_item::GameItem, INITIAL_MAX_HEALTH},
+    game::game_item::GameItem,
     view::{
         coordinates::Coordinates, render::Renderable, renderer::Renderer, util::chars_width,
         viewport::Viewport,
@@ -39,14 +39,14 @@ impl CommandHandler for HealthBar {
 impl Default for HealthBar {
     fn default() -> Self {
         let coordinates = Coordinates::new(3, 2);
-        Self::new(coordinates, INITIAL_MAX_HEALTH, INITIAL_MAX_HEALTH)
+        Self::new(coordinates, 0, 0)
     }
 }
 
 impl GameItem for HealthBar {}
 
 impl Renderable for HealthBar {
-    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+    fn render(&self, renderer: &mut Renderer) {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::HealthHeader);
         let current = span(self.text_current(), ColorTheme::HealthCurrent);
         let lost = span(self.text_lost(), ColorTheme::HealthLost);

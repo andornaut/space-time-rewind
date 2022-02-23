@@ -5,7 +5,6 @@ pub enum ColorTheme {
     Bg,
     BoardBorderFg,
     BoardTitleFg,
-    ErrorBg,
     ErrorFg,
 
     // Actors
@@ -59,8 +58,7 @@ impl From<ColorTheme> for Color {
             ColorTheme::Bg => BLACK,
             ColorTheme::BoardBorderFg => GREY,
             ColorTheme::BoardTitleFg => GREY_MEDIUM_LIGHT,
-            ColorTheme::ErrorBg => RED,
-            ColorTheme::ErrorFg => BLACK,
+            ColorTheme::ErrorFg => RED,
 
             // Actors
             ColorTheme::AsteroidHighHpLarge => Color::Rgb(120, 130, 110),

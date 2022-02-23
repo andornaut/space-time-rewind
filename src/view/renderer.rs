@@ -1,4 +1,6 @@
-use super::{coordinates::Coordinates, factory::WORLD_WIDTH, util::chars_width};
+use super::{
+    coordinates::Coordinates, factory::WORLD_WIDTH, util::chars_width, viewport::Viewport,
+};
 use crate::app::color::ColorTheme;
 use tui::{
     style::{Color, Style},
@@ -7,25 +9,32 @@ use tui::{
 };
 
 pub struct Renderer<'a, 'b> {
-    ctx: &'a mut Context<'b>,
+    context: &'a mut Context<'b>,
     offset: Coordinates,
+    viewport: Viewport,
 }
 
 impl<'a, 'b> Renderer<'a, 'b> {
-    pub fn new(ctx: &'a mut Context<'b>, offset: Coordinates) -> Self {
-        Self { ctx, offset }
+    pub fn new(context: &'a mut Context<'b>, offset: Coordinates, viewport: Viewport) -> Self {
+        Self {
+            context,
+            offset,
+            viewport,
+        }
     }
 
     pub fn render(&mut self, coordinates: Coordinates, text: &'static str, color: ColorTheme) {
+        if self.skip(coordinates) {
+            return;
+        }
+
         let style = Style::default().fg(Color::from(color));
         let (x, y) = coordinates.as_tuple();
-        let x = f64::from(x);
-        let y = f64::from(y);
-
         // Reverse the string, because it is stored top->down, but is rendered bottom->up.
         for (y_offset, line) in text.lines().rev().enumerate() {
+            let y_offset = i8::try_from(y_offset).unwrap();
             let span = Span::styled(line, style);
-            self.ctx.print(x, y + y_offset as f64, span);
+            self.print(x, y + y_offset, Spans::from(span));
         }
     }
 
@@ -36,30 +45,45 @@ impl<'a, 'b> Renderer<'a, 'b> {
         color: ColorTheme,
     ) {
         coordinates.offset(self.offset);
+        if self.skip(coordinates) {
+            return;
+        }
 
         let style = Style::default().fg(Color::from(color));
         let (x, y) = coordinates.as_tuple();
         let x_offset = x_offset(x, text);
-        let mut x = f64::from(x);
-        let y = f64::from(y);
-
+        let mut x = x;
         // Reverse the string, because it is stored top->down, but is rendered bottom->up.
         for (y_offset, line) in text.lines().rev().enumerate() {
             let mut line = line;
             if x_offset != 0 {
                 line = crop_left_offset(line, x_offset);
-                x = 0.;
+                x = 0;
             }
+            let y_offset = i8::try_from(y_offset).unwrap();
             let span = Span::styled(line, style);
-            self.ctx.print(x, y + y_offset as f64, span);
+            self.print(x, y + y_offset, Spans::from(span));
         }
     }
 
     pub fn render_spans(&mut self, coordinates: Coordinates, spans: Vec<Span<'b>>) {
+        if self.skip(coordinates) {
+            return;
+        }
+
         let (x, y) = coordinates.as_tuple();
+        self.print(x, y, Spans::from(spans));
+    }
+
+    fn print(&mut self, x: u8, y: i8, spans: Spans<'b>) {
         let x = f64::from(x);
         let y = f64::from(y);
-        self.ctx.print(x, y, Spans::from(spans));
+        self.context.print(x, y, Spans::from(spans));
+    }
+
+    fn skip(&self, coordinates: Coordinates) -> bool {
+        let (x, y) = coordinates.as_tuple();
+        x >= self.viewport.width() || y >= i8::try_from(self.viewport.height()).unwrap()
     }
 }
 

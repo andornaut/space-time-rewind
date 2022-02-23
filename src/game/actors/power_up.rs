@@ -76,7 +76,7 @@ impl GameItem for PowerUp {
 }
 
 impl Renderable for PowerUp {
-    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+    fn render(&self, renderer: &mut Renderer) {
         renderer.render_with_offset(self.coordinates, self.text, self.color);
     }
 
@@ -86,7 +86,7 @@ impl Renderable for PowerUp {
 }
 
 impl TickHandler for PowerUp {
-    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: &Viewport) {
+    fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(Frequency::Three) {
             self.coordinates.y_offset(-1);
 

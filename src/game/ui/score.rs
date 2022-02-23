@@ -29,8 +29,14 @@ pub struct Score {
 
 impl CommandHandler for Score {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
-        if let Command::IncreaseScore(number) = command {
-            self.score += u32::from(number);
+        match command {
+            Command::IncreaseScore(number) => {
+                self.score += number;
+            }
+            Command::UiViewportInitializedOrChanged(viewport) => {
+                self.align(viewport);
+            }
+            _ => (),
         }
         NO_COMMANDS
     }
@@ -44,7 +50,7 @@ impl Default for Score {
 impl GameItem for Score {}
 
 impl Renderable for Score {
-    fn render(&mut self, renderer: &mut Renderer, visible_viewport: &Viewport) {
+    fn render(&self, renderer: &mut Renderer) {
         let width = self.width();
         // One of these offsets will be 0.
         let header_offset = width - chars_width(TEXT_HEADER);
@@ -59,7 +65,6 @@ impl Renderable for Score {
             Style::default().fg(Color::from(ColorTheme::ScorePoints)),
         )];
 
-        self.align(visible_viewport); // Must `align()` before accessing `self.coordinates`
         let (x, y) = self.coordinates.as_tuple();
         renderer.render_spans(Coordinates::new(x + points_offset, y), points_spans);
         renderer.render_spans(Coordinates::new(x + header_offset, y + 1), header_spans);
@@ -80,10 +85,12 @@ impl Score {
         }
     }
 
-    fn align(&mut self, viewport: &Viewport) {
+    fn align(&mut self, viewport: Viewport) {
         let (x, _) = viewport.top_right();
         let (_, y) = viewport.bottom_left();
-        let x = x - self.width() - GUTTER_WIDTH;
+        let w = self.width();
+        let ww = w + GUTTER_WIDTH;
+        let x = x - ww;
         let y = y + i8::try_from(GUTTER_HEIGHT).unwrap();
         self.coordinates = Coordinates::new(x, y);
     }

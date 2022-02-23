@@ -11,13 +11,13 @@ use tui::{
     },
 };
 
-const ACTORS_MIN_HEIGHT: u8 = 10;
+const ACTORS_MIN_HEIGHT: u8 = 7;
 const UI_HEIGHT: u8 = 3;
 
 const MAX_HEIGHT: u8 = 40;
 const MAX_WIDTH: u8 = 100;
 pub const WINDOW_MIN_HEIGHT: u8 = ACTORS_MIN_HEIGHT + UI_HEIGHT;
-pub const WINDOW_MIN_WIDTH: u8 = 42;
+pub const WINDOW_MIN_WIDTH: u8 = 19;
 pub const WORLD_HEIGHT: u8 = MAX_HEIGHT - UI_HEIGHT - 2; // Account for the actors viewport's borders
 pub const WORLD_WIDTH: u8 = 200;
 
@@ -39,7 +39,7 @@ pub fn create_resize_warning_paragraph<'a>() -> Paragraph<'a> {
     Paragraph::new(RESIZE_WARNING_MESSAGE)
         .style(
             Style::default()
-                .bg(Color::from(ColorTheme::ErrorBg))
+                .bg(Color::from(ColorTheme::Bg))
                 .fg(Color::from(ColorTheme::ErrorFg)),
         )
         .block(block)
@@ -110,16 +110,16 @@ fn normalize(rect: Rect) -> Rect {
     normalized_rect
 }
 
-fn with_default_borders<'a>(block: Block<'a>) -> Block<'a> {
+fn with_default_borders(block: Block) -> Block {
     block
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::from(ColorTheme::BoardBorderFg)))
         .border_type(BorderType::Rounded)
 }
 
-fn with_error_borders<'a>(block: Block<'a>) -> Block<'a> {
+fn with_error_borders(block: Block) -> Block {
     block
         .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::from(ColorTheme::ErrorBg)))
+        .border_style(Style::default().fg(Color::from(ColorTheme::ErrorFg)))
         .border_type(BorderType::Rounded)
 }

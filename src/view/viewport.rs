@@ -3,7 +3,7 @@ use super::{
     factory::{WORLD_HEIGHT, WORLD_WIDTH},
 };
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Viewport {
     x: u8,
     y: i8,
@@ -110,6 +110,10 @@ impl Viewport {
         // firing a gun at x:199, after calling centered() the top-right x-position will be 201,
         // which would cause a panic
         (x, y)
+    }
+
+    pub fn height(&self) -> u8 {
+        self.height
     }
 
     pub fn width(&self) -> u8 {

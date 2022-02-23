@@ -8,10 +8,7 @@ use crate::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},
     },
-    game::{
-        game_item::{GameItem, GameItemKind},
-        INITIAL_MAX_HEALTH, INITIAL_MAX_MISSILES,
-    },
+    game::game_item::{GameItem, GameItemKind},
     view::{
         coordinates::Coordinates,
         render::Renderable,
@@ -30,6 +27,8 @@ static TEXT_SHIELDS: &str = "\
 
 const DISABLED_GUNS_COUNT: u16 = TICKS_PER_SECOND / 20; // 50 ms
 const ENABLED_SHIELDS_COUNT: u16 = TICKS_PER_SECOND * 5; // 5 seconds
+const INITIAL_MAX_HEALTH: u8 = 5;
+const INITIAL_MAX_MISSILES: u8 = 5;
 
 pub struct Ship {
     coordinates: Coordinates,
@@ -37,7 +36,7 @@ pub struct Ship {
     disabled_guns: Countdown,
     enabled_shields: Countdown,
     health: u8,
-    initialized: bool,
+    max_y: i8,
     missiles: u8,
 }
 
@@ -94,8 +93,31 @@ impl CommandHandler for Ship {
                     return vec![Command::UpdateMissiles(self.missiles, INITIAL_MAX_MISSILES)];
                 }
             }
-            Command::MoveShip(movement) => {
-                self.coordinates.movement(movement);
+            Command::MoveShip((dx, dy)) => {
+                let dx = dx * i16::from(self.width());
+                self.coordinates.movement((dx, dy));
+
+                // Don't move above the visible viewport.
+                let (x, y) = self.coordinates.as_tuple();
+                if y > self.max_y {
+                    self.coordinates = Coordinates::new(x, self.max_y);
+                }
+                return vec![Command::MoveOffset((-dx, 0))];
+            }
+            Command::ActorsViewportChanged(viewport) => {
+                self.coordinates = viewport.contained_vertically(self.viewport());
+                self.update_max_y(viewport);
+            }
+            Command::ActorsViewportInitialized(viewport) => {
+                self.coordinates = self
+                    .viewport()
+                    .with_coordinates(viewport.centered())
+                    .centered_around_bottom_left();
+                self.update_max_y(viewport);
+                return vec![
+                    Command::UpdateMissiles(INITIAL_MAX_MISSILES, INITIAL_MAX_MISSILES),
+                    Command::UpdateHealth(INITIAL_MAX_HEALTH, INITIAL_MAX_HEALTH),
+                ];
             }
             _ => (),
         }
@@ -118,16 +140,7 @@ impl GameItem for Ship {
 }
 
 impl Renderable for Ship {
-    fn render(&mut self, renderer: &mut Renderer, visible_viewport: &Viewport) {
-        if self.initialized {
-            self.coordinates = visible_viewport.contained_vertically(self.viewport());
-        } else {
-            self.initialized = true;
-            self.coordinates = self
-                .viewport()
-                .with_coordinates(visible_viewport.centered())
-                .centered_around_bottom_left();
-        }
+    fn render(&self, renderer: &mut Renderer) {
         renderer.render_with_offset(self.coordinates, self.text(), self.color());
     }
 
@@ -137,7 +150,7 @@ impl Renderable for Ship {
 }
 
 impl TickHandler for Ship {
-    fn handle_tick(&mut self, _: &Ticker, _: &Viewport) {
+    fn handle_tick(&mut self, _: &Ticker, _: Viewport) {
         self.disabled_guns.down();
 
         if self.enabled_shields.current() == 1 {
@@ -159,7 +172,7 @@ impl Ship {
             disabled_guns: Countdown::new(DISABLED_GUNS_COUNT),
             enabled_shields: Countdown::new(ENABLED_SHIELDS_COUNT),
             health: INITIAL_MAX_HEALTH,
-            initialized: false,
+            max_y: 0,
             missiles: INITIAL_MAX_MISSILES,
         }
     }
@@ -186,5 +199,11 @@ impl Ship {
 
     fn width(&self) -> u8 {
         chars_width(self.text())
+    }
+
+    fn update_max_y(&mut self, viewport: Viewport) {
+        // Save the max visible viewport y-position to constrain movement when the viewport is changed.
+        let (_, max_y) = viewport.top_right();
+        self.max_y = max_y;
     }
 }

@@ -17,14 +17,14 @@ use crate::{
 const ANIMATION_COUNT: u16 = TICKS_PER_SECOND / 10; // 100ms
 
 static TEXT_A: &str = "\
-\x20\x20\x20\x20\x20\x20
-\x20\x20▒▒\x20\x20
-\x20\x20\x20\x20\x20\x20";
+\x20
+\x20\x20▒▒
+";
 
 static TEXT_B: &str = "\
-\x20\x20░░\x20\x20
-\x20░▒▒░\x20
-\x20\x20░░\x20\x20";
+\x20\x20░░
+\x20░▒▒░
+\x20\x20░░";
 
 static TEXT_C_AND_D: &str = "\
 ░▒▒▒░
@@ -87,7 +87,7 @@ impl GameItem for Explosion {
 }
 
 impl Renderable for Explosion {
-    fn render(&mut self, renderer: &mut Renderer, _: &Viewport) {
+    fn render(&self, renderer: &mut Renderer) {
         let text = self.animation.text();
         let color = self.animation.color();
         renderer.render_with_offset(self.coordinates, text, color);
@@ -99,7 +99,7 @@ impl Renderable for Explosion {
 }
 
 impl TickHandler for Explosion {
-    fn handle_tick(&mut self, _: &Ticker, _: &Viewport) {
+    fn handle_tick(&mut self, _: &Ticker, _: Viewport) {
         if self.animation_next.off() {
             self.animation_next.restart();
             self.animation = self.animation.next();
