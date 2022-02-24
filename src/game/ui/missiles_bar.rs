@@ -16,7 +16,6 @@ use tui::{
 };
 
 const HEIGHT: u8 = 1;
-
 static TEXT_HEADER: &str = "Missiles ";
 static TEXT_CURRENT: &str = "▮";
 static TEXT_USED: &str = "▯";
@@ -50,7 +49,7 @@ impl Renderable for MissilesBar {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::MissilesHeader);
         let current = span(self.text_current(), ColorTheme::MissilesCurrent);
         let used = span(self.text_used(), ColorTheme::MissilesLost);
-        renderer.render_spans(self.coordinates, vec![header, current, used]);
+        renderer.render_spans(self.viewport(), vec![header, current, used]);
     }
 
     fn viewport(&self) -> Viewport {

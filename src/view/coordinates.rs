@@ -2,7 +2,7 @@ use super::factory::{WORLD_HEIGHT, WORLD_WIDTH};
 
 pub type Movement = (i16, i16);
 
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct Coordinates(u8, i8);
 
 impl Coordinates {
@@ -22,10 +22,6 @@ impl Coordinates {
         coordinates
     }
 
-    pub fn offset(&mut self, Coordinates(x, y): Coordinates) {
-        self.offset_((i16::from(x), i16::from(y)));
-    }
-
     pub fn movement(&mut self, (dx, dy): Movement) {
         let Coordinates(x, y) = *self;
         self.0 = wrap_x(x, dx);
@@ -33,11 +29,15 @@ impl Coordinates {
         self.validate();
     }
 
-    pub fn x_offset(&mut self, dx: i16) {
+    pub fn offset(&mut self, Coordinates(x, y): Coordinates) {
+        self.offset_((i16::from(x), i16::from(y)));
+    }
+
+    pub fn offset_x(&mut self, dx: i16) {
         self.offset_((dx, 0));
     }
 
-    pub fn y_offset(&mut self, dy: i16) {
+    pub fn offset_y(&mut self, dy: i16) {
         self.offset_((0, dy));
     }
 
@@ -54,11 +54,14 @@ impl Coordinates {
 
     fn validate(&self) {
         let Coordinates(x, y) = *self;
+
         assert!(x < WORLD_WIDTH);
 
-        // Sanity check y: Actors should be deleted once they no longer intersect vertically with the world.
+        // Actors that are spawned at the top of the WORLD_HEIGHT may have top_right() Coordinates that
+        // are a bit higher, and actors may be deleted only after dipping below y=0 by a few positions,
+        // so double the WORLD_HEIGHT in the assertion to compensate while still providing a sanity check.
         let y_abs = u8::try_from(y.abs()).unwrap();
-        assert!(y_abs <= WORLD_HEIGHT)
+        assert!(y_abs <= 2 * WORLD_HEIGHT)
     }
 }
 
@@ -90,7 +93,7 @@ mod tests {
     #[test]
     fn x_offset_wraps_left() {
         let mut coordinates = Coordinates::new(1, 1);
-        coordinates.x_offset(-2);
+        coordinates.offset_x(-2);
 
         assert_eq!(coordinates.as_tuple(), (199, 1));
     }
@@ -98,7 +101,7 @@ mod tests {
     #[test]
     fn x_offset_wraps_right() {
         let mut coordinates = Coordinates::new(1, 1);
-        coordinates.x_offset(200);
+        coordinates.offset_x(200);
 
         assert_eq!(coordinates.as_tuple(), (1, 1))
     }
@@ -106,7 +109,7 @@ mod tests {
     #[test]
     fn y_offset_goes_into_negative() {
         let mut coordinates = Coordinates::new(1, 1);
-        coordinates.y_offset(-2);
+        coordinates.offset_y(-2);
 
         assert_eq!(coordinates.as_tuple(), (1, -1))
     }

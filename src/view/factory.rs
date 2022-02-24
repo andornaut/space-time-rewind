@@ -19,7 +19,7 @@ const MAX_WIDTH: u8 = 100;
 pub const WINDOW_MIN_HEIGHT: u8 = ACTORS_MIN_HEIGHT + UI_HEIGHT;
 pub const WINDOW_MIN_WIDTH: u8 = 19;
 pub const WORLD_HEIGHT: u8 = MAX_HEIGHT - UI_HEIGHT - 2; // Account for the actors viewport's borders
-pub const WORLD_WIDTH: u8 = 200;
+pub const WORLD_WIDTH: u8 = 200; // The following must hold: WORLD_WIDTH + widest_actor < 256.
 
 static TITLE: &str = "Space-Time-Rewind!";
 static RESIZE_WARNING_MESSAGE: &str = "Please increase the size of the terminal window";
@@ -69,8 +69,9 @@ pub fn create_canvas<F>(block: Block, viewport: Viewport) -> Canvas<F>
 where
     F: Fn(&mut Context),
 {
-    let (x_min, y_min) = viewport.bottom_left();
-    let (x_max, y_max) = viewport.top_right();
+    let (x_min, y_min) = viewport.bottom_left().as_tuple();
+    let (x_max, y_max) = viewport.top_right().as_tuple();
+
     Canvas::default()
         .background_color(Color::from(ColorTheme::Bg))
         .block(block)

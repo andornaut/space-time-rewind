@@ -14,7 +14,8 @@ use crate::{
     },
 };
 
-static TEXT: &str = "  ▄\x20\x20
+static TEXT: &str = "\
+\x20 ▄ \x20
 ▟███▙
 ▀▜ ▛▀";
 
@@ -48,7 +49,7 @@ impl GameItem for Missile {
 
 impl Renderable for Missile {
     fn render<'a>(&self, renderer: &mut Renderer) {
-        renderer.render_with_offset(self.coordinates, TEXT, ColorTheme::Missile);
+        renderer.render_with_offset(self.viewport(), TEXT, ColorTheme::Missile);
     }
 
     fn viewport(&self) -> Viewport {
@@ -59,7 +60,7 @@ impl Renderable for Missile {
 impl TickHandler for Missile {
     fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(Frequency::Two) {
-            self.coordinates.y_offset(1);
+            self.coordinates.offset_y(1);
 
             if !world_viewport.intersects_vertically(self.viewport()) {
                 self.deleted = true;
@@ -73,7 +74,7 @@ impl Missile {
         // The given coordinates are relative to the center of a ship, so left-align.
         let height = chars_height(TEXT);
         let width = chars_width(TEXT);
-        coordinates.x_offset(i16::from(width) / -2);
+        coordinates.offset_x(i16::from(width) / -2);
         Self {
             coordinates,
             deleted: false,

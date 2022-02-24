@@ -17,8 +17,7 @@ use tui::{
     text::Span,
 };
 
-const GUTTER_HEIGHT: u8 = 1;
-const GUTTER_WIDTH: u8 = 1;
+const GUTTER_LENGTH: u8 = 1;
 const HEIGHT: u8 = 2;
 static TEXT_HEADER: &str = "Score";
 
@@ -41,6 +40,7 @@ impl CommandHandler for Score {
         NO_COMMANDS
     }
 }
+
 impl Default for Score {
     fn default() -> Self {
         Self::new(Coordinates::default()) // Will be re-aligned during `render()`
@@ -51,23 +51,26 @@ impl GameItem for Score {}
 
 impl Renderable for Score {
     fn render(&self, renderer: &mut Renderer) {
-        let width = self.width();
-        // One of these offsets will be 0.
-        let header_offset = width - chars_width(TEXT_HEADER);
-        let points_offset = width - chars_width(self.text().as_str());
+        let (x, y) = self.coordinates.as_tuple();
 
+        let width = self.width();
+        let header_offset = width - chars_width(TEXT_HEADER);
         let header_spans = vec![Span::styled(
             TEXT_HEADER,
             Style::default().fg(Color::from(ColorTheme::ScoreHeader)),
         )];
+        let header_coordinates = Coordinates::new(x + header_offset, y + 1);
+
+        let points_offset = width - chars_width(self.text().as_str());
         let points_spans = vec![Span::styled(
             self.text(),
             Style::default().fg(Color::from(ColorTheme::ScorePoints)),
         )];
+        let points_coordinates = Coordinates::new(x + points_offset, y);
 
-        let (x, y) = self.coordinates.as_tuple();
-        renderer.render_spans(Coordinates::new(x + points_offset, y), points_spans);
-        renderer.render_spans(Coordinates::new(x + header_offset, y + 1), header_spans);
+        let viewport = self.viewport();
+        renderer.render_spans(viewport.with_coordinates(points_coordinates), points_spans);
+        renderer.render_spans(viewport.with_coordinates(header_coordinates), header_spans);
     }
 
     fn viewport(&self) -> Viewport {
@@ -86,12 +89,10 @@ impl Score {
     }
 
     fn align(&mut self, viewport: Viewport) {
-        let (x, _) = viewport.top_right();
-        let (_, y) = viewport.bottom_left();
-        let w = self.width();
-        let ww = w + GUTTER_WIDTH;
-        let x = x - ww;
-        let y = y + i8::try_from(GUTTER_HEIGHT).unwrap();
+        let (x, _) = viewport.top_right().as_tuple();
+        let (_, y) = viewport.bottom_left().as_tuple();
+        let x = x - self.width() + GUTTER_LENGTH;
+        let y = y + i8::try_from(GUTTER_LENGTH).unwrap();
         self.coordinates = Coordinates::new(x, y);
     }
 

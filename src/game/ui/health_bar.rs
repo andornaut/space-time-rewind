@@ -50,7 +50,7 @@ impl Renderable for HealthBar {
         let header = span(TEXT_HEADER.to_string(), ColorTheme::HealthHeader);
         let current = span(self.text_current(), ColorTheme::HealthCurrent);
         let lost = span(self.text_lost(), ColorTheme::HealthLost);
-        renderer.render_spans(self.coordinates, vec![header, current, lost]);
+        renderer.render_spans(self.viewport(), vec![header, current, lost]);
     }
 
     fn viewport(&self) -> Viewport {

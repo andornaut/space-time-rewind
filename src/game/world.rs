@@ -41,25 +41,24 @@ impl Default for World {
 impl World {
     pub fn broadcast_collisions(&mut self) -> Result<()> {
         let commands = self.detect_collisions();
-        self.broadcast_commands(commands)
+        self.broadcast_commands(&commands)
     }
 
-    pub fn broadcast_commands(&mut self, commands: Vec<Command>) -> Result<()> {
-        validate_unhandled_commands(
-            commands
-                .into_iter()
-                .flat_map(|command| self.broadcast_command(command))
-                .collect(),
-        )
+    pub fn broadcast_commands(&mut self, commands: &[Command]) -> Result<()> {
+        let commands: Vec<Command> = commands
+            .iter()
+            .flat_map(|command| self.broadcast_command(*command))
+            .collect();
+        validate_unhandled_commands(&commands)
     }
 
     pub fn broadcast_actors_viewport(&mut self, viewport: Viewport) -> Result<()> {
         if let Some(previous_viewport) = self.actors_viewport {
             if previous_viewport != viewport {
-                self.broadcast_commands(vec![Command::ActorsViewportChanged(viewport)])?;
+                self.broadcast_commands(&vec![Command::ActorsViewportChanged(viewport)])?;
             }
         } else {
-            self.broadcast_commands(vec![Command::ActorsViewportInitialized(viewport)])?;
+            self.broadcast_commands(&vec![Command::ActorsViewportInitialized(viewport)])?;
         }
         self.actors_viewport = Some(viewport);
         Ok(())
@@ -110,11 +109,16 @@ impl World {
     }
 
     fn broadcast_command_to_ui(&mut self, command: Command) -> Result<()> {
-        validate_unhandled_commands(self.notify_ui_handlers(command))
+        let commands = self.notify_ui_handlers(command);
+        validate_unhandled_commands(&commands)
     }
 
     fn consumed_command(&mut self, command: Command) -> bool {
         match command {
+            Command::ActorsViewportChanged(viewport) => {
+                self.align_offset(viewport);
+                return false;
+            }
             Command::AddBullet(coordinates) => self.actors.push(Box::new(Bullet::new(coordinates))),
             Command::AddExplosion(coordinates) => {
                 self.actors.push(Box::new(Explosion::new(coordinates)))
@@ -123,10 +127,6 @@ impl World {
                 self.actors.push(Box::new(Missile::new(coordinates)))
             }
             Command::MoveOffset(movement) => self.offset.movement(movement),
-            Command::ActorsViewportChanged(viewport) => {
-                self.align_offset(viewport);
-                return false;
-            }
             Command::Restart => {
                 self.actors.clear();
                 self.offset = Coordinates::default();
@@ -142,7 +142,7 @@ impl World {
         let (x_previous, _) = self.actors_viewport.unwrap().centered().as_tuple();
         let (x_current, _) = viewport.centered().as_tuple();
         let dx = i16::from(x_current) - i16::from(x_previous);
-        self.offset.x_offset(dx);
+        self.offset.offset_x(dx);
     }
 
     fn detect_collisions(&mut self) -> Vec<Command> {
@@ -152,7 +152,7 @@ impl World {
             let left_actor = &mut left_actors[index];
             if left_actor.deleted() {
                 // Do not detect collisions on deleted actors,
-                // which occurs when the ship is moved faster than once per tick.
+                // which can occur when the ship moves faster than once per tick.
                 continue;
             }
             for right_actor in right_actors {
@@ -174,24 +174,24 @@ impl World {
         self.actors.iter_mut().chain(self.ui.iter_mut())
     }
 
-    fn notify_handlers<'a>(&mut self, command: Command) -> Vec<Command> {
+    fn notify_handlers(&mut self, command: Command) -> Vec<Command> {
         if self.consumed_command(command) {
             return NO_COMMANDS;
         }
         self.game_items_iter_mut()
-            .flat_map(|handler| handler.handle_command(command))
-            .collect()
+            .flat_map(move |handler| handler.handle_command(command))
+            .collect::<Vec<Command>>()
     }
 
-    fn notify_ui_handlers<'a>(&mut self, command: Command) -> Vec<Command> {
+    fn notify_ui_handlers(&mut self, command: Command) -> Vec<Command> {
         self.ui
             .iter_mut()
-            .flat_map(|handler| handler.handle_command(command))
-            .collect()
+            .flat_map(move |handler| handler.handle_command(command))
+            .collect::<Vec<Command>>()
     }
 }
 
-fn validate_unhandled_commands(commands: Vec<Command>) -> Result<()> {
+fn validate_unhandled_commands(commands: &[Command]) -> Result<()> {
     if commands.is_empty() {
         Ok(())
     } else {

@@ -62,14 +62,14 @@ impl CommandHandler for Ship {
                 if self.disabled_guns.off() {
                     self.disabled_guns.restart();
                     let mut coordinates = self.viewport().centered();
-                    coordinates.y_offset(1);
+                    coordinates.offset_y(1);
                     return vec![Command::AddBullet(coordinates)];
                 }
             }
             Command::FireMissile => {
                 self.missiles = self.missiles.saturating_sub(1);
                 let mut coordinates = self.viewport().centered();
-                coordinates.y_offset(1);
+                coordinates.offset_y(1);
                 return vec![
                     Command::AddMissile(coordinates),
                     Command::UpdateMissiles(self.missiles, INITIAL_MAX_MISSILES),
@@ -132,7 +132,7 @@ impl GameItem for Ship {
 
     fn kind(&self) -> GameItemKind {
         if self.enabled_shields.on() {
-            GameItemKind::ShipWithShields
+            GameItemKind::Unspecified
         } else {
             GameItemKind::Ship
         }
@@ -141,7 +141,7 @@ impl GameItem for Ship {
 
 impl Renderable for Ship {
     fn render(&self, renderer: &mut Renderer) {
-        renderer.render_with_offset(self.coordinates, self.text(), self.color());
+        renderer.render_with_offset(self.viewport(), self.text(), self.color());
     }
 
     fn viewport(&self) -> Viewport {
@@ -202,8 +202,8 @@ impl Ship {
     }
 
     fn update_max_y(&mut self, viewport: Viewport) {
-        // Save the max visible viewport y-position to constrain movement when the viewport is changed.
-        let (_, max_y) = viewport.top_right();
+        // Save the max visible viewport y-position to constrain the ship's movement.
+        let (_, max_y) = viewport.top_right().as_tuple();
         self.max_y = max_y;
     }
 }

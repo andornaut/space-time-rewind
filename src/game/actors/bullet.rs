@@ -46,7 +46,7 @@ impl GameItem for Bullet {
 
 impl Renderable for Bullet {
     fn render(&self, renderer: &mut Renderer) {
-        renderer.render_with_offset(self.coordinates, TEXT, ColorTheme::Bullet);
+        renderer.render_with_offset(self.viewport(), TEXT, ColorTheme::Bullet);
     }
 
     fn viewport(&self) -> Viewport {
@@ -57,7 +57,7 @@ impl Renderable for Bullet {
 impl TickHandler for Bullet {
     fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(Frequency::One) {
-            self.coordinates.y_offset(1);
+            self.coordinates.offset_y(1);
 
             if !world_viewport.intersects_vertically(self.viewport()) {
                 self.deleted = true;

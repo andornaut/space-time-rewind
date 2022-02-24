@@ -5,6 +5,7 @@ use crate::{
         coordinates::Coordinates,
         renderer::Renderer,
         util::{chars_height, chars_width},
+        viewport::Viewport,
     },
 };
 
@@ -79,7 +80,8 @@ impl ButtonContainer {
     pub fn render(&self, renderer: &mut Renderer, coordinates: Coordinates, size: ButtonSize) {
         let color = self.button.color(self.active.on(), self.disabled.on());
         let text = self.button.text(size);
-        renderer.render(coordinates, text, color);
+        let viewport = self.viewport(coordinates, size);
+        renderer.render(viewport, text, color);
     }
 
     pub fn height(&self, size: ButtonSize) -> u8 {
@@ -88,5 +90,9 @@ impl ButtonContainer {
 
     pub fn width(&self, size: ButtonSize) -> u8 {
         chars_width(self.button.text(size))
+    }
+
+    fn viewport(&self, coordinates: Coordinates, size: ButtonSize) -> Viewport {
+        Viewport::new_with_coordinates(self.width(size), self.height(size), coordinates)
     }
 }

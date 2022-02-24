@@ -16,7 +16,6 @@ pub enum GameItemKind {
     Bullet,
     Missile,
     Ship,
-    ShipWithShields,
 
     Unspecified,
 }

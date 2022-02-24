@@ -51,7 +51,7 @@ impl App {
             }
 
             if ticked || !commands.is_empty() {
-                self.world.broadcast_commands(commands)?;
+                self.world.broadcast_commands(&commands)?;
                 render(session, &mut self.world)?;
 
                 // A tick, command, or render can cause a collision.

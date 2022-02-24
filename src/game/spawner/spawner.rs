@@ -26,10 +26,10 @@ impl Level {
         }
     }
 
-    fn spawn(&self, ticker: &Ticker, world_viewport: Viewport) -> Vec<Box<dyn GameItem>> {
+    fn spawn(&self, ticker: &Ticker, viewport: Viewport) -> Vec<Box<dyn GameItem>> {
         match self {
-            Self::Initial => initial(world_viewport),
-            Self::Level1 => level1(ticker, world_viewport),
+            Self::Initial => initial(viewport),
+            Self::Level1 => level1(ticker, viewport),
         }
     }
 }
@@ -47,8 +47,8 @@ impl Default for Spawner {
 }
 
 impl Spawner {
-    pub fn actors(&mut self, ticker: &Ticker, world_viewport: Viewport) -> Vec<Box<dyn GameItem>> {
-        let actors = self.level.spawn(ticker, world_viewport);
+    pub fn actors(&mut self, ticker: &Ticker, viewport: Viewport) -> Vec<Box<dyn GameItem>> {
+        let actors = self.level.spawn(ticker, viewport);
         self.level.next(ticker);
         actors
     }

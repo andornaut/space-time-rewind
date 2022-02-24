@@ -18,13 +18,13 @@ const ANIMATION_COUNT: u16 = TICKS_PER_SECOND / 10; // 100ms
 
 static TEXT_A: &str = "\
 \x20
-\x20\x20▒▒
-";
+▒▒
+\x20";
 
 static TEXT_B: &str = "\
-\x20\x20░░
-\x20░▒▒░
-\x20\x20░░";
+\x20 ░░
+ ░▒▒░
+  ░░";
 
 static TEXT_C_AND_D: &str = "\
 ░▒▒▒░
@@ -90,7 +90,7 @@ impl Renderable for Explosion {
     fn render(&self, renderer: &mut Renderer) {
         let text = self.animation.text();
         let color = self.animation.color();
-        renderer.render_with_offset(self.coordinates, text, color);
+        renderer.render_with_offset(self.viewport(), text, color);
     }
 
     fn viewport(&self) -> Viewport {

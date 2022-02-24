@@ -15,18 +15,18 @@ use crate::{
 };
 
 static TEXT_LARGE: &str = "\
-\x20\x20▟▒▒▒▓▓▓▒▒▒▓▓▓▓▓▒▓▩
+\x20▟▒▒▒▓▓▓▒▒▒▓▓▓▓▓▒▓▩
 ▜▓▓▛▞▒▒▒▓▓▒▓▒▒▓▟▓▓▓▞
 ▜▓▓▒▒▓▟▛▓▛▛▓▓▛▓▛▛▓▓▞
-\x20▜▓▓▓▒▒▓▟▓▓▓▓▞▓▓▓▓▛
-\x20\x20▟▒▒▒▛▟▛▒▛▒▓▓▓▓▓▓▒▓▩
-\x20▜▓▓▓▓▓▒▛▒▒▓▓▓▒▒▒▒▓▞
+ ▜▓▓▓▒▒▓▟▓▓▓▓▞▓▓▓▓▛
+  ▟▒▒▒▛▟▛▒▛▒▓▓▓▓▓▓▒▓▩
+ ▜▓▓▓▓▓▒▛▒▒▓▓▓▒▒▒▒▓▞
 ▩▒▓▓▓▟▟▓▓▟▟▓▓▓▟▓▓▒▒▓▛";
 static TEXT_MEDIUM: &str = "\
 \x20▟▒▒▓▩▩
 ▜▓▓▓▓▞▟▓▞
 ▜▓▓▞▟▓▓▓▓▞
-\x20▩▒▓▒▒▓▛";
+ ▩▒▓▒▒▓▛";
 static TEXT_SMALL: &str = "\
 ▟▒▓▩
 ▜▓▓▞
@@ -124,7 +124,7 @@ impl GameItem for Asteroid {
 
 impl Renderable for Asteroid {
     fn render(&self, renderer: &mut Renderer) {
-        renderer.render_with_offset(self.coordinates, self.text, self.kind.color(self.hp));
+        renderer.render_with_offset(self.viewport(), self.text, self.kind.color(self.hp));
     }
 
     fn viewport(&self) -> Viewport {
@@ -135,7 +135,7 @@ impl Renderable for Asteroid {
 impl TickHandler for Asteroid {
     fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(self.kind.frequency()) {
-            self.coordinates.y_offset(-1);
+            self.coordinates.offset_y(-1);
 
             if !world_viewport.intersects_vertically(self.viewport()) {
                 self.deleted = true;

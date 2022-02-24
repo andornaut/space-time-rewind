@@ -10,7 +10,7 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 pub const NO_COMMANDS: Vec<Command> = Vec::new();
 
 pub trait CommandHandler {
-    fn handle_command(&mut self, _: Command) -> Vec<Command> {
+    fn handle_command(&mut self, _command: Command) -> Vec<Command> {
         NO_COMMANDS
     }
 }

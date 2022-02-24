@@ -57,7 +57,7 @@ pub struct PowerUp {
 impl CommandHandler for PowerUp {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         if let Command::Collide(kind) = command {
-            if let GameItemKind::Ship | GameItemKind::ShipWithShields = kind {
+            if let GameItemKind::Ship = kind {
                 self.deleted = true;
                 return match self.kind {
                     PowerUpKind::Health => vec![Command::IncreaseHealth(1)],
@@ -77,7 +77,7 @@ impl GameItem for PowerUp {
 
 impl Renderable for PowerUp {
     fn render(&self, renderer: &mut Renderer) {
-        renderer.render_with_offset(self.coordinates, self.text, self.color);
+        renderer.render_with_offset(self.viewport(), self.text, self.color);
     }
 
     fn viewport(&self) -> Viewport {
@@ -88,7 +88,7 @@ impl Renderable for PowerUp {
 impl TickHandler for PowerUp {
     fn handle_tick(&mut self, ticker: &Ticker, world_viewport: Viewport) {
         if ticker.at(Frequency::Three) {
-            self.coordinates.y_offset(-1);
+            self.coordinates.offset_y(-1);
 
             if !world_viewport.intersects_vertically(self.viewport()) {
                 self.deleted = true;

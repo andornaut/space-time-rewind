@@ -61,7 +61,7 @@ impl Renderable for ButtonPanel {
             let x = u8::try_from(i).unwrap() * (button.width(self.size) + GUTTER_WIDTH);
 
             let mut coordinates = self.coordinates.clone();
-            coordinates.x_offset(i16::from(x));
+            coordinates.offset_x(i16::from(x));
             button.render(renderer, coordinates, self.size);
         }
     }
