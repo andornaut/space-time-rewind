@@ -17,15 +17,17 @@ impl Coordinates {
         // which is useful in some cases, such as:
         //   Firing a gun from a Ship at (199, y) will attempt to add a Bullet
         //   at (200, 0), which would otherwise panic due being wider than the world.
-        let mut coordinates = Self(x, y);
-        coordinates.movement((0, 0));
-        coordinates
+        let x = wrap_x(i16::from(x));
+        let y = saturate_y(i16::from(y));
+        Self(x, y)
     }
 
     pub fn movement(&mut self, (dx, dy): Movement) {
         let Coordinates(x, y) = *self;
-        self.0 = wrap_x(x, dx);
-        self.1 = saturate_y(i16::from(y), dy);
+        let x = i16::from(x);
+        let y = i16::from(y);
+        self.0 = wrap_x(x + dx);
+        self.1 = saturate_y(y + dy);
         self.validate();
     }
 
@@ -47,26 +49,25 @@ impl Coordinates {
 
     fn offset_(&mut self, (dx, dy): (i16, i16)) {
         let Coordinates(x, _) = *self;
-        self.0 = wrap_x(x, dx);
+        let x = i16::from(x);
+        self.0 = wrap_x(x + dx);
         self.1 += i8::try_from(dy).unwrap();
         self.validate();
     }
 
     fn validate(&self) {
         let Coordinates(x, y) = *self;
-
         assert!(x < WORLD_WIDTH);
 
         // Actors that are spawned at the top of the WORLD_HEIGHT may have top_right() Coordinates that
         // are a bit higher, and actors may be deleted only after dipping below y=0 by a few positions,
         // so double the WORLD_HEIGHT in the assertion to compensate while still providing a sanity check.
         let y_abs = u8::try_from(y.abs()).unwrap();
-        assert!(y_abs <= 2 * WORLD_HEIGHT)
+        assert!(y_abs < 2 * WORLD_HEIGHT)
     }
 }
 
-fn saturate_y(y1: i16, y2: i16) -> i8 {
-    let mut y = y1 + y2;
+fn saturate_y(mut y: i16) -> i8 {
     let max_y = i16::from(WORLD_HEIGHT) - 1;
     if y.is_negative() {
         y = 0
@@ -76,8 +77,7 @@ fn saturate_y(y1: i16, y2: i16) -> i8 {
     i8::try_from(y).unwrap()
 }
 
-fn wrap_x(x1: u8, x2: i16) -> u8 {
-    let mut x = i16::from(x1) + x2;
+fn wrap_x(mut x: i16) -> u8 {
     if x.is_negative() {
         x += i16::from(WORLD_WIDTH);
     } else {

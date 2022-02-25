@@ -17,7 +17,7 @@ use tui::{
     text::Span,
 };
 
-const GUTTER_LENGTH: u8 = 1;
+const MARGIN_LEGTH: u8 = 1;
 const HEIGHT: u8 = 2;
 static TEXT_HEADER: &str = "Score";
 
@@ -91,8 +91,8 @@ impl Score {
     fn align(&mut self, viewport: Viewport) {
         let (x, _) = viewport.top_right().as_tuple();
         let (_, y) = viewport.bottom_left().as_tuple();
-        let x = x - self.width() + GUTTER_LENGTH;
-        let y = y + i8::try_from(GUTTER_LENGTH).unwrap();
+        let x = x - self.width() + 1 - MARGIN_LEGTH;
+        let y = y + i8::try_from(MARGIN_LEGTH).unwrap();
         self.coordinates = Coordinates::new(x, y);
     }
 

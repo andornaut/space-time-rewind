@@ -6,7 +6,7 @@ use crate::{
     view::{coordinates::Coordinates, render::Renderable, renderer::Renderer, viewport::Viewport},
 };
 
-const GUTTER_WIDTH: u8 = 1;
+const MARGIN_LENGTH: u8 = 1;
 const MIN_FULL_WIDTH: u8 = 58;
 
 pub struct ButtonPanel {
@@ -19,10 +19,11 @@ impl CommandHandler for ButtonPanel {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match command {
             Command::GameOver => {
+                // TODO move to world to avoid centering on viewport change?
                 self.buttons = vec![ButtonContainer::new_game_over()];
                 // Align to the top-left of the UI viewport.
                 self.coordinates =
-                    Coordinates::new(GUTTER_WIDTH, i8::try_from(GUTTER_WIDTH).unwrap());
+                    Coordinates::new(MARGIN_LENGTH, i8::try_from(MARGIN_LENGTH).unwrap());
                 return NO_COMMANDS;
             }
             Command::UiViewportInitializedOrChanged(viewport) => {
@@ -58,7 +59,7 @@ impl Renderable for ButtonPanel {
     #[allow(clippy::clone_on_copy)]
     fn render(&self, renderer: &mut Renderer) {
         for (i, button) in self.buttons.iter().enumerate() {
-            let x = u8::try_from(i).unwrap() * (button.width(self.size) + GUTTER_WIDTH);
+            let x = u8::try_from(i).unwrap() * (button.width(self.size) + MARGIN_LENGTH);
 
             let mut coordinates = self.coordinates.clone();
             coordinates.offset_x(i16::from(x));
@@ -102,7 +103,7 @@ impl ButtonPanel {
             .iter()
             .map(|button| button.width(self.size))
             .sum();
-        let number_of_gutters = u8::try_from(self.buttons.len()).unwrap() - 1;
-        buttons_width + (number_of_gutters * GUTTER_WIDTH)
+        let number_of_margins = u8::try_from(self.buttons.len()).unwrap() - 1;
+        buttons_width + (number_of_margins * MARGIN_LENGTH)
     }
 }

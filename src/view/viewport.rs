@@ -36,27 +36,35 @@ impl Viewport {
     }
 
     pub fn centered(&self) -> Coordinates {
-        let (x1, y1) = self.bottom_left().as_tuple();
-        // TODO test with x-wrapping.
-        let (x2, y2) = self.top_right().as_tuple();
-        let x1 = u16::from(x1);
-        let x2 = u16::from(x2);
-        let y1 = i16::from(y1);
-        let y2 = i16::from(y2);
-        Coordinates::new_wrapped_and_saturated(
-            u8::try_from((x1 + x2) / 2).unwrap(),
-            i8::try_from((y1 + y2) / 2).unwrap(),
-        )
+        let (x, y) = self.bottom_left().as_tuple();
+
+        // x
+        let x = u16::from(x);
+        let w = u16::from(self.width);
+        let x = u8::try_from((2 * x + w) / 2).unwrap();
+
+        // y
+        let y = i16::from(y);
+        let h = i16::from(self.height);
+        let y = i8::try_from((2 * y + h) / 2).unwrap();
+        Coordinates::new_wrapped_and_saturated(x, y)
     }
 
     pub fn centered_around_bottom_left(&self) -> Coordinates {
-        let (x1, y1) = self.bottom_left().as_tuple();
-        let mut x = i16::from(x1) - (i16::from(self.width) / 2);
+        let (x, y) = self.bottom_left().as_tuple();
+
+        // x
+        let x = i16::from(x);
+        let w = i16::from(self.width);
+        let mut x = x - (w / 2);
         if x.is_negative() {
             x += i16::from(WORLD_WIDTH);
         }
         let x = u8::try_from(x).unwrap();
-        let y = y1 - (i8::try_from(self.height).unwrap() / 2);
+
+        // y
+        let h = i8::try_from(self.height).unwrap();
+        let y = y - (h / 2);
         Coordinates::new(x, y)
     }
 
@@ -105,8 +113,8 @@ impl Viewport {
         let (_, y2) = other.bottom_left().as_tuple();
         let y1 = i16::from(y1);
         let y2 = i16::from(y2);
-        let h2 = i16::from(other.height);
         let h1 = i16::from(self.height);
+        let h2 = i16::from(other.height);
         intersects(y1, y2, h1, h2)
     }
 
@@ -149,6 +157,65 @@ fn intersects(pos_1: i16, pos_2: i16, len_1: i16, len_2: i16) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn centered_around_bottom_left_handles_no_wrap() {
+        let v = Viewport::new_with_coordinates(2, 2, Coordinates::new(2, 2));
+
+        let (x, y) = v.centered_around_bottom_left().as_tuple();
+
+        assert_eq!(x, 1);
+        assert_eq!(y, 1);
+    }
+
+    #[test]
+    fn centered_around_bottom_left_handles_x_wrapping() {
+        let v = Viewport::new_with_coordinates(2, 2, Coordinates::new(0, 0));
+
+        let (x, y) = v.centered_around_bottom_left().as_tuple();
+
+        assert_eq!(x, 199);
+        assert_eq!(y, -1);
+    }
+
+    #[test]
+    fn centered_returns_0x0_for_1_length_from_origin() {
+        let v = Viewport::new_with_coordinates(1, 1, Coordinates::new(0, 0));
+
+        let (x, y) = v.centered().as_tuple();
+
+        assert_eq!(x, 0);
+        assert_eq!(y, 0);
+    }
+
+    #[test]
+    fn centered_returns_1x1_for_2_length_from_origin() {
+        let v = Viewport::new_with_coordinates(2, 2, Coordinates::new(0, 0));
+
+        let (x, y) = v.centered().as_tuple();
+
+        assert_eq!(x, 1);
+        assert_eq!(y, 1);
+    }
+
+    #[test]
+    fn centered_handles_negative_y() {
+        let v = Viewport::new_with_coordinates(2, 2, Coordinates::new(0, -1));
+
+        let (x, y) = v.centered().as_tuple();
+
+        assert_eq!(x, 1);
+        assert_eq!(y, 0);
+    }
+    #[test]
+    fn centered_handles_x_wrapping() {
+        let v = Viewport::new_with_coordinates(2, 2, Coordinates::new(199, 0));
+
+        let (x, y) = v.centered().as_tuple();
+
+        assert_eq!(x, 0);
+        assert_eq!(y, 1);
+    }
 
     #[test]
     fn intersects_returns_true_when_overlapping() {

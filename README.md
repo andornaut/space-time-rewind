@@ -26,7 +26,7 @@ Objectives
 * [tui documentation > widgets](https://docs.rs/tui/latest/tui/widgets/index.html)
 * [tui > examples > canvas](https://github.com/fdehau/tui-rs/blob/master/examples/canvas.rs)
 
-n.b. Requires Rust from the *nightly* channel as of 1.59.0-nightly to support
+n.b. Requires Rust from the *nightly* channel as of 1.61.0-nightly to support
 [`mixed_integer_ops`](https://doc.rust-lang.org/nightly/unstable-book/library-features/mixed-integer-ops.html#mixed_integer_ops).
 
 ```

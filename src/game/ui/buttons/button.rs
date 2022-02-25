@@ -23,7 +23,7 @@ pub enum ButtonSize {
 pub trait Button {
     fn color(&self, active: bool, disabled: bool) -> ColorTheme;
 
-    fn handle_command(&mut self, _: Command) -> Option<Command> {
+    fn handle_command(&mut self, _command: Command) -> Option<Command> {
         None
     }
 

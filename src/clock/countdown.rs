@@ -39,7 +39,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn is_always_off_if_starting_from_0() {
+    fn is_always_off_when_starting_from_0() {
         let mut countdown = Countdown::new(0);
         assert!(countdown.off());
         countdown.down();

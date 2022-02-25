@@ -55,10 +55,9 @@ pub enum Command {
 impl From<KeyEvent> for Command {
     fn from(event: KeyEvent) -> Self {
         let KeyEvent { code, modifiers } = event;
-        match (code, modifiers) {
-            (KeyCode::Char('c'), KeyModifiers::CONTROL) => return Self::Quit,
-            (_, _) => (),
-        };
+        if let (KeyCode::Char('c'), KeyModifiers::CONTROL) = (code, modifiers) {
+            return Self::Quit;
+        }
         match code {
             KeyCode::Down | KeyCode::Char('s') => Self::MoveShip((0, -1)),
             KeyCode::Up | KeyCode::Char('w') => Self::MoveShip((0, 1)),

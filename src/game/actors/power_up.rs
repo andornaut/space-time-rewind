@@ -56,14 +56,12 @@ pub struct PowerUp {
 
 impl CommandHandler for PowerUp {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
-        if let Command::Collide(kind) = command {
-            if let GameItemKind::Ship = kind {
-                self.deleted = true;
-                return match self.kind {
-                    PowerUpKind::Health => vec![Command::IncreaseHealth(1)],
-                    PowerUpKind::Missile => vec![Command::IncreaseMissiles(1)],
-                };
-            }
+        if let Command::Collide(GameItemKind::Ship | GameItemKind::ShipWithShields) = command {
+            self.deleted = true;
+            return match self.kind {
+                PowerUpKind::Health => vec![Command::IncreaseHealth(1)],
+                PowerUpKind::Missile => vec![Command::IncreaseMissiles(1)],
+            };
         }
         NO_COMMANDS
     }

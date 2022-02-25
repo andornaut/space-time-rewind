@@ -55,10 +55,10 @@ impl World {
     pub fn broadcast_actors_viewport(&mut self, viewport: Viewport) -> Result<()> {
         if let Some(previous_viewport) = self.actors_viewport {
             if previous_viewport != viewport {
-                self.broadcast_commands(&vec![Command::ActorsViewportChanged(viewport)])?;
+                self.broadcast_commands(&[Command::ActorsViewportChanged(viewport)])?;
             }
         } else {
-            self.broadcast_commands(&vec![Command::ActorsViewportInitialized(viewport)])?;
+            self.broadcast_commands(&[Command::ActorsViewportInitialized(viewport)])?;
         }
         self.actors_viewport = Some(viewport);
         Ok(())

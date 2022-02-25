@@ -132,7 +132,7 @@ impl GameItem for Ship {
 
     fn kind(&self) -> GameItemKind {
         if self.enabled_shields.on() {
-            GameItemKind::Unspecified
+            GameItemKind::ShipWithShields
         } else {
             GameItemKind::Ship
         }
