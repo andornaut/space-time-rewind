@@ -19,11 +19,7 @@ impl CommandHandler for ButtonPanel {
     fn handle_command(&mut self, command: Command) -> Vec<Command> {
         match command {
             Command::GameOver => {
-                // TODO move to world to avoid centering on viewport change?
-                self.buttons = vec![ButtonContainer::new_game_over()];
-                // Align to the top-left of the UI viewport.
-                self.coordinates =
-                    Coordinates::new(MARGIN_LENGTH, i8::try_from(MARGIN_LENGTH).unwrap());
+                self.buttons.clear();
                 return NO_COMMANDS;
             }
             Command::UiViewportInitializedOrChanged(viewport) => {
@@ -94,10 +90,16 @@ impl ButtonPanel {
     }
 
     fn height(&self) -> u8 {
+        if self.buttons.is_empty() {
+            return 0;
+        }
         self.buttons[0].height(self.size) // All buttons are the same height.
     }
 
     fn width(&self) -> u8 {
+        if self.buttons.is_empty() {
+            return 0;
+        }
         let buttons_width: u8 = self
             .buttons
             .iter()

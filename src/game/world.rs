@@ -2,6 +2,7 @@ use super::{
     actors::{bullet::Bullet, explosion::Explosion, missile::Missile},
     game_item::GameItem,
     spawner::spawner::Spawner,
+    ui::game_over_alert::GameOverAlert,
 };
 use crate::{
     app::command::{Command, NO_COMMANDS},
@@ -125,6 +126,10 @@ impl World {
             }
             Command::AddMissile(coordinates) => {
                 self.actors.push(Box::new(Missile::new(coordinates)))
+            }
+            Command::GameOver => {
+                self.ui.push(Box::new(GameOverAlert::new()));
+                return false;
             }
             Command::MoveOffset(movement) => self.offset.movement(movement),
             Command::Restart => {

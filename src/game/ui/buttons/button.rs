@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-use super::{game_over::GameOverButton, missile::MissileButton, shields::ShieldsButton};
+use super::{missile::MissileButton, shields::ShieldsButton};
 
 const ACTIVE_COUNT: u16 = TICKS_PER_SECOND / 10; // 100ms
 const DISABLED_SHIELDS_COUNT: u16 = TICKS_PER_SECOND * 30; // 30 seconds
@@ -37,10 +37,6 @@ pub struct ButtonContainer {
 }
 
 impl ButtonContainer {
-    pub fn new_game_over() -> Self {
-        Self::new(Box::new(GameOverButton::default()))
-    }
-
     pub fn new_missiles() -> Self {
         Self::new(Box::new(MissileButton::default()))
     }
