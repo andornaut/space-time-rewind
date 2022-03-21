@@ -15,10 +15,8 @@ impl Countdown {
         self.current
     }
 
-    pub fn down(&mut self) -> bool {
-        let changed = self.current == 1;
+    pub fn down(&mut self) {
         self.current = self.current.saturating_sub(1);
-        changed
     }
 
     pub fn off(&self) -> bool {
