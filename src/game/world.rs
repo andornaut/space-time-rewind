@@ -1,7 +1,7 @@
 use super::{
     actors::{bullet::Bullet, explosion::Explosion, missile::Missile},
     game_item::GameItem,
-    spawner::spawner::Spawner,
+    spawner::main::Spawner,
     ui::game_over_alert::GameOverAlert,
 };
 use crate::{

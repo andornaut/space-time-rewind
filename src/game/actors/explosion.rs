@@ -1,5 +1,5 @@
 use crate::{
-    app::{app::TICKS_PER_SECOND, color::ColorTheme, command::CommandHandler},
+    app::{color::ColorTheme, command::CommandHandler, main::TICKS_PER_SECOND},
     clock::{
         countdown::Countdown,
         ticker::{TickHandler, Ticker},

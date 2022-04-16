@@ -1,8 +1,8 @@
 use crate::{
     app::{
-        app::TICKS_PER_SECOND,
         color::ColorTheme,
         command::{Command, CommandHandler, NO_COMMANDS},
+        main::TICKS_PER_SECOND,
     },
     clock::{
         countdown::Countdown,
